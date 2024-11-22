@@ -1,1 +1,1 @@
-# Commit-Reveal-Square
+# Commit-Reveal^2
