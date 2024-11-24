@@ -51,8 +51,6 @@ endif
 # 	NETWORK_ARGS := --rpc-url $(TITAN_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(TITAN_EXPLORER) -vv --legacy
 # endif
 
-deploy: deploy-commit-reveal2 deploy-consumer-example
-
 deploy-commit-reveal2:
 	@forge script script/DeployCommitReveal2.s.sol:DeployCommitReveal2 $(NETWORK_ARGS)
 
