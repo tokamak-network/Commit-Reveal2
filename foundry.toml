@@ -1,6 +1,14 @@
 [profile.default]
+optimizer = true
+optimizer_runs = 100000000 #4294967295 
+evm_version = 'paris' #'cancun'
+via_ir = true
 src = "src"
 out = "out"
 libs = ["lib"]
-
+ffi = true
+# Whether to cache builds or not
+cache = true
+fs_permissions = [{ access = "read-write", path = "./"}]
+remappings = ["@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"]
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
