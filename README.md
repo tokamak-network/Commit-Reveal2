@@ -28,6 +28,7 @@ make test
 PRIVATE_KEY=
 TITAN_SEPOLIA_URL=https://rpc.titan-sepolia.tokamak.network
 TITAN_SEPOLIA_EXPLORER=https://explorer.titan-sepolia.tokamak.network/api
+OP_MAINNET_RPC_URL=<Optimism Mainnet RPC URL>
 ```
 
 ## Deploy
