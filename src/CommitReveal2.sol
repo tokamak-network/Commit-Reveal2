@@ -242,7 +242,7 @@ contract CommitReveal2 is
         bool success = _call(
             requestInfo.consumer,
             abi.encodeWithSelector(
-                DRBConsumerBase.rawFulfillRandomWords.selector,
+                DRBConsumerBase.rawFulfillRandomNumber.selector,
                 round,
                 randomNumber
             ),

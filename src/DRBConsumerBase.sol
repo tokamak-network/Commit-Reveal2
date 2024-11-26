@@ -43,7 +43,7 @@ abstract contract DRBConsumerBase {
      * @param randomNumber the random number
      * @dev Callback function for the Coordinator to call after the request is fulfilled.  Override this function in your contract
      */
-    function fulfillRandomWords(
+    function fulfillRandomRandomNumber(
         uint256 round,
         uint256 randomNumber
     ) internal virtual;
@@ -53,7 +53,7 @@ abstract contract DRBConsumerBase {
      * @param randomNumber The random number
      * @dev Callback function for the Coordinator to call after the request is fulfilled. This function is called by the Coordinator
      */
-    function rawFulfillRandomWords(
+    function rawFulfillRandomNumber(
         uint256 requestId,
         uint256 randomNumber
     ) external {
@@ -61,6 +61,6 @@ abstract contract DRBConsumerBase {
             msg.sender == address(i_commitreveal2),
             OnlyCoordinatorCanFulfill(msg.sender, address(i_commitreveal2))
         );
-        fulfillRandomWords(requestId, randomNumber);
+        fulfillRandomRandomNumber(requestId, randomNumber);
     }
 }

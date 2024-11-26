@@ -24,7 +24,7 @@ contract ConsumerExample is DRBConsumerBase {
         requestIds.push(requestId);
     }
 
-    function fulfillRandomWords(
+    function fulfillRandomRandomNumber(
         uint256 requestId,
         uint256 hashedOmegaVal
     ) internal override {
