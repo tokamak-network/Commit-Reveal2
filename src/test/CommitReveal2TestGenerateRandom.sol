@@ -2,14 +2,14 @@
 pragma solidity ^0.8.28;
 
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
-import {OptimismL1Fees} from "./OptimismL1Fees.sol";
+import {OptimismL1Fees} from "./../OptimismL1Fees.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {DRBConsumerBase} from "./DRBConsumerBase.sol";
-import {CommitReveal2Storage} from "./CommitReveal2Storage.sol";
-import {Sort} from "./Sort.sol";
+import {DRBConsumerBase} from "./../DRBConsumerBase.sol";
+import {CommitReveal2Storage} from "./../CommitReveal2Storage.sol";
+import {Sort} from "./../Sort.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
-contract CommitReveal2 is
+contract CommitReveal2TestGenerateRandom is
     EIP712,
     Ownable,
     ReentrancyGuardTransient,
@@ -425,15 +425,7 @@ contract CommitReveal2 is
             }
             // call and return whether we succeeded. ignore return data
             // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
-            success := call(
-                callbackGasLimit,
-                target,
-                0,
-                add(data, 0x20),
-                mload(data),
-                0,
-                0
-            )
+            success := mload(add(data, 0x20))
         }
         return success;
     }

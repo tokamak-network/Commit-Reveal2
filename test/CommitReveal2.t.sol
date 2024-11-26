@@ -2,6 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {CommitReveal2} from "./../src/CommitReveal2.sol";
+import {CommitReveal2TestGenerateRandom} from "./../src/test/CommitReveal2TestGenerateRandom.sol";
 import {BaseTest} from "./shared/BaseTest.t.sol";
 import {ConsumerExample} from "./../src/ConsumerExample.sol";
 import {console2} from "forge-std/Test.sol";
@@ -23,6 +24,7 @@ interface L1Block {
 contract CommitReveal2Test is BaseTest {
     // ** Contracts
     CommitReveal2 public s_commitReveal2;
+    CommitReveal2TestGenerateRandom public s_commitReveal2TestGenerateRandom;
     ConsumerExample public s_consumerExample;
 
     // ** Constructor Parameters
@@ -108,7 +110,7 @@ contract CommitReveal2Test is BaseTest {
         return sum / data.length;
     }
 
-    function test_generateRandomNumber() public {
+    function test_all() public {
         uint256 requestTestNum = 20;
         console2.log("l2gasUsed of commitreveal2");
         console2.log("-------------------------");
@@ -155,17 +157,9 @@ contract CommitReveal2Test is BaseTest {
                 s_consumerExample.CALLBACK_GAS_LIMIT()
             );
 
-            uint256[] memory gasUsedOfRequestRandomNumber = new uint256[](
-                requestTestNum
-            );
             for (uint256 i; i < requestTestNum; i++) {
                 s_consumerExample.requestRandomNumber{value: requestFee}();
-                gasUsedOfRequestRandomNumber[i] = vm.lastCallGas().gasTotalUsed;
             }
-            console2.log(
-                "Average Gas Used of Request Random Number: ",
-                getAverage(gasUsedOfRequestRandomNumber)
-            );
 
             // *** 2. Commit^2
             // ** Generate commit, reveal1, reveal2, merkle roots
@@ -217,9 +211,6 @@ contract CommitReveal2Test is BaseTest {
             bytes32[] memory rvs = new bytes32[](requestTestNum);
             uint256[][] memory revealOrders = new uint256[][](requestTestNum);
             uint256[][] memory revealOrdersIndexs = new uint256[][](
-                requestTestNum
-            );
-            uint256[] memory gasUsedOfGenerateRandomNumber1 = new uint256[](
                 requestTestNum
             );
             for (uint256 i; i < requestTestNum; i++) {
@@ -303,9 +294,6 @@ contract CommitReveal2Test is BaseTest {
                     rs[i],
                     ss[i]
                 );
-                gasUsedOfGenerateRandomNumber1[i] = vm
-                    .lastCallGas()
-                    .gasTotalUsed;
                 (, , uint256 randomNumber) = s_consumerExample.s_requests(i);
                 assertEq(
                     uint256(
@@ -316,16 +304,6 @@ contract CommitReveal2Test is BaseTest {
                     randomNumber
                 );
             }
-            // for (uint256 i; i < requestTestNum; i++) {
-            //     console2.log(
-            //         "Gas Used of Generate Random Number: ",
-            //         gasUsedOfGenerateRandomNumber1[i]
-            //     );
-            // }
-            console2.log(
-                "Average Gas Used of Generate Random Number: ",
-                getAverage(gasUsedOfGenerateRandomNumber1)
-            );
             for (uint256 i; i < numOfOperators; i++) {
                 s_commitReveal2.deactivate(s_anvilDefaultAddresses[i]);
             }
@@ -337,7 +315,7 @@ contract CommitReveal2Test is BaseTest {
         }
     }
 
-    function test_generateRandomNumberCalldata() public {
+    function test_L1GasFeegenerateRandomNumber() public {
         string memory key = "OP_MAINNET_RPC_URL";
         string memory OP_MAINNET_RPC_URL = vm.envString(key);
         uint256 optimismFork = vm.createFork(OP_MAINNET_RPC_URL);
@@ -391,6 +369,269 @@ contract CommitReveal2Test is BaseTest {
             console2.log(
                 "l1gasFee of chainlink fulfill",
                 optimismL1FeesExternal.getL1CostWeiForCalldataSize(772)
+            );
+        }
+    }
+
+    function test_requestRandomNumber() public {
+        uint256 requestTestNum = 20;
+        console2.log("---request");
+        // *** activated Operators 2~10
+        for (
+            uint256 numOfOperators = 2;
+            numOfOperators <= s_maxActivatedOperators;
+            numOfOperators++
+        ) {
+            console2.log("Number of Operators: ", numOfOperators);
+            // *** Deploy contracts
+            s_commitReveal2 = new CommitReveal2(
+                s_activationThreshold,
+                s_flatFee,
+                s_maxActivatedOperators,
+                name,
+                version
+            );
+            (uint8 mode, ) = s_commitReveal2.getL1FeeCalculationMode();
+            if (uint256(mode) != s_l1GasCostMode) {
+                s_commitReveal2.setL1FeeCalculation(
+                    uint8(s_l1GasCostMode),
+                    100
+                );
+            }
+            s_consumerExample = new ConsumerExample(address(s_commitReveal2));
+
+            // *** Deposit And Activate
+            vm.stopPrank();
+            for (uint256 i; i < numOfOperators; i++) {
+                vm.startPrank(s_anvilDefaultAddresses[i]);
+                s_commitReveal2.deposit{value: 1000 ether}();
+                vm.stopPrank();
+            }
+            vm.startPrank(OWNER);
+            for (uint256 i; i < numOfOperators; i++) {
+                s_commitReveal2.activate(s_anvilDefaultAddresses[i]);
+            }
+
+            // *** 1. Wait For Requests
+            // ** Consumer Example Request requestTestNum times
+            uint256 requestFee = s_commitReveal2.estimateRequestPrice(
+                tx.gasprice,
+                s_consumerExample.CALLBACK_GAS_LIMIT()
+            );
+
+            uint256[] memory gasUsedOfRequestRandomNumber = new uint256[](
+                requestTestNum
+            );
+            for (uint256 i; i < requestTestNum; i++) {
+                //s_consumerExample.requestRandomNumber{value: requestFee}();
+                s_commitReveal2.requestRandomNumber{value: requestFee}(83011);
+                gasUsedOfRequestRandomNumber[i] = vm.lastCallGas().gasTotalUsed;
+            }
+            console2.log(
+                "Average Gas Used of Request Random Number: ",
+                getAverage(gasUsedOfRequestRandomNumber)
+            );
+        }
+    }
+
+    function test_generateRandomNumber() public {
+        uint256 requestTestNum = 20;
+        console2.log("l2gasUsed of commitreveal2");
+        console2.log("-------------------------");
+        // *** activated Operators 2~10
+        for (
+            uint256 numOfOperators = 2;
+            numOfOperators <= s_maxActivatedOperators;
+            numOfOperators++
+        ) {
+            console2.log("Number of Operators: ", numOfOperators);
+            // *** Deploy contracts
+            s_commitReveal2TestGenerateRandom = new CommitReveal2TestGenerateRandom(
+                s_activationThreshold,
+                s_flatFee,
+                s_maxActivatedOperators,
+                name,
+                version
+            );
+            (uint8 mode, ) = s_commitReveal2TestGenerateRandom
+                .getL1FeeCalculationMode();
+            if (uint256(mode) != s_l1GasCostMode) {
+                s_commitReveal2TestGenerateRandom.setL1FeeCalculation(
+                    uint8(s_l1GasCostMode),
+                    100
+                );
+            }
+            s_consumerExample = new ConsumerExample(
+                address(s_commitReveal2TestGenerateRandom)
+            );
+
+            // *** Deposit And Activate
+            vm.stopPrank();
+            for (uint256 i; i < numOfOperators; i++) {
+                vm.startPrank(s_anvilDefaultAddresses[i]);
+                s_commitReveal2TestGenerateRandom.deposit{value: 1000 ether}();
+                vm.stopPrank();
+            }
+            vm.startPrank(OWNER);
+            for (uint256 i; i < numOfOperators; i++) {
+                s_commitReveal2TestGenerateRandom.activate(
+                    s_anvilDefaultAddresses[i]
+                );
+            }
+
+            // *** 1. Wait For Requests
+            // ** Consumer Example Request requestTestNum times
+            uint256 requestFee = s_commitReveal2TestGenerateRandom
+                .estimateRequestPrice(
+                    tx.gasprice,
+                    s_consumerExample.CALLBACK_GAS_LIMIT()
+                );
+
+            for (uint256 i; i < requestTestNum; i++) {
+                s_consumerExample.requestRandomNumber{value: requestFee}();
+            }
+
+            // *** 2. Commit^2
+            // ** Generate commit, reveal1, reveal2, merkle roots
+            bytes32[][] memory secretValues = new bytes32[][](requestTestNum);
+            bytes32[][] memory cos = new bytes32[][](requestTestNum);
+            bytes32[][] memory cvs = new bytes32[][](requestTestNum);
+            bytes32[] memory merkleRoots = new bytes32[](requestTestNum);
+
+            for (uint256 i; i < requestTestNum; i++) {
+                secretValues[i] = new bytes32[](numOfOperators);
+                cos[i] = new bytes32[](numOfOperators);
+                cvs[i] = new bytes32[](numOfOperators);
+                for (uint256 j; j < numOfOperators; j++) {
+                    secretValues[i][j] = keccak256(
+                        abi.encodePacked(i, j, block.timestamp)
+                    );
+                    cos[i][j] = keccak256(abi.encodePacked(secretValues[i][j]));
+                    cvs[i][j] = keccak256(abi.encodePacked(cos[i][j]));
+                    mine();
+                    merkleRoots[i] = createMerkleRoot(cvs[i]);
+                }
+            }
+            // ** Submit Merkle Root
+
+            vm.stopPrank();
+            for (uint256 i; i < requestTestNum; i++) {
+                vm.startPrank(s_anvilDefaultAddresses[i % numOfOperators]);
+                s_commitReveal2TestGenerateRandom.submitMerkleRoot(
+                    i,
+                    merkleRoots[i]
+                );
+                vm.stopPrank();
+            }
+            vm.startPrank(OWNER);
+
+            // *** 3. Reveal1, calculate rv and reveal orders
+            bytes32[] memory rvs = new bytes32[](requestTestNum);
+            uint256[][] memory revealOrders = new uint256[][](requestTestNum);
+            uint256[][] memory revealOrdersIndexs = new uint256[][](
+                requestTestNum
+            );
+            uint256[] memory gasUsedOfGenerateRandomNumber1 = new uint256[](
+                requestTestNum
+            );
+            for (uint256 i; i < requestTestNum; i++) {
+                rvs[i] = keccak256(abi.encodePacked(cos[i]));
+                revealOrders[i] = new uint256[](numOfOperators);
+                revealOrdersIndexs[i] = new uint256[](numOfOperators);
+                for (uint256 j; j < numOfOperators; j++) {
+                    revealOrders[i][j] = uint256(rvs[i]) > uint256(cvs[i][j])
+                        ? uint256(rvs[i]) - uint256(cvs[i][j])
+                        : uint256(cvs[i][j]) - uint256(rvs[i]);
+                    revealOrdersIndexs[i][j] = j;
+                }
+            }
+            // ** Sort reveal orders
+            for (uint256 i; i < requestTestNum; i++) {
+                Sort.sort(revealOrders[i], revealOrdersIndexs[i]);
+            }
+
+            // *** 4. Reveal2, Broadcast
+            bytes32[][] memory secretValuesInRevealOrder = new bytes32[][](
+                requestTestNum
+            );
+            uint8[][] memory vs = new uint8[][](requestTestNum);
+            bytes32[][] memory rs = new bytes32[][](requestTestNum);
+            bytes32[][] memory ss = new bytes32[][](requestTestNum);
+            for (uint256 i; i < requestTestNum; i++) {
+                secretValuesInRevealOrder[i] = new bytes32[](numOfOperators);
+                // ** secreteValues in reveal order
+                for (uint256 j; j < numOfOperators; j++) {
+                    secretValuesInRevealOrder[i][j] = secretValues[i][
+                        revealOrdersIndexs[i][j]
+                    ];
+                }
+
+                vs[i] = new uint8[](numOfOperators);
+                rs[i] = new bytes32[](numOfOperators);
+                ss[i] = new bytes32[](numOfOperators);
+                // ** signatures
+                for (uint256 j; j < numOfOperators; j++) {
+                    bytes32 typedDataHash = keccak256(
+                        abi.encodePacked(
+                            hex"19_01",
+                            keccak256(
+                                abi.encode(
+                                    keccak256(
+                                        "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+                                    ),
+                                    nameHash,
+                                    versionHash,
+                                    block.chainid,
+                                    address(s_commitReveal2TestGenerateRandom)
+                                )
+                            ),
+                            keccak256(
+                                abi.encode(
+                                    keccak256(
+                                        "Message(uint256 round,bytes32 cv)"
+                                    ),
+                                    CommitReveal2Storage.Message({
+                                        round: i,
+                                        cv: cvs[i][j]
+                                    })
+                                )
+                            )
+                        )
+                    );
+                    (uint8 v, bytes32 r, bytes32 s) = vm.sign(
+                        s_anvilDefaultPrivateKeys[j],
+                        typedDataHash
+                    );
+                    vs[i][j] = v;
+                    rs[i][j] = r;
+                    ss[i][j] = s;
+                }
+                // ** broadcast
+                s_commitReveal2TestGenerateRandom.generateRandomNumber(
+                    i,
+                    secretValues[i],
+                    // revealOrdersIndexs[i],
+                    vs[i],
+                    rs[i],
+                    ss[i]
+                );
+                gasUsedOfGenerateRandomNumber1[i] = vm
+                    .lastCallGas()
+                    .gasTotalUsed;
+            }
+            console2.log(
+                "Average Gas Used of Generate Random Number: ",
+                getAverage(gasUsedOfGenerateRandomNumber1)
+            );
+            for (uint256 i; i < numOfOperators; i++) {
+                s_commitReveal2TestGenerateRandom.deactivate(
+                    s_anvilDefaultAddresses[i]
+                );
+            }
+            assertEq(
+                s_commitReveal2TestGenerateRandom.getActivatedOperatorsLength(),
+                0,
+                "Activated Operators Length"
             );
         }
     }
