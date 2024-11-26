@@ -90,8 +90,7 @@ contract CommitReveal2 is
         uint256 i = 1;
         s_depositAmount[owner()] += msg.value;
         do {
-            address operator = activatedOperators[i];
-            activatedOperatorOrderAtRound[operator] = i;
+            activatedOperatorOrderAtRound[activatedOperators[i]] = i;
             unchecked {
                 ++i;
             }
