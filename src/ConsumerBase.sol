@@ -9,7 +9,7 @@ import {ICommitReveal2} from "./ICommitReveal2.sol";
  * @dev Consumer contracts must inherit from VRFConsumerBase, and can
  * @dev initialize Coordinator address in their constructor as
  */
-abstract contract DRBConsumerBase {
+abstract contract ConsumerBase {
     error OnlyCoordinatorCanFulfill(address have, address want);
     error InvalidRequest(uint256 requestId);
 

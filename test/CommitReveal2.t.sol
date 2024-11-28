@@ -337,7 +337,7 @@ contract CommitReveal2Test is BaseTest {
         }
     }
 
-    function test_generateRandomNumberCalldata() public {
+    function test_L1GasFeegenerateRandomNumber() public {
         string memory key = "OP_MAINNET_RPC_URL";
         string memory OP_MAINNET_RPC_URL = vm.envString(key);
         uint256 optimismFork = vm.createFork(OP_MAINNET_RPC_URL);
