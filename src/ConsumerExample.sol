@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
-import {DRBConsumerBase} from "./DRBConsumerBase.sol";
+import {ConsumerBase} from "./ConsumerBase.sol";
 
-contract ConsumerExample is DRBConsumerBase {
+contract ConsumerExample is ConsumerBase {
     struct RequestStatus {
         bool requested; // whether the request has been made
         bool fulfilled; // whether the request has been successfully fulfilled
@@ -16,7 +16,7 @@ contract ConsumerExample is DRBConsumerBase {
     uint256[] public requestIds;
     uint32 public constant CALLBACK_GAS_LIMIT = 83011;
 
-    constructor(address coordinator) DRBConsumerBase(coordinator) {}
+    constructor(address coordinator) ConsumerBase(coordinator) {}
 
     function requestRandomNumber() external payable {
         uint256 requestId = _requestRandomNumber(CALLBACK_GAS_LIMIT);
@@ -24,7 +24,7 @@ contract ConsumerExample is DRBConsumerBase {
         requestIds.push(requestId);
     }
 
-    function fulfillRandomWords(
+    function fulfillRandomRandomNumber(
         uint256 requestId,
         uint256 hashedOmegaVal
     ) internal override {
