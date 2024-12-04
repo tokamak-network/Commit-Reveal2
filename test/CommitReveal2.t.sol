@@ -316,10 +316,10 @@ contract CommitReveal2Test is BaseTest {
     }
 
     function test_L1GasFeegenerateRandomNumber() public {
-        string memory key = "OP_MAINNET_RPC_URL";
-        string memory OP_MAINNET_RPC_URL = vm.envString(key);
-        uint256 optimismFork = vm.createFork(OP_MAINNET_RPC_URL);
-        vm.selectFork(optimismFork);
+        string memory key = "THANOS_SEPOLIA_URL";
+        string memory THANOS_SEPOLIA_URL = vm.envString(key);
+        uint256 thanosFork = vm.createFork(THANOS_SEPOLIA_URL);
+        vm.selectFork(thanosFork);
 
         L1Block l1Block = L1Block(
             address(0x4200000000000000000000000000000000000015)
