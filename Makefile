@@ -39,9 +39,6 @@ anvil :; anvil -m 'test test test test test test test test test test test junk' 
 
 NETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast --legacy --gas-limit 9999999999999999999
 
-ifeq ($(findstring --network thanossepolia,$(ARGS)), --network thanossepolia)
-	NETWORK_ARGS := --rpc-url $(THANOS_SEPOLIA_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url https://explorer.thanos-sepolia.tokamak.network/api --etherscan-api-key 11 -vv
-endif
 ifeq ($(findstring --network sepolia,$(ARGS)), --network sepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vv
 endif
@@ -50,6 +47,9 @@ ifeq ($(findstring --network opsepolia,$(ARGS)), --network opsepolia)
 endif
 ifeq ($(findstring --network titansepolia,$(ARGS)), --network titansepolia)
 	NETWORK_ARGS := --rpc-url $(TITAN_SEPOLIA_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(TITAN_SEPOLIA_EXPLORER) -vv --legacy
+endif
+ifeq ($(findstring --network thanossepolia,$(ARGS)), --network thanossepolia)
+	NETWORK_ARGS := --rpc-url $(THANOS_SEPOLIA_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) -vv
 endif
 # ifeq ($(findstring --network titan,$(ARGS)), --network titan)
 # 	NETWORK_ARGS := --rpc-url $(TITAN_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(TITAN_EXPLORER) -vv --legacy
