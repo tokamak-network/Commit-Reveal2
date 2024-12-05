@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import {OptimismL1Fees} from "./../OptimismL1Fees.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {DRBConsumerBase} from "./../DRBConsumerBase.sol";
+import {ConsumerBase} from "./../ConsumerBase.sol";
 import {CommitReveal2Storage} from "./../CommitReveal2Storage.sol";
 import {Sort} from "./../Sort.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
@@ -242,7 +242,7 @@ contract CommitReveal2TestGenerateRandom is
         bool success = _call(
             requestInfo.consumer,
             abi.encodeWithSelector(
-                DRBConsumerBase.rawFulfillRandomWords.selector,
+                ConsumerBase.rawFulfillRandomNumber.selector,
                 round,
                 randomNumber
             ),
