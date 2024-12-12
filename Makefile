@@ -55,6 +55,8 @@ endif
 # 	NETWORK_ARGS := --rpc-url $(TITAN_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(TITAN_EXPLORER) -vv --legacy
 # endif
 
+deploy: deploy-commit-reveal2 deploy-consumer-example
+
 deploy-commit-reveal2:
 	@forge script script/DeployCommitReveal2.s.sol:DeployCommitReveal2 $(NETWORK_ARGS)
 
@@ -63,11 +65,11 @@ deploy-consumer-example:
 
 verify-commitreveal2:
 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Tokamak DRB" "1") \
-	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(TITAN_SEPOLIA_EXPLORER) --rpc-url $(TITAN_SEPOLIA_URL) $(ADDRESS) CommitReveal2
+	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) CommitReveal2L2
 
 verify-consumer-example:
 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(address)" $(DRB)) \
-	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(TITAN_SEPOLIA_EXPLORER) --rpc-url $(TITAN_SEPOLIA_URL) $(ADDRESS) ConsumerExample
+	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) ConsumerExample
 
 test:
 	@forge test --gas-limit 9999999999999999999 --isolate -vv
