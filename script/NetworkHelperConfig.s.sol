@@ -135,10 +135,10 @@ contract NetworkHelperConfig is Script {
             flatFee;
         return
             NetworkConfig({
-                activationThreshold: activationThreshold,
+                activationThreshold: 0.001 ether,
                 compensateAmount: compensateAmount,
                 flatFee: flatFee,
-                l1GasCostMode: 1,
+                l1GasCostMode: 0,
                 gameExpiry: 60 * 60 * 24,
                 tonToken: IERC20(address(0)),
                 reward: 1000 ether

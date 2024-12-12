@@ -5,7 +5,7 @@ import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/Reentrancy
 import {OptimismL1Fees} from "./../OptimismL1Fees.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ConsumerBase} from "./../ConsumerBase.sol";
-import {CommitReveal2Storage} from "./../CommitReveal2Storage.sol";
+import {CommitReveal2StorageL2} from "./../CommitReveal2StorageL2.sol";
 import {Sort} from "./../Sort.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
@@ -14,7 +14,7 @@ contract CommitReveal2TestGenerateRandom is
     Ownable,
     ReentrancyGuardTransient,
     OptimismL1Fees,
-    CommitReveal2Storage
+    CommitReveal2StorageL2
 {
     constructor(
         uint256 activationThreshold,
@@ -26,8 +26,6 @@ contract CommitReveal2TestGenerateRandom is
         s_activationThreshold = activationThreshold;
         s_flatFee = flatFee;
         s_maxActivatedOperators = maxActivatedOperators;
-
-        s_activatedOperators.push(address(0));
     }
 
     function estimateRequestPrice(
@@ -59,7 +57,7 @@ contract CommitReveal2TestGenerateRandom is
             ExceedCallbackGasLimit()
         );
         uint256 activatedOperatorsLength = s_activatedOperators.length;
-        require(activatedOperatorsLength > 2, NotEnoughActivatedOperators());
+        require(activatedOperatorsLength > 1, NotEnoughActivatedOperators());
         require(
             msg.value >=
                 _calculateRequestPrice(
@@ -86,13 +84,11 @@ contract CommitReveal2TestGenerateRandom is
             storage activatedOperatorOrderAtRound = s_activatedOperatorOrderAtRound[
                 round
             ];
-
-        uint256 i = 1;
         s_depositAmount[owner()] += msg.value;
+        uint256 i;
         do {
-            activatedOperatorOrderAtRound[activatedOperators[i]] = i;
             unchecked {
-                ++i;
+                activatedOperatorOrderAtRound[activatedOperators[i - 1]] = ++i;
             }
         } while (i < activatedOperatorsLength);
         emit RandomNumberRequested(round, activatedOperators);
@@ -181,7 +177,7 @@ contract CommitReveal2TestGenerateRandom is
         // ** determine reveal order
         uint256[] memory diffs = new uint256[](secretsLength);
         uint256[] memory revealOrders = new uint256[](secretsLength);
-        for (uint256 i = 0; i < secretsLength; i = unchecked_inc(i)) {
+        for (uint256 i; i < secretsLength; i = unchecked_inc(i)) {
             diffs[i] = diff(rv, cvs[i]);
             revealOrders[i] = i;
         }
@@ -340,7 +336,7 @@ contract CommitReveal2TestGenerateRandom is
     function deactivate(address operator) external nonReentrant onlyOwner {
         uint256 activatedOperatorIndex = s_activatedOperatorOrder[operator];
         require(activatedOperatorIndex != 0, OperatorNotActivated());
-        _deactivate(activatedOperatorIndex, operator);
+        _deactivate(activatedOperatorIndex - 1, operator);
     }
 
     function deactivate(
@@ -351,7 +347,7 @@ contract CommitReveal2TestGenerateRandom is
             address operator = operators[i];
             uint256 activatedOperatorIndex = s_activatedOperatorOrder[operator];
             require(activatedOperatorIndex != 0, OperatorNotActivated());
-            _deactivate(activatedOperatorIndex, operator);
+            _deactivate(activatedOperatorIndex - 1, operator);
         }
     }
 
@@ -366,19 +362,19 @@ contract CommitReveal2TestGenerateRandom is
         if (
             activatedOperatorIndex != 0 &&
             s_depositAmount[msg.sender] < s_activationThreshold
-        ) _deactivate(activatedOperatorIndex, msg.sender);
+        ) _deactivate(activatedOperatorIndex - 1, msg.sender);
         payable(msg.sender).transfer(amount);
     }
 
     function _activate(address operator) private {
         require(s_activatedOperatorOrder[operator] == 0, AlreadyActivated());
+        s_activatedOperators.push(operator);
         uint256 activatedOperatorLength = s_activatedOperators.length;
         require(
             activatedOperatorLength <= s_maxActivatedOperators,
             ActivatedOperatorsLimitReached()
         );
         s_activatedOperatorOrder[operator] = activatedOperatorLength;
-        s_activatedOperators.push(operator);
         emit Activated(operator);
     }
 
@@ -391,7 +387,7 @@ contract CommitReveal2TestGenerateRandom is
         ];
         s_activatedOperators[activatedOperatorIndex] = lastOperator;
         s_activatedOperators.pop();
-        s_activatedOperatorOrder[lastOperator] = activatedOperatorIndex;
+        s_activatedOperatorOrder[lastOperator] = activatedOperatorIndex + 1;
         delete s_activatedOperatorOrder[operator];
         emit DeActivated(operator);
     }
@@ -400,7 +396,7 @@ contract CommitReveal2TestGenerateRandom is
         address target,
         bytes memory data,
         uint256 callbackGasLimit
-    ) private returns (bool success) {
+    ) private view returns (bool success) {
         assembly {
             let g := gas()
             // Compute g -= GAS_FOR_CALL_EXACT_CHECK and check for underflow

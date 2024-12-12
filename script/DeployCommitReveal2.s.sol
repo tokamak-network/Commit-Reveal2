@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {Script, console2} from "forge-std/Script.sol";
 
-import {CommitReveal2} from "../src/CommitReveal2.sol";
+import {CommitReveal2L2} from "../src/CommitReveal2L2.sol";
 import {console2} from "forge-std/Test.sol";
 import {NetworkHelperConfig} from "./NetworkHelperConfig.s.sol";
 
@@ -16,7 +16,7 @@ contract DeployCommitReveal2 is Script {
 
     function deployCommitReveal2UsingConfig()
         public
-        returns (CommitReveal2 commitReveal2)
+        returns (CommitReveal2L2 commitReveal2)
     {
         NetworkHelperConfig networkHelperConfig = new NetworkHelperConfig();
         (
@@ -40,9 +40,9 @@ contract DeployCommitReveal2 is Script {
         uint256 activationThreshold,
         uint256 flatFee,
         uint256 l1GasCostMode
-    ) public returns (CommitReveal2 commitReveal2) {
+    ) public returns (CommitReveal2L2 commitReveal2) {
         vm.startBroadcast();
-        commitReveal2 = new CommitReveal2(
+        commitReveal2 = new CommitReveal2L2(
             activationThreshold,
             flatFee,
             s_maxActivatedOperators,
@@ -59,8 +59,8 @@ contract DeployCommitReveal2 is Script {
         }
     }
 
-    function run() public returns (CommitReveal2 commitReveal2) {
+    function run() public returns (CommitReveal2L2 commitReveal2) {
         commitReveal2 = deployCommitReveal2UsingConfig();
-        console2.log("Deployed CommitReveal2 at:", address(commitReveal2));
+        console2.log("Deployed CommitReveal2L2 at:", address(commitReveal2));
     }
 }

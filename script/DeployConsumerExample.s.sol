@@ -10,7 +10,7 @@ contract DeployConsumerExample is Script {
 
     function run() public {
         address commitReveal2 = DevOpsTools.get_most_recent_deployment(
-            "CommitReveal2",
+            "CommitReveal2L2",
             block.chainid
         );
         vm.startBroadcast();

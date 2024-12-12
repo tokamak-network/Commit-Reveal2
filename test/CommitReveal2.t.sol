@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {CommitReveal2} from "./../src/CommitReveal2.sol";
+import {CommitReveal2L2} from "./../src/CommitReveal2L2.sol";
 import {CommitReveal2TestGenerateRandom} from "./../src/test/CommitReveal2TestGenerateRandom.sol";
 import {BaseTest} from "./shared/BaseTest.t.sol";
 import {ConsumerExample} from "./../src/ConsumerExample.sol";
 import {console2} from "forge-std/Test.sol";
 import {NetworkHelperConfig} from "./../script/NetworkHelperConfig.s.sol";
 import {Sort} from "./../src/Sort.sol";
-import {CommitReveal2Storage} from "./../src/CommitReveal2Storage.sol";
+import {CommitReveal2StorageL2} from "./../src/CommitReveal2StorageL2.sol";
 import {OptimismL1FeesExternal} from "./shared/OptimismL1FeesExternal.sol";
 
 interface L1Block {
@@ -23,7 +23,7 @@ interface L1Block {
 
 contract CommitReveal2Test is BaseTest {
     // ** Contracts
-    CommitReveal2 public s_commitReveal2;
+    CommitReveal2L2 public s_commitReveal2;
     CommitReveal2TestGenerateRandom public s_commitReveal2TestGenerateRandom;
     ConsumerExample public s_consumerExample;
 
@@ -122,7 +122,7 @@ contract CommitReveal2Test is BaseTest {
         ) {
             console2.log("Number of Operators: ", numOfOperators);
             // *** Deploy contracts
-            s_commitReveal2 = new CommitReveal2(
+            s_commitReveal2 = new CommitReveal2L2(
                 s_activationThreshold,
                 s_flatFee,
                 s_maxActivatedOperators,
@@ -156,18 +156,16 @@ contract CommitReveal2Test is BaseTest {
                 tx.gasprice,
                 s_consumerExample.CALLBACK_GAS_LIMIT()
             );
-
             for (uint256 i; i < requestTestNum; i++) {
                 s_consumerExample.requestRandomNumber{value: requestFee}();
             }
 
-            // *** 2. Commit^2
+            // *** 2. Commit
             // ** Generate commit, reveal1, reveal2, merkle roots
             bytes32[][] memory secretValues = new bytes32[][](requestTestNum);
             bytes32[][] memory cos = new bytes32[][](requestTestNum);
             bytes32[][] memory cvs = new bytes32[][](requestTestNum);
             bytes32[] memory merkleRoots = new bytes32[](requestTestNum);
-
             for (uint256 i; i < requestTestNum; i++) {
                 secretValues[i] = new bytes32[](numOfOperators);
                 cos[i] = new bytes32[](numOfOperators);
@@ -269,7 +267,7 @@ contract CommitReveal2Test is BaseTest {
                                     keccak256(
                                         "Message(uint256 round,bytes32 cv)"
                                     ),
-                                    CommitReveal2Storage.Message({
+                                    CommitReveal2StorageL2.Message({
                                         round: i,
                                         cv: cvs[i][j]
                                     })
@@ -294,7 +292,7 @@ contract CommitReveal2Test is BaseTest {
                     rs[i],
                     ss[i]
                 );
-                (, , uint256 randomNumber) = s_consumerExample.s_requests(i);
+                (, uint256 randomNumber) = s_consumerExample.s_requests(i);
                 assertEq(
                     uint256(
                         keccak256(
@@ -384,7 +382,7 @@ contract CommitReveal2Test is BaseTest {
         ) {
             console2.log("Number of Operators: ", numOfOperators);
             // *** Deploy contracts
-            s_commitReveal2 = new CommitReveal2(
+            s_commitReveal2 = new CommitReveal2L2(
                 s_activationThreshold,
                 s_flatFee,
                 s_maxActivatedOperators,
@@ -424,7 +422,7 @@ contract CommitReveal2Test is BaseTest {
             );
             for (uint256 i; i < requestTestNum; i++) {
                 //s_consumerExample.requestRandomNumber{value: requestFee}();
-                s_commitReveal2.requestRandomNumber{value: requestFee}(83011);
+                s_commitReveal2.requestRandomNumber{value: requestFee}(80000);
                 gasUsedOfRequestRandomNumber[i] = vm.lastCallGas().gasTotalUsed;
             }
             console2.log(
@@ -590,7 +588,7 @@ contract CommitReveal2Test is BaseTest {
                                     keccak256(
                                         "Message(uint256 round,bytes32 cv)"
                                     ),
-                                    CommitReveal2Storage.Message({
+                                    CommitReveal2StorageL2.Message({
                                         round: i,
                                         cv: cvs[i][j]
                                     })
