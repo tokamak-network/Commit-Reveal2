@@ -11,7 +11,6 @@ import {ICommitReveal2} from "./ICommitReveal2.sol";
  */
 abstract contract ConsumerBase {
     error OnlyCoordinatorCanFulfill(address have, address want);
-    error InvalidRequest(uint256 requestId);
 
     /// @dev The RNGCoordinator contract
     ICommitReveal2 internal immutable i_commitreveal2;
@@ -32,8 +31,12 @@ abstract contract ConsumerBase {
     function _requestRandomNumber(
         uint32 callbackGasLimit
     ) internal returns (uint256) {
+        uint256 requestFee = i_commitreveal2.estimateRequestPrice(
+            callbackGasLimit,
+            tx.gasprice
+        );
         uint256 requestId = i_commitreveal2.requestRandomNumber{
-            value: msg.value
+            value: requestFee
         }(callbackGasLimit);
         return requestId;
     }
@@ -49,18 +52,18 @@ abstract contract ConsumerBase {
     ) internal virtual;
 
     /**
-     * @param requestId The round of the randomness
+     * @param round The round of the randomness
      * @param randomNumber The random number
      * @dev Callback function for the Coordinator to call after the request is fulfilled. This function is called by the Coordinator
      */
     function rawFulfillRandomNumber(
-        uint256 requestId,
+        uint256 round,
         uint256 randomNumber
     ) external {
         require(
             msg.sender == address(i_commitreveal2),
             OnlyCoordinatorCanFulfill(msg.sender, address(i_commitreveal2))
         );
-        fulfillRandomRandomNumber(requestId, randomNumber);
+        fulfillRandomRandomNumber(round, randomNumber);
     }
 }

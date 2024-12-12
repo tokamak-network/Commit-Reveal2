@@ -40,6 +40,9 @@ contract BaseTest is Test {
         // Set msg.sender to OWNER until changePrank or stopPrank is called
         vm.startPrank(OWNER);
         vm.deal(OWNER, 10000 ether);
+        for (uint256 i; i < 10; i++) {
+            vm.deal(s_anvilDefaultAddresses[i], 10000 ether);
+        }
     }
 
     function getRandomAddresses(

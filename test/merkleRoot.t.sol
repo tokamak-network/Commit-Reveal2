@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {CommitReveal2} from "./../src/CommitReveal2.sol";
+import {CommitReveal2L2} from "./../src/CommitReveal2L2.sol";
 import {Test} from "forge-std/Test.sol";
 import {console2} from "forge-std/Test.sol";
 

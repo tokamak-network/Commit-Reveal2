@@ -12,4 +12,15 @@ interface ICommitReveal2 {
     function requestRandomNumber(
         uint32 callbackGasLimit
     ) external payable returns (uint256);
+
+    function estimateRequestPrice(
+        uint256 callbackGasLimit,
+        uint256 gasPrice
+    ) external view returns (uint256);
+
+    function estimateRequestPrice(
+        uint256 callbackGasLimit,
+        uint256 gasPrice,
+        uint256 numOfOperators
+    ) external view returns (uint256);
 }

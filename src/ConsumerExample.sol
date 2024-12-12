@@ -4,55 +4,53 @@ import {ConsumerBase} from "./ConsumerBase.sol";
 
 contract ConsumerExample is ConsumerBase {
     struct RequestStatus {
-        bool requested; // whether the request has been made
         bool fulfilled; // whether the request has been successfully fulfilled
         uint256 randomNumber;
     }
 
-    mapping(uint256 => RequestStatus)
+    mapping(address requester => uint256[] requestIds)
+        public s_requesterRequestIds;
+    mapping(uint256 requestId => RequestStatus)
         public s_requests; /* requestId --> requestStatus */
 
     // past requests Id.
-    uint256[] public requestIds;
-    uint32 public constant CALLBACK_GAS_LIMIT = 83011;
+    uint32 public constant CALLBACK_GAS_LIMIT = 80000;
 
     constructor(address coordinator) ConsumerBase(coordinator) {}
 
     function requestRandomNumber() external payable {
         uint256 requestId = _requestRandomNumber(CALLBACK_GAS_LIMIT);
-        s_requests[requestId].requested = true;
-        requestIds.push(requestId);
+        s_requesterRequestIds[msg.sender].push(requestId);
     }
 
     function fulfillRandomRandomNumber(
         uint256 requestId,
-        uint256 hashedOmegaVal
+        uint256 randomNumber
     ) internal override {
-        if (!s_requests[requestId].requested) {
-            revert InvalidRequest(requestId);
-        }
         s_requests[requestId].fulfilled = true;
-        s_requests[requestId].randomNumber = hashedOmegaVal;
+        s_requests[requestId].randomNumber = randomNumber;
     }
 
-    function getRNGCoordinator() external view returns (address) {
+    function getCommitReveal2Address() external view returns (address) {
         return address(i_commitreveal2);
     }
 
-    function getRequestStatus(
-        uint256 _requestId
-    ) external view returns (bool, bool, uint256) {
-        RequestStatus memory request = s_requests[_requestId];
-        return (request.requested, request.fulfilled, request.randomNumber);
-    }
-
-    function totalRequests() external view returns (uint256 requestCount) {
-        requestCount = requestIds.length;
-    }
-
-    function lastRequestId() external view returns (uint256 requestId) {
-        requestId = requestIds.length == 0
-            ? 0
-            : requestIds[requestIds.length - 1];
+    function getYourRequests()
+        external
+        view
+        returns (
+            uint256[] memory requestIds,
+            bool[] memory isFulFilled,
+            uint256[] memory randomNumbers
+        )
+    {
+        requestIds = s_requesterRequestIds[msg.sender];
+        isFulFilled = new bool[](requestIds.length);
+        randomNumbers = new uint256[](requestIds.length);
+        for (uint256 i = 0; i < requestIds.length; i++) {
+            RequestStatus memory request = s_requests[requestIds[i]];
+            isFulFilled[i] = request.fulfilled;
+            randomNumbers[i] = request.randomNumber;
+        }
     }
 }
