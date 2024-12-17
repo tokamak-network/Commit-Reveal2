@@ -1,0 +1,51 @@
+{
+  "gasUsed": {
+    "commitReveal2Hybrid": [
+      {
+        "numberOfOperators": 2,
+        "submitMerkleRoot": 31380,
+        "generateRandomNumber": 72318
+      },
+      {
+        "numberOfOperators": 3,
+        "submitMerkleRoot": 31380,
+        "generateRandomNumber": 82917
+      },
+      {
+        "numberOfOperators": 4,
+        "submitMerkleRoot": 31380,
+        "generateRandomNumber": 93502
+      },
+      {
+        "numberOfOperators": 5,
+        "submitMerkleRoot": 31381,
+        "generateRandomNumber": 104097
+      },
+      {
+        "numberOfOperators": 6,
+        "submitMerkleRoot": 31381,
+        "generateRandomNumber": 114679
+      },
+      {
+        "numberOfOperators": 7,
+        "submitMerkleRoot": 31380,
+        "generateRandomNumber": 125280
+      },
+      {
+        "numberOfOperators": 8,
+        "submitMerkleRoot": 31380,
+        "generateRandomNumber": 135858
+      },
+      {
+        "numberOfOperators": 9,
+        "submitMerkleRoot": 31380,
+        "generateRandomNumber": 146464
+      },
+      {
+        "numberOfOperators": 10,
+        "submitMerkleRoot": 31380,
+        "generateRandomNumber": 157048
+      }
+    ]
+  }
+}

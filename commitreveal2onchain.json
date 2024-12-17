@@ -1,0 +1,60 @@
+{
+  "gasUsed": {
+    "commitReveal2OnChain": [
+      {
+        "numberOfOperators": 2,
+        "commit": 178231,
+        "reveal1": 166483,
+        "reveal2": 224606
+      },
+      {
+        "numberOfOperators": 3,
+        "commit": 258796,
+        "reveal1": 230413,
+        "reveal2": 319411
+      },
+      {
+        "numberOfOperators": 4,
+        "commit": 339365,
+        "reveal1": 294345,
+        "reveal2": 414212
+      },
+      {
+        "numberOfOperators": 5,
+        "commit": 419933,
+        "reveal1": 358278,
+        "reveal2": 509022
+      },
+      {
+        "numberOfOperators": 6,
+        "commit": 500503,
+        "reveal1": 422210,
+        "reveal2": 603820
+      },
+      {
+        "numberOfOperators": 7,
+        "commit": 581070,
+        "reveal1": 486142,
+        "reveal2": 698632
+      },
+      {
+        "numberOfOperators": 8,
+        "commit": 661629,
+        "reveal1": 550073,
+        "reveal2": 793435
+      },
+      {
+        "numberOfOperators": 9,
+        "commit": 742196,
+        "reveal1": 614001,
+        "reveal2": 888237
+      },
+      {
+        "numberOfOperators": 10,
+        "commit": 822761,
+        "reveal1": 677937,
+        "reveal2": 983041
+      }
+    ]
+  }
+}
