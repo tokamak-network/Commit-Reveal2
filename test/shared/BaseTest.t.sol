@@ -40,23 +40,7 @@ contract BaseTest is Test {
         // Set msg.sender to OWNER until changePrank or stopPrank is called
         vm.startPrank(OWNER);
         vm.deal(OWNER, 10000 ether);
-        for (uint256 i; i < 10; i++) {
+        for (uint256 i; i < 10; i++)
             vm.deal(s_anvilDefaultAddresses[i], 10000 ether);
-        }
-    }
-
-    function getRandomAddresses(
-        uint256 from,
-        uint256 to
-    ) internal returns (address[] memory) {
-        uint256 length = to - from;
-        address[] memory addresses = new address[](length);
-        for (uint256 i = 0; i < length; ++i) {
-            addresses[i] = address(
-                uint160(uint256(keccak256(abi.encodePacked(i + from))))
-            );
-            vm.deal(addresses[i], 10000 ether);
-        }
-        return addresses;
     }
 }
