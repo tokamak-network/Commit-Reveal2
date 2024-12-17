@@ -14,11 +14,9 @@
 
 -include .env
 
-.PHONY: all test clean deploy fund help install snapshot format anvil 
+.PHONY: all test clean install snapshot format anvil 
 
 DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
-
-.PHONY: all test clean deploy fund help install snapshot format anvil 
 
 all: clean remove install update build
 
@@ -28,7 +26,9 @@ clean :; forge clean
 # Remove modules
 remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 
-install :; forge install OpenZeppelin/openzeppelin-contracts --no-commit && forge install Cyfrin/foundry-devops --no-commit
+snapshot :; forge snapshot
+
+install :; forge install OpenZeppelin/openzeppelin-contracts --no-commit
 
 # Update Dependencies
 update :; forge update
@@ -37,39 +37,5 @@ build :; forge build
 
 anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1
 
-NETWORK_ARGS := --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast --legacy --gas-limit 9999999999999999999
-
-ifeq ($(findstring --network sepolia,$(ARGS)), --network sepolia)
-	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(ETHERSCAN_API_KEY) -vv
-endif
-ifeq ($(findstring --network opsepolia,$(ARGS)), --network opsepolia)
-	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(OP_ETHERSCAN_API_KEY) -vv
-endif
-ifeq ($(findstring --network titansepolia,$(ARGS)), --network titansepolia)
-	NETWORK_ARGS := --rpc-url $(TITAN_SEPOLIA_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(TITAN_SEPOLIA_EXPLORER) -vv --legacy
-endif
-ifeq ($(findstring --network thanossepolia,$(ARGS)), --network thanossepolia)
-	NETWORK_ARGS := --rpc-url $(THANOS_SEPOLIA_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) -vv
-endif
-# ifeq ($(findstring --network titan,$(ARGS)), --network titan)
-# 	NETWORK_ARGS := --rpc-url $(TITAN_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(TITAN_EXPLORER) -vv --legacy
-# endif
-
-deploy: deploy-commit-reveal2 deploy-consumer-example
-
-deploy-commit-reveal2:
-	@forge script script/DeployCommitReveal2.s.sol:DeployCommitReveal2 $(NETWORK_ARGS)
-
-deploy-consumer-example:
-	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
-
-verify-commitreveal2:
-	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Commit Reveal2" "1") \
-	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) CommitReveal2L2
-
-verify-consumer-example:
-	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(address)" $(DRB)) \
-	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) ConsumerExample
-
 test:
-	@forge test --gas-limit 9999999999999999999 --isolate -vv
+	@forge test --gas-limit 9999999999999999999 --isolate -vvv
