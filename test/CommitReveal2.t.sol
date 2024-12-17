@@ -34,9 +34,9 @@ contract CommitReveal2Test is BaseTest {
     uint256 s_l1GasCostMode;
 
     // ** constant
-    string public name = "Tokamak DRB";
+    string public name = "Commit Reveal2";
     string public version = "1";
-    bytes32 public nameHash = keccak256(bytes(name));
+    bytes32 public nameHash = keccak256(bytes("Commit Reveal2"));
     bytes32 public versionHash = keccak256(bytes(version));
 
     function setUp() public override {

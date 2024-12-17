@@ -40,8 +40,16 @@ contract CommitReveal2L1Test is BaseTest {
         vm.roll(block.number + 10);
     }
 
+    function getAverage(uint256[] memory data) public pure returns (uint256) {
+        uint256 sum;
+        for (uint256 i; i < data.length; i++) {
+            sum += data[i];
+        }
+        return sum / data.length;
+    }
+
     function test_L1commitReveal2Gas() public {
-        uint256 requestTestNum = 20;
+        uint256 requestTestNum = 21;
         console2.log("gasUsed of commmitReveal2L1");
         console2.log("---------------------------");
         uint256 i = 0;
@@ -51,6 +59,10 @@ contract CommitReveal2L1Test is BaseTest {
             numOfOperators++
         ) {
             console2.log("Number of Operators: ", numOfOperators);
+            uint256[] memory gasUsedRequest = new uint256[](requestTestNum - 1);
+            uint256[] memory gasUsedCommit = new uint256[](requestTestNum - 1);
+            uint256[] memory gasUsedReveal1 = new uint256[](requestTestNum - 1);
+            uint256[] memory gasUsedReveal2 = new uint256[](requestTestNum - 1);
             for (
                 uint256 requestId = i++ * requestTestNum;
                 requestId < requestTestNum * i;
@@ -58,7 +70,13 @@ contract CommitReveal2L1Test is BaseTest {
             ) {
                 // ** Request Random Number
                 commitReveal2L1.requestRandomNumber{value: s_requestFee}();
-                console2.log("Request:", vm.lastCallGas().gasTotalUsed);
+                // from second request
+                if (requestId % requestTestNum != 0) {
+                    gasUsedRequest[(requestId % requestTestNum) - 1] = vm
+                        .lastCallGas()
+                        .gasTotalUsed;
+                }
+                //console2.log("Request:", vm.lastCallGas().gasTotalUsed);
 
                 // * Create secretValues, cos, cvs
                 bytes32[] memory secretValues = new bytes32[](numOfOperators);
@@ -77,12 +95,20 @@ contract CommitReveal2L1Test is BaseTest {
                     cvs[j] = keccak256(abi.encodePacked(cos[j]));
                 }
                 // ** Commit
+                uint256 sum;
                 for (uint256 j; j < numOfOperators; j++) {
                     vm.startPrank(s_anvilDefaultAddresses[j]);
                     commitReveal2L1.commit(uint256(cvs[j]));
                     vm.stopPrank();
-                    console2.log("Commit:", vm.lastCallGas().gasTotalUsed);
+                    //console2.log("Commit:", vm.lastCallGas().gasTotalUsed);
+                    if (requestId % requestTestNum != 0) {
+                        sum += vm.lastCallGas().gasTotalUsed;
+                    }
                 }
+                if (requestId % requestTestNum != 0) {
+                    gasUsedCommit[(requestId % requestTestNum) - 1] = sum;
+                }
+                sum = 0;
                 mine();
 
                 // ** Reveal1
@@ -90,8 +116,21 @@ contract CommitReveal2L1Test is BaseTest {
                     vm.startPrank(s_anvilDefaultAddresses[j]);
                     commitReveal2L1.reveal1(cos[j]);
                     vm.stopPrank();
-                    console2.log("Reveal1:", vm.lastCallGas().gasTotalUsed);
+                    if (requestId % requestTestNum != 0) {
+                        sum += vm.lastCallGas().gasTotalUsed;
+                    }
+                    // if (requestId % requestTestNum != 0) {
+                    //     gasUsedReveal1[
+                    //         ((requestId % requestTestNum) - 1) *
+                    //             numOfOperators +
+                    //             j
+                    //     ] = vm.lastCallGas().gasTotalUsed;
+                    // }
                 }
+                if (requestId % requestTestNum != 0) {
+                    gasUsedReveal1[(requestId % requestTestNum) - 1] = sum;
+                }
+                sum = 0;
                 mine();
 
                 // ** Reveal2
@@ -112,14 +151,35 @@ contract CommitReveal2L1Test is BaseTest {
                     secretValues[revealOrders[0]],
                     revealOrders
                 );
-                console2.log("FirstReveal2:", vm.lastCallGas().gasTotalUsed);
+                //console2.log("FirstReveal2:", vm.lastCallGas().gasTotalUsed);
+                if (requestId % requestTestNum != 0) {
+                    // gasUsedReveal2[
+                    //     ((requestId % requestTestNum) - 1) * numOfOperators
+                    // ] = vm.lastCallGas().gasTotalUsed;
+                    if (requestId % requestTestNum != 0) {
+                        sum += vm.lastCallGas().gasTotalUsed;
+                    }
+                }
                 vm.stopPrank();
 
                 for (uint256 j = 1; j < numOfOperators; j++) {
                     vm.startPrank(s_anvilDefaultAddresses[revealOrders[j]]);
                     commitReveal2L1.reveal2(secretValues[revealOrders[j]]);
                     vm.stopPrank();
-                    console2.log("Reveal2:", vm.lastCallGas().gasTotalUsed);
+                    //console2.log("Reveal2:", vm.lastCallGas().gasTotalUsed);
+                    if (requestId % requestTestNum != 0) {
+                        sum += vm.lastCallGas().gasTotalUsed;
+                    }
+                    // if (requestId % requestTestNum != 0) {
+                    //     gasUsedReveal2[
+                    //         ((requestId % requestTestNum) - 1) *
+                    //             numOfOperators +
+                    //             j
+                    //     ] = vm.lastCallGas().gasTotalUsed;
+                    // }
+                }
+                if (requestId % requestTestNum != 0) {
+                    gasUsedReveal2[(requestId % requestTestNum) - 1] = sum;
                 }
 
                 // ** Assert
@@ -135,6 +195,14 @@ contract CommitReveal2L1Test is BaseTest {
                 uint256 randomNum = commitReveal2L1.s_randomNum(requestId + 1);
                 assertEq(calculatedRandomNum, randomNum);
             }
+            console2.log("Request:");
+            console2.log("Average:", getAverage(gasUsedRequest));
+            console2.log("Commit:");
+            console2.log("Average:", getAverage(gasUsedCommit));
+            console2.log("Reveal1:");
+            console2.log("Average:", getAverage(gasUsedReveal1));
+            console2.log("Reveal2:");
+            console2.log("Average:", getAverage(gasUsedReveal2));
         }
     }
 }

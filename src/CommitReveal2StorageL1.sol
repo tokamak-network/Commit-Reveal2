@@ -18,9 +18,6 @@ contract CommitReveal2StorageL1 {
     error Reveal2PhaseNotStarted();
     error StillInProgress();
 
-    // *** Events
-    event RandomNumberRequested();
-
     // *** State Variables
     // ** public
     // * service variables
@@ -28,8 +25,8 @@ contract CommitReveal2StorageL1 {
     mapping(address operator => uint256 depositAmount) public s_depositAmount;
 
     // * protocol variables
-    uint256 public s_activationThreshold;
-    uint256 public s_activatedNum;
+    uint256 public s_d;
+    uint256 public s_canParticipateNum;
     uint256[] public s_cvs;
     bytes32[] public s_cos;
     bytes32[] public s_secrets;

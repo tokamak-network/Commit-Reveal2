@@ -43,7 +43,11 @@ contract CommitReveal2StorageL2 {
     event DeActivated(address operator);
     event RandomNumberRequested(uint256 round, address[] activatedOperators);
     event MerkleRootSubmitted(uint256 round, bytes32 merkleRoot);
-    event RandomNumberGenerated(uint256 round, uint256 randomNumber);
+    event RandomNumberGenerated(
+        uint256 round,
+        uint256 randomNumber,
+        address[] participatedOperators
+    );
 
     // * State Variables
     // ** public

@@ -6,12 +6,12 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CommitReveal2L1 is Ownable, CommitReveal2StorageL1 {
     constructor(
-        uint256 activationThreshold,
+        uint256 d,
         uint256 requestFee,
         uint256 commitDuration,
         uint256 reveal1Duration
     ) Ownable(msg.sender) {
-        s_activationThreshold = activationThreshold;
+        s_d = d;
         s_requestFee = requestFee;
         s_commitDuration = commitDuration;
         s_commitReveal1Duration = commitDuration + reveal1Duration;
@@ -19,7 +19,7 @@ contract CommitReveal2L1 is Ownable, CommitReveal2StorageL1 {
 
     // *** For Consumers
     function requestRandomNumber() external payable {
-        require(s_activatedNum > 1, NotEnoughActivatedOperators());
+        require(s_canParticipateNum > 1, NotEnoughActivatedOperators());
         require(msg.value >= s_requestFee, InsufficientAmount());
         require(s_secrets.length == s_cvs.length, StillInProgress());
         s_depositAmount[owner()] += msg.value;
@@ -33,7 +33,6 @@ contract CommitReveal2L1 is Ownable, CommitReveal2StorageL1 {
         delete s_secrets;
         delete s_revealOrders;
         s_isRevealPhase = false;
-        emit RandomNumberRequested();
     }
 
     // *** For Operators
@@ -41,7 +40,7 @@ contract CommitReveal2L1 is Ownable, CommitReveal2StorageL1 {
         mapping(address operator => uint256 commitOrder)
             storage commitOrders = s_commitOrders[s_requestId];
         require(
-            s_depositAmount[msg.sender] >= s_activationThreshold,
+            s_depositAmount[msg.sender] >= s_d,
             DepositLessThanActivationThreshold()
         );
         require(commitOrders[msg.sender] == 0, AlreadyCommitted());
@@ -122,25 +121,23 @@ contract CommitReveal2L1 is Ownable, CommitReveal2StorageL1 {
 
     function deposit() external payable {
         uint256 depositAmount = s_depositAmount[msg.sender];
-        uint256 activationThreshold = s_activationThreshold;
+        uint256 d = s_d;
         unchecked {
             if (
-                (s_depositAmount[msg.sender] += msg.value) >=
-                activationThreshold &&
-                depositAmount < activationThreshold
-            ) ++s_activatedNum;
+                (s_depositAmount[msg.sender] += msg.value) >= d &&
+                depositAmount < d
+            ) ++s_canParticipateNum;
         }
     }
 
     function withdraw(uint256 amount) external {
         uint256 depositAmount = s_depositAmount[msg.sender];
-        uint256 activationThreshold = s_activationThreshold;
+        uint256 d = s_d;
         unchecked {
             if (
-                (s_depositAmount[msg.sender] -= amount) <
-                s_activationThreshold &&
-                depositAmount >= activationThreshold
-            ) --s_activatedNum;
+                (s_depositAmount[msg.sender] -= amount) < s_d &&
+                depositAmount >= d
+            ) --s_canParticipateNum;
         }
         payable(msg.sender).transfer(amount);
     }

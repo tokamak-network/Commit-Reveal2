@@ -199,6 +199,7 @@ contract CommitReveal2L2 is
             storage activatedOperatorOrderAtRound = s_activatedOperatorOrderAtRound[
                 round
             ];
+        address[] memory participatedOperators = new address[](secretsLength);
         for (uint256 i; i < secretsLength; i = unchecked_inc(i)) {
             // signature malleability prevention
             require(
@@ -206,22 +207,22 @@ contract CommitReveal2L2 is
                     0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
                 InvalidSignatureS()
             );
-            require(
-                activatedOperatorOrderAtRound[
-                    ecrecover(
-                        _hashTypedDataV4(
-                            keccak256(
-                                abi.encode(
-                                    MESSAGE_TYPEHASH,
-                                    Message({round: round, cv: leaves[i]})
-                                )
-                            )
-                        ),
-                        vs[i],
-                        rs[i],
-                        ss[i]
+            address recoveredAddress = ecrecover(
+                _hashTypedDataV4(
+                    keccak256(
+                        abi.encode(
+                            MESSAGE_TYPEHASH,
+                            Message({round: round, cv: leaves[i]})
+                        )
                     )
-                ] > 0,
+                ),
+                vs[i],
+                rs[i],
+                ss[i]
+            );
+            participatedOperators[i] = recoveredAddress;
+            require(
+                activatedOperatorOrderAtRound[recoveredAddress] > 0,
                 InvalidSignature()
             );
         }
@@ -245,7 +246,7 @@ contract CommitReveal2L2 is
             requestInfo.callbackGasLimit
         );
         roundInfo.fulfillSucceeded = success;
-        emit RandomNumberGenerated(round, randomNumber);
+        emit RandomNumberGenerated(round, randomNumber, participatedOperators);
     }
 
     function getMessageHash(

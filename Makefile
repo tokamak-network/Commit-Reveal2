@@ -64,7 +64,7 @@ deploy-consumer-example:
 	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
 
 verify-commitreveal2:
-	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Tokamak DRB" "1") \
+	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Commit Reveal2" "1") \
 	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) CommitReveal2L2
 
 verify-consumer-example:
