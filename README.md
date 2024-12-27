@@ -37,7 +37,7 @@ THANOS_SEPOLIA_EXPLORER=https://explorer.titan-sepolia.tokamak.network/api
 ```
 
 You can deploy by setting up an .env file for the network you want to deploy to and referring to the script below.
-The command below will deploy and verify two contracts, CommitReveal2 and ConsumerExample.
+The command below will deploy and verify two contracts, CommitReveal2 and ConsumerExample.
 
 ```
 make deploy ARGS="--network thanossepolia"
