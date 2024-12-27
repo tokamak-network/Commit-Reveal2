@@ -16,36 +16,31 @@ make install
 make build
 ```
 
-## Set .env
-
-```
-PRIVATE_KEY=
-TITAN_SEPOLIA_URL=https://rpc.titan-sepolia.tokamak.network
-TITAN_SEPOLIA_EXPLORER=https://explorer.titan-sepolia.tokamak.network/api
-OP_MAINNET_RPC_URL=<Optimism Mainnet RPC URL>
-```
-
 ## Test
 
 ```
 make test
 ```
 
-## Deploy
+## Deploy and Verify on Explorer
 
-The evm_version is set to “paris” for the Titan network. Deploy CommitReveal2 and ConsumerExample contracts to Titan-Sepolia for testing.
-
-```
-make deploy-commit-reveal2 ARGS="--network titansepolia"
-make deploy-consumer-example ARGS="--network titansepolia"
-```
-
-## Verify on Blockscout
+### Set .env
 
 ```
-make verify-commitreveal2 ADDRESS="<address>"
-// eg. make verify-commitreveal2 ADDRESS="0x898FBed6452ed884954544CA93753bd5f974a459"
+PRIVATE_KEY=<Private Key>
+ETHERSCAN_API_KEY=<Etherscan API Key>
+SEPOLIA_RPC_URL=<Sepolia RPC URL>
+OP_SEPOLIA_RPC_URL=<Optimism Sepolia RPC URL>
+OP_ETHERSCAN_API_KEY=<Optimism Etherscan API Key>
+THANOS_SEPOLIA_URL=https://rpc.titan-sepolia.tokamak.network
+THANOS_SEPOLIA_EXPLORER=https://explorer.titan-sepolia.tokamak.network/api
+```
 
-make verify-consumer-example DRB="<commitreveal2Address>" ADDRESS="<consumerExampleAddress>"
-// eg.  make verify-consumer-example DRB="0x898FBed6452ed884954544CA93753bd5f974a459" ADDRESS="0xCf2A4d6FC95172FcF44221fB06592ffe49492F89"
+You can deploy by setting up an .env file for the network you want to deploy to and referring to the script below.
+The command below will deploy and verify two contracts, CommitReveal2 and ConsumerExample.
+
+```
+make deploy ARGS="--network thanossepolia"
+make deploy ARGS="--network opsepolia"
+make deploy ARGS="--network sepolia"
 ```
