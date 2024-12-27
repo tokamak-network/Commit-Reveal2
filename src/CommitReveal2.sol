@@ -2,14 +2,14 @@
 pragma solidity ^0.8.28;
 
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
-import {OptimismL1Fees} from "./../OptimismL1Fees.sol";
+import {OptimismL1Fees} from "./OptimismL1Fees.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ConsumerBase} from "./../ConsumerBase.sol";
-import {CommitReveal2Storage} from "./../CommitReveal2Storage.sol";
-import {Sort} from "./../Sort.sol";
+import {ConsumerBase} from "./ConsumerBase.sol";
+import {CommitReveal2Storage} from "./CommitReveal2Storage.sol";
+import {Sort} from "./Sort.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
-contract CommitReveal2TestGenerateRandom is
+contract CommitReveal2 is
     EIP712,
     Ownable,
     ReentrancyGuardTransient,
@@ -397,7 +397,7 @@ contract CommitReveal2TestGenerateRandom is
         address target,
         bytes memory data,
         uint256 callbackGasLimit
-    ) private view returns (bool success) {
+    ) private returns (bool success) {
         assembly {
             let g := gas()
             // Compute g -= GAS_FOR_CALL_EXACT_CHECK and check for underflow
@@ -422,7 +422,15 @@ contract CommitReveal2TestGenerateRandom is
             }
             // call and return whether we succeeded. ignore return data
             // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
-            success := mload(add(data, 0x20))
+            success := call(
+                callbackGasLimit,
+                target,
+                0,
+                add(data, 0x20),
+                mload(data),
+                0,
+                0
+            )
         }
         return success;
     }
