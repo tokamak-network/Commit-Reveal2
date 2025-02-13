@@ -67,7 +67,7 @@ deploy-consumer-example:
 
 verify-commitreveal2:
 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Commit Reveal2" "1") \
-	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) CommitReveal2L2
+	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) CommitReveal2
 
 verify-consumer-example:
 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(address)" $(DRB)) \

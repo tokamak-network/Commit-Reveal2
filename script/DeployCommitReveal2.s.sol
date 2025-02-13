@@ -38,6 +38,13 @@ contract DeployCommitReveal2 is Script {
         uint256 flatFee,
         uint256 l1GasCostMode
     ) public returns (CommitReveal2 commitReveal2) {
+        console2.log("Args...");
+        console2.log("activationThreshold:", activationThreshold);
+        console2.log("flatFee:", flatFee);
+        console2.log("maxActivatedOperators:", s_maxActivatedOperators);
+        console2.log("name:", name);
+        console2.log("version:", version);
+
         vm.startBroadcast();
         commitReveal2 = new CommitReveal2(
             activationThreshold,
@@ -47,6 +54,7 @@ contract DeployCommitReveal2 is Script {
             version
         );
         vm.stopBroadcast();
+
         (uint8 mode, ) = commitReveal2.getL1FeeCalculationMode();
         if (uint256(mode) != l1GasCostMode) {
             vm.startBroadcast();
