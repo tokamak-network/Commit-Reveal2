@@ -28,7 +28,7 @@ remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gi
 
 snapshot :; forge snapshot
 
-install :; forge install OpenZeppelin/openzeppelin-contracts --no-commit
+install :; forge install OpenZeppelin/openzeppelin-contracts --no-commit && forge install Cyfrin/foundry-devops --no-commit
 
 # Update Dependencies
 update :; forge update
