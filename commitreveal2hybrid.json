@@ -4,47 +4,47 @@
       {
         "numberOfOperators": 2,
         "submitMerkleRoot": 31380,
-        "generateRandomNumber": 72318
+        "generateRandomNumber": 69352
       },
       {
         "numberOfOperators": 3,
         "submitMerkleRoot": 31380,
-        "generateRandomNumber": 82917
+        "generateRandomNumber": 78685
       },
       {
         "numberOfOperators": 4,
         "submitMerkleRoot": 31380,
-        "generateRandomNumber": 93502
+        "generateRandomNumber": 88060
       },
       {
         "numberOfOperators": 5,
         "submitMerkleRoot": 31381,
-        "generateRandomNumber": 104097
+        "generateRandomNumber": 97402
       },
       {
         "numberOfOperators": 6,
         "submitMerkleRoot": 31381,
-        "generateRandomNumber": 114679
+        "generateRandomNumber": 106761
       },
       {
         "numberOfOperators": 7,
         "submitMerkleRoot": 31380,
-        "generateRandomNumber": 125280
+        "generateRandomNumber": 116122
       },
       {
         "numberOfOperators": 8,
         "submitMerkleRoot": 31380,
-        "generateRandomNumber": 135858
+        "generateRandomNumber": 125478
       },
       {
         "numberOfOperators": 9,
         "submitMerkleRoot": 31380,
-        "generateRandomNumber": 146464
+        "generateRandomNumber": 134821
       },
       {
         "numberOfOperators": 10,
         "submitMerkleRoot": 31380,
-        "generateRandomNumber": 157048
+        "generateRandomNumber": 144189
       }
     ]
   }
