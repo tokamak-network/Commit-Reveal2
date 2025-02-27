@@ -117,8 +117,16 @@ contract CommitReveal2Test is BaseTest, Utils {
                 bytes32 rv = keccak256(abi.encodePacked(cos));
                 for (uint256 j; j < numOfOperators; j++) {
                     dis[j] = rv > cvs[j]
-                        ? uint256(rv) - uint256(cvs[j])
-                        : uint256(cvs[j]) - uint256(rv);
+                        ? uint256(
+                            keccak256(
+                                abi.encodePacked(uint256(rv) - uint256(cvs[j]))
+                            )
+                        )
+                        : uint256(
+                            keccak256(
+                                abi.encodePacked(uint256(cvs[j]) - uint256(rv))
+                            )
+                        );
                     revealOrders[j] = j;
                 }
                 QuickSort.sort(dis, revealOrders);

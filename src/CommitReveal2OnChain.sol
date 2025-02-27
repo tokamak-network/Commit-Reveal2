@@ -109,8 +109,8 @@ contract CommitReveal2OnChain is Ownable {
         uint256 commitLength = s_cvs.length;
         for (uint256 i = 1; i < commitLength; i = unchecked_inc(i)) {
             require(
-                diff(rv, s_cvs[revealOrders[i - 1]]) <
-                    diff(rv, s_cvs[revealOrders[i]]),
+                efficientKeccak256(diff(rv, s_cvs[revealOrders[i - 1]])) >
+                    efficientKeccak256(diff(rv, s_cvs[revealOrders[i]])),
                 RevealNotInAscendingOrder()
             );
         }
@@ -150,6 +150,15 @@ contract CommitReveal2OnChain is Ownable {
 
     function diff(uint256 a, uint256 b) private pure returns (uint256) {
         return a > b ? a - b : b - a;
+    }
+
+    function efficientKeccak256(
+        uint256 a
+    ) private pure returns (uint256 value) {
+        assembly ("memory-safe") {
+            mstore(0x00, a)
+            value := keccak256(0x00, 0x20)
+        }
     }
 
     function deposit() external payable {

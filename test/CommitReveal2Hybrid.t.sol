@@ -104,8 +104,16 @@ contract CommitReveal2Test is BaseTest, Utils {
                 );
                 for (uint256 j; j < numOfOperators; j++) {
                     revealOrders[j] = uint256(rv) > uint256(cvs[j])
-                        ? uint256(rv) - uint256(cvs[j])
-                        : uint256(cvs[j]) - uint256(rv);
+                        ? uint256(
+                            keccak256(
+                                abi.encodePacked(uint256(rv) - uint256(cvs[j]))
+                            )
+                        )
+                        : uint256(
+                            keccak256(
+                                abi.encodePacked(uint256(cvs[j]) - uint256(rv))
+                            )
+                        );
                     revealOrdersIndex[j] = j;
                 }
                 QuickSort.sort(revealOrders, revealOrdersIndex);
