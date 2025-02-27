@@ -33,36 +33,37 @@ contract CommitReveal2Test is BaseTest, Utils {
     }
 
     function test_HybridCommitReveal2() public {
-        uint256 requestTestNum = s_requestTestNum;
         console2.log("gasUsed of commmitReveal2Hybrid");
         console2.log("---------------------------");
         // *** activated Operators 2~10
-        uint256 i = 0;
+        uint256 i;
         for (
             uint256 numOfOperators = 2;
             numOfOperators <= 10;
             numOfOperators++
         ) {
             console2.log("Number of Operators: ", numOfOperators);
-            uint256[] memory gasUsedRequest = new uint256[](requestTestNum - 1);
+            uint256[] memory gasUsedRequest = new uint256[](
+                s_requestTestNum - 1
+            );
             uint256[] memory gasUsedSubmitMerkleRoot = new uint256[](
-                requestTestNum - 1
+                s_requestTestNum - 1
             );
             uint256[] memory gasUsedGenerateRandomNumber = new uint256[](
-                requestTestNum - 1
+                s_requestTestNum - 1
             );
 
             // *** Request Random Number
             for (
-                uint256 round = i++ * requestTestNum;
-                round < requestTestNum * i;
+                uint256 round = i++ * s_requestTestNum;
+                round < s_requestTestNum * i;
                 round++
             ) {
                 s_commitReveal2Hybrid.requestRandomNumber{
                     value: s_requestFee
                 }();
-                if (round % requestTestNum != 0) {
-                    gasUsedRequest[(round % requestTestNum) - 1] = vm
+                if (round % s_requestTestNum != 0) {
+                    gasUsedRequest[(round % s_requestTestNum) - 1] = vm
                         .lastCallGas()
                         .gasTotalUsed;
                 }
@@ -85,13 +86,12 @@ contract CommitReveal2Test is BaseTest, Utils {
                 }
 
                 // *** Submit MerkleRoot
-                bytes32 merkleRoot = getMerkleRoot(cvs);
                 vm.stopPrank();
                 vm.startPrank(s_anvilDefaultAddresses[round % numOfOperators]);
-                s_commitReveal2Hybrid.submitMerkleRoot(merkleRoot);
+                s_commitReveal2Hybrid.submitMerkleRoot(getMerkleRoot(cvs));
                 vm.stopPrank();
-                if (round % requestTestNum != 0) {
-                    gasUsedSubmitMerkleRoot[(round % requestTestNum) - 1] = vm
+                if (round % s_requestTestNum != 0) {
+                    gasUsedSubmitMerkleRoot[(round % s_requestTestNum) - 1] = vm
                         .lastCallGas()
                         .gasTotalUsed;
                 }
@@ -111,14 +111,6 @@ contract CommitReveal2Test is BaseTest, Utils {
                 QuickSort.sort(revealOrders, revealOrdersIndex);
 
                 // *** 4. Reveal2, Broadcast
-                bytes32[] memory secretValuesInRevealOrder = new bytes32[](
-                    numOfOperators
-                );
-                for (uint256 j; j < numOfOperators; j++) {
-                    secretValuesInRevealOrder[j] = secretValues[
-                        revealOrdersIndex[j]
-                    ];
-                }
                 uint8[] memory vs = new uint8[](numOfOperators);
                 bytes32[] memory rs = new bytes32[](numOfOperators);
                 bytes32[] memory ss = new bytes32[](numOfOperators);
@@ -141,19 +133,16 @@ contract CommitReveal2Test is BaseTest, Utils {
                     secretValues,
                     vs,
                     rs,
-                    ss,
-                    revealOrdersIndex
+                    ss
                 );
-                if (round % requestTestNum != 0) {
+                if (round % s_requestTestNum != 0) {
                     gasUsedGenerateRandomNumber[
-                        (round % requestTestNum) - 1
+                        (round % s_requestTestNum) - 1
                     ] = vm.lastCallGas().gasTotalUsed;
                 }
                 assertEq(
                     s_commitReveal2Hybrid.s_randomNum(round + 1),
-                    uint256(
-                        keccak256(abi.encodePacked(secretValuesInRevealOrder))
-                    )
+                    uint256(keccak256(abi.encodePacked(secretValues)))
                 );
             }
             console2.log("Request:");

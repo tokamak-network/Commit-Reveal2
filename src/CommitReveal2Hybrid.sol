@@ -75,38 +75,23 @@ contract CommitReveal2Hybrid is Ownable, EIP712 {
         bytes32[] calldata secrets,
         uint8[] calldata vs,
         bytes32[] calldata rs,
-        bytes32[] calldata ss,
-        uint256[] calldata revealOrders
+        bytes32[] calldata ss
     ) external {
         // ** verify secrets length
         uint256 secretsLength = secrets.length;
         require(secretsLength > 1, NotEnoughParticipatedOperators());
 
         bytes32[] memory cos = new bytes32[](secretsLength);
-        uint256[] memory cvs = new uint256[](secretsLength);
+        bytes32[] memory cvs = new bytes32[](secretsLength);
 
         for (uint256 i; i < secretsLength; i = unchecked_inc(i)) {
             cos[i] = keccak256(abi.encodePacked(secrets[i]));
-            cvs[i] = uint256(keccak256(abi.encodePacked(cos[i])));
-        }
-        uint256 rv = uint256(keccak256(abi.encodePacked(cos)));
-
-        // ** verify reveal order
-        for (uint256 i = 1; i < secretsLength; i = unchecked_inc(i)) {
-            require(
-                diff(rv, cvs[revealOrders[i - 1]]) <
-                    diff(rv, cvs[revealOrders[i]]),
-                RevealNotInAscendingOrder()
-            );
+            cvs[i] = keccak256(abi.encodePacked(cos[i]));
         }
 
         // ** verify merkle root
-        bytes32[] memory leaves;
-        assembly ("memory-safe") {
-            leaves := cvs
-        }
         require(
-            createMerkleRoot(leaves) == s_merkleRoot,
+            createMerkleRoot(cvs) == s_merkleRoot,
             MerkleVerificationFailed()
         );
 
@@ -126,7 +111,7 @@ contract CommitReveal2Hybrid is Ownable, EIP712 {
                             keccak256(
                                 abi.encode(
                                     MESSAGE_TYPEHASH,
-                                    Message({round: round, cv: leaves[i]})
+                                    Message({round: round, cv: cvs[i]})
                                 )
                             )
                         ),
@@ -140,17 +125,8 @@ contract CommitReveal2Hybrid is Ownable, EIP712 {
         }
 
         // ** create random number
-        bytes32[] memory secretsInRevealOrder = new bytes32[](secretsLength);
-        for (uint256 i; i < secretsLength; i = unchecked_inc(i))
-            secretsInRevealOrder[i] = secrets[revealOrders[i]];
-        s_randomNum[round] = uint256(
-            keccak256(abi.encodePacked(secretsInRevealOrder))
-        );
+        s_randomNum[round] = uint256(keccak256(abi.encodePacked(secrets)));
         s_isStarted = false;
-    }
-
-    function diff(uint256 a, uint256 b) private pure returns (uint256) {
-        return a > b ? a - b : b - a;
     }
 
     function createMerkleRoot(
@@ -186,6 +162,7 @@ contract CommitReveal2Hybrid is Ownable, EIP712 {
 
     // * activate and deactivate operators
     function activate(address operator) external onlyOwner {
+        require(!s_isStarted);
         require(
             s_depositAmount[operator] >= s_activationThreshold,
             LessThanActivationThreshold()
@@ -194,6 +171,7 @@ contract CommitReveal2Hybrid is Ownable, EIP712 {
     }
 
     function activate(address[] calldata operators) external onlyOwner {
+        require(!s_isStarted);
         uint256 operatorsLength = operators.length;
         for (uint256 i; i < operatorsLength; i = unchecked_inc(i)) {
             address operator = operators[i];
@@ -206,12 +184,14 @@ contract CommitReveal2Hybrid is Ownable, EIP712 {
     }
 
     function deactivate(address operator) external onlyOwner {
+        require(!s_isStarted);
         uint256 activatedOperatorIndex = s_activatedOperatorOrder[operator];
         require(activatedOperatorIndex != 0, OperatorNotActivated());
         _deactivate(activatedOperatorIndex - 1, operator);
     }
 
     function deactivate(address[] calldata operators) external onlyOwner {
+        require(!s_isStarted);
         uint256 operatorsLength = operators.length;
         for (uint256 i; i < operatorsLength; i = unchecked_inc(i)) {
             address operator = operators[i];

@@ -70,7 +70,7 @@ contract CommitReveal2OnChain is Ownable {
         s_isRevealPhase = false;
     }
 
-    // *** For Operators
+    // *** For Participants
     function commit(uint256 cv) external {
         require(
             s_depositAmount[msg.sender] >= s_d,
