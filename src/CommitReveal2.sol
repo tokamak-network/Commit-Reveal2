@@ -3,16 +3,17 @@ pragma solidity ^0.8.28;
 
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import {OptimismL1Fees} from "./OptimismL1Fees.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {ConsumerBase} from "./ConsumerBase.sol";
 import {CommitReveal2Storage} from "./CommitReveal2Storage.sol";
 import {Sort} from "./Sort.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
+import {console2} from "forge-std/Test.sol";
+
 contract CommitReveal2 is
     EIP712,
-    Ownable,
-    ReentrancyGuardTransient,
+    Ownable2Step,
     OptimismL1Fees,
     CommitReveal2Storage
 {
@@ -21,11 +22,31 @@ contract CommitReveal2 is
         uint256 flatFee,
         uint256 maxActivatedOperators,
         string memory name,
-        string memory version
+        string memory version,
+        uint256 phase1StartOffset,
+        uint256 phase2StartOffset,
+        uint256 phase3StartOffset,
+        uint256 phase4StartOffset,
+        uint256 phase5StartOffset,
+        uint256 phase6StartOffset,
+        uint256 phase7StartOffset,
+        uint256 phase8StartOffset,
+        uint256 phase9StartOffset,
+        uint256 phase10StartOffset
     ) EIP712(name, version) Ownable(msg.sender) {
         s_activationThreshold = activationThreshold;
         s_flatFee = flatFee;
         s_maxActivatedOperators = maxActivatedOperators;
+        s_phase1StartOffset = phase1StartOffset;
+        s_phase2StartOffset = phase2StartOffset;
+        s_phase3StartOffset = phase3StartOffset;
+        s_phase4StartOffset = phase4StartOffset;
+        s_phase5StartOffset = phase5StartOffset;
+        s_phase6StartOffset = phase6StartOffset;
+        s_phase7StartOffset = phase7StartOffset;
+        s_phase8StartOffset = phase8StartOffset;
+        s_phase9StartOffset = phase9StartOffset;
+        s_phase10StartOffset = phase10StartOffset;
     }
 
     function estimateRequestPrice(
@@ -51,7 +72,7 @@ contract CommitReveal2 is
 
     function requestRandomNumber(
         uint32 callbackGasLimit
-    ) external payable nonReentrant returns (uint256 round) {
+    ) external payable returns (uint256 round) {
         require(
             callbackGasLimit <= MAX_CALLBACK_GAS_LIMIT,
             ExceedCallbackGasLimit()
@@ -70,35 +91,22 @@ contract CommitReveal2 is
         unchecked {
             round = s_nextRound++;
         }
+        uint256 startTime = round > s_fulfilledCount ? 0 : block.timestamp;
         s_requestInfo[round] = RequestInfo({
             consumer: msg.sender,
-            requestedTime: block.timestamp,
+            startTime: startTime,
             cost: msg.value,
             callbackGasLimit: callbackGasLimit
         });
-        address[] memory activatedOperators;
-        s_activatedOperatorsAtRound[
-            round
-        ] = activatedOperators = s_activatedOperators;
-        mapping(address => uint256)
-            storage activatedOperatorOrderAtRound = s_activatedOperatorOrderAtRound[
-                round
-            ];
-        s_depositAmount[owner()] += msg.value;
-        uint256 i;
-        do {
-            unchecked {
-                activatedOperatorOrderAtRound[activatedOperators[i - 1]] = ++i;
-            }
-        } while (i < activatedOperatorsLength);
-        emit RandomNumberRequested(round, activatedOperators);
+        s_isInProcess = IN_PROGRESS;
+        emit RandomNumberRequested(round, startTime, s_activatedOperators);
     }
 
     function _calculateRequestPrice(
         uint256 callbackGasLimit,
         uint256 gasPrice,
         uint256 numOfOperators
-    ) private view returns (uint256) {
+    ) internal view virtual returns (uint256) {
         // submitRoot l2GasUsed = 47216
         // generateRandomNumber l2GasUsed = 21118.97⋅N + 87117.53
         return
@@ -115,90 +123,228 @@ contract CommitReveal2 is
         uint256 calldataSizeBytes1,
         uint256 calldataSizeBytes2
     ) private view returns (uint256) {
-        uint8 l1FeeCalculationMode = s_l1FeeCalculationMode;
-        if (l1FeeCalculationMode == L1_GAS_FEES_ECOTONE_MODE) {
-            // estimate based on unsigned fully RLP-encoded transaction size so we have to account for paddding bytes as well
-            return
-                _calculateOptimismL1DataFee(
-                    calldataSizeBytes1 + L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE
-                ) +
-                _calculateOptimismL1DataFee(
-                    calldataSizeBytes2 + L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE
-                );
-        } else if (l1FeeCalculationMode == L1_GAS_FEES_UPPER_BOUND_MODE) {
-            // getL1FeeUpperBound expects unsigned fully RLP-encoded transaction size so we have to account for paddding bytes as well
-            return
-                OVM_GASPRICEORACLE.getL1FeeUpperBound(
-                    calldataSizeBytes1 + L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE
-                ) +
-                OVM_GASPRICEORACLE.getL1FeeUpperBound(
-                    calldataSizeBytes2 + L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE
-                );
-        } else if (l1FeeCalculationMode == L1_GAS_FEES_LEGACY_MODE)
-            return
-                _calculateLegacyL1DataFee(calldataSizeBytes1) +
-                _calculateLegacyL1DataFee(calldataSizeBytes2);
-        else return 0;
+        // getL1FeeUpperBound expects unsigned fully RLP-encoded transaction size so we have to account for paddding bytes as well
+        return
+            _getL1CostWeiForCalldataSize(calldataSizeBytes1) +
+            _getL1CostWeiForCalldataSize(calldataSizeBytes2);
     }
 
-    // **** Operators ****
-    // ** Commit Reveal
-    function submitMerkleRoot(
-        uint256 round,
-        bytes32 merkleRoot
-    ) external nonReentrant {
-        require(
-            s_activatedOperatorOrderAtRound[round][msg.sender] > 0,
-            NotActivatedOperatorForThisRound()
-        );
-        s_roundInfo[round].merkleRoot = merkleRoot;
+    // ** Commit Reveal2
+
+    // * Phase1: On-chain: Commit Submission Request
+    function requestToSubmitCV(uint256[] calldata indices) external onlyOwner {
+        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
+        require(block.timestamp >= startTime + s_phase1StartOffset, TooEarly());
+        require(block.timestamp < startTime + s_phase2StartOffset, TooLate());
+        s_requestedToSubmitCVIndices = indices;
+        s_cvs[startTime] = new bytes32[](s_activatedOperators.length);
+        emit RequestedToSubmitCV(startTime, indices);
+    }
+
+    // * Phase2: On-chain: Commit Submission
+    function submitCV(bytes32 cv) external {
+        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
+        require(block.timestamp >= startTime + s_phase2StartOffset, TooEarly());
+        require(block.timestamp < startTime + s_phase3StartOffset, TooLate());
+        uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[
+            msg.sender
+        ] - 1;
+        s_cvs[startTime][activatedOperatorIndex] = cv;
+        emit CVSubmitted(startTime, cv, activatedOperatorIndex);
+    }
+
+    // * Phase3: On-chain: Merkle Root Submission
+    // * Or Restart this round
+    function phase2FailedAndRestart() external onlyOwner {}
+
+    function submitMerkleRoot(bytes32 merkleRoot) external onlyOwner {
+        uint256 round = s_fulfilledCount;
+        uint256 startTime = s_requestInfo[round].startTime;
+        require(block.timestamp >= startTime + s_phase3StartOffset, TooEarly());
+        require(block.timestamp < startTime + s_phase4StartOffset, TooLate());
+        s_merkleRoot = merkleRoot;
         emit MerkleRootSubmitted(round, merkleRoot);
     }
 
+    // * Phase5: On-chain: Reaveal-1 Submission Request
+    function requestToSubmitCO(
+        uint256[] calldata indices,
+        bytes32[] calldata cvs,
+        uint8[] calldata vs,
+        bytes32[] calldata rs,
+        bytes32[] calldata ss
+    ) external onlyOwner {
+        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
+        require(block.timestamp >= startTime + s_phase5StartOffset, TooEarly());
+        require(block.timestamp < startTime + s_phase6StartOffset, TooLate());
+        uint256 cvsLength = cvs.length;
+        bytes32[] storage s_cvsArray = s_cvs[startTime];
+        for (uint256 i; i < cvsLength; i = unchecked_inc(i)) {
+            require(
+                ss[i] <=
+                    0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
+                InvalidSignatureS()
+            );
+            require(
+                indices[i] + 1 ==
+                    s_activatedOperatorIndex1Based[
+                        ecrecover(
+                            _hashTypedDataV4(
+                                keccak256(
+                                    abi.encode(
+                                        MESSAGE_TYPEHASH,
+                                        Message({
+                                            timestamp: startTime,
+                                            cv: cvs[i]
+                                        })
+                                    )
+                                )
+                            ),
+                            vs[i],
+                            rs[i],
+                            ss[i]
+                        )
+                    ],
+                InvalidSignature()
+            );
+            s_cvsArray[indices[i]] = cvs[i];
+        }
+        uint256 indicesLength = indices.length;
+        for (uint256 i = cvsLength; i < indicesLength; i = unchecked_inc(i)) {
+            require(s_cvsArray[indices[i]] > 0, CVNotSubmitted(indices[i]));
+        }
+        s_requestedToSubmitCOIndices = indices;
+        emit RequestedToSubmitCO(startTime, indices);
+    }
+
+    // * Phase6: On-chain: Reaveal-1 Submission
+    function submitCO(bytes32 co) external {
+        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
+        require(block.timestamp >= startTime + s_phase6StartOffset, TooEarly());
+        require(block.timestamp < startTime + s_phase7StartOffset, TooLate());
+        uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[
+            msg.sender
+        ] - 1;
+        require(
+            s_cvs[startTime][activatedOperatorIndex] ==
+                keccak256(abi.encodePacked(co)),
+            InvalidCO()
+        );
+        emit COSubmitted(startTime, co, activatedOperatorIndex);
+    }
+
+    // * Phase8: On-chain: Reveal-2 Submission Request
+    function requestToSubmitSFromIndex(
+        uint256 k,
+        bytes32[] calldata cos,
+        Signature[] calldata signatures // used struct to avoid stack too deep error
+    ) external onlyOwner {
+        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
+        require(block.timestamp >= startTime + s_phase8StartOffset, TooEarly());
+        require(block.timestamp < startTime + s_phase9StartOffset, TooLate());
+        bytes32[] storage s_cvsArray = s_cvs[startTime];
+        uint256 operatorsLength = s_activatedOperators.length;
+        uint256[] memory diffs = new uint256[](operatorsLength);
+        uint256[] memory revealOrders = new uint256[](operatorsLength);
+        uint256 rv = uint256(keccak256(abi.encodePacked(cos)));
+        uint256 i;
+        s_ss[startTime] = new bytes32[](operatorsLength);
+        do {
+            unchecked {
+                bytes32 cv = _efficientOneKeccak256(cos[--operatorsLength]);
+                if (s_cvsArray[operatorsLength] > 0) {
+                    require(s_cvsArray[operatorsLength] == cv, InvalidCO());
+                } else {
+                    require(
+                        signatures[i].s <=
+                            0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
+                        InvalidSignatureS()
+                    );
+                    require(
+                        s_activatedOperatorIndex1Based[
+                            ecrecover(
+                                _hashTypedDataV4(
+                                    keccak256(
+                                        abi.encode(
+                                            MESSAGE_TYPEHASH,
+                                            Message({
+                                                timestamp: startTime,
+                                                cv: cv
+                                            })
+                                        )
+                                    )
+                                ),
+                                signatures[i].v,
+                                signatures[i].r,
+                                signatures[i++].s
+                            )
+                        ] == operatorsLength + 1,
+                        InvalidSignature()
+                    );
+                    s_cvsArray[operatorsLength] = cv;
+                }
+                diffs[operatorsLength] = diff(rv, uint256(cv));
+                revealOrders[operatorsLength] = operatorsLength;
+            }
+        } while (operatorsLength > 0);
+        // ** calculate reveal order
+        Sort.sort(diffs, revealOrders);
+        s_revealOrders = revealOrders;
+        s_requestedToSubmitSFromIndexK = k;
+        emit RequestedToSubmitSFromIndex(startTime, k);
+    }
+
+    // * Phase9: On-chain: Reveal-2 Submission
+    function submitS(bytes32 s) external {
+        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
+        require(block.timestamp >= startTime + s_phase9StartOffset, TooEarly());
+        require(block.timestamp < startTime + s_phase10StartOffset, TooLate());
+        uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[
+            msg.sender
+        ] - 1;
+        unchecked {
+            require(
+                s_revealOrders[s_requestedToSubmitSFromIndexK++] ==
+                    activatedOperatorIndex,
+                InvalidRevealOrder()
+            );
+        }
+        require(
+            s_cvs[startTime][activatedOperatorIndex] ==
+                _efficientTwoKeccak256(s),
+            InvalidS()
+        );
+        s_ss[startTime][activatedOperatorIndex] = s;
+        emit SSubmitted(startTime, s, activatedOperatorIndex);
+    }
+
     function generateRandomNumber(
-        uint256 round,
         bytes32[] calldata secrets,
         uint8[] calldata vs,
         bytes32[] calldata rs,
         bytes32[] calldata ss
-    ) external nonReentrant {
+    ) external {
         uint256 secretsLength = secrets.length;
         require(secretsLength > 1, NotEnoughParticipatedOperators());
 
         bytes32[] memory cos = new bytes32[](secretsLength);
-        uint256[] memory cvs = new uint256[](secretsLength);
+        bytes32[] memory cvs = new bytes32[](secretsLength);
 
         for (uint256 i; i < secretsLength; i = unchecked_inc(i)) {
             cos[i] = keccak256(abi.encodePacked(secrets[i]));
-            cvs[i] = uint256(keccak256(abi.encodePacked(cos[i])));
+            cvs[i] = keccak256(abi.encodePacked(cos[i]));
         }
-        uint256 rv = uint256(keccak256(abi.encodePacked(cos)));
 
-        // ** determine reveal order
-        uint256[] memory diffs = new uint256[](secretsLength);
-        uint256[] memory revealOrders = new uint256[](secretsLength);
-        for (uint256 i; i < secretsLength; i = unchecked_inc(i)) {
-            diffs[i] = diff(rv, cvs[i]);
-            revealOrders[i] = i;
-        }
-        Sort.sort(diffs, revealOrders);
-
-        bytes32[] memory leaves;
-        assembly ("memory-safe") {
-            leaves := cvs
-        }
-        RoundInfo storage roundInfo = s_roundInfo[round];
         // ** verify merkle root
         require(
-            createMerkleRoot(leaves) == roundInfo.merkleRoot,
+            createMerkleRoot(cvs) == s_merkleRoot,
             MerkleVerificationFailed()
         );
 
         // ** verify signer
-        mapping(address => uint256)
-            storage activatedOperatorOrderAtRound = s_activatedOperatorOrderAtRound[
-                round
-            ];
+        uint256 round = s_fulfilledCount;
+        RequestInfo storage requestInfo = s_requestInfo[round];
+        uint256 startTimestamp = requestInfo.startTime;
         address[] memory participatedOperators = new address[](secretsLength);
         for (uint256 i; i < secretsLength; i = unchecked_inc(i)) {
             // signature malleability prevention
@@ -212,7 +358,7 @@ contract CommitReveal2 is
                     keccak256(
                         abi.encode(
                             MESSAGE_TYPEHASH,
-                            Message({round: round, cv: leaves[i]})
+                            Message({timestamp: startTimestamp, cv: cvs[i]})
                         )
                     )
                 ),
@@ -222,35 +368,35 @@ contract CommitReveal2 is
             );
             participatedOperators[i] = recoveredAddress;
             require(
-                activatedOperatorOrderAtRound[recoveredAddress] > 0,
+                s_activatedOperatorIndex1Based[recoveredAddress] > 0,
                 InvalidSignature()
             );
         }
         // ** create random number
-        bytes32[] memory secretsInRevealOrder = new bytes32[](secretsLength);
-        for (uint256 i; i < secretsLength; i = unchecked_inc(i))
-            secretsInRevealOrder[i] = secrets[revealOrders[i]];
-
-        uint256 randomNumber;
-        roundInfo.randomNumber = randomNumber = uint256(
-            keccak256(abi.encodePacked(secretsInRevealOrder))
-        );
-        RequestInfo storage requestInfo = s_requestInfo[round];
-        bool success = _call(
-            requestInfo.consumer,
-            abi.encodeWithSelector(
-                ConsumerBase.rawFulfillRandomNumber.selector,
-                round,
-                randomNumber
+        uint256 randomNumber = uint256(keccak256(abi.encodePacked(secrets)));
+        unchecked {
+            if (++s_fulfilledCount == s_nextRound)
+                s_isInProcess = NOT_IN_PROGRESS;
+            else s_requestInfo[round + 1].startTime = block.timestamp;
+        }
+        emit RandomNumberGenerated(
+            round,
+            randomNumber,
+            _call(
+                requestInfo.consumer,
+                abi.encodeWithSelector(
+                    ConsumerBase.rawFulfillRandomNumber.selector,
+                    round,
+                    randomNumber
+                ),
+                requestInfo.callbackGasLimit
             ),
-            requestInfo.callbackGasLimit
+            participatedOperators
         );
-        roundInfo.fulfillSucceeded = success;
-        emit RandomNumberGenerated(round, randomNumber, participatedOperators);
     }
 
     function getMessageHash(
-        uint256 round,
+        uint256 timestamp,
         bytes32 cv
     ) external view returns (bytes32) {
         return
@@ -258,7 +404,7 @@ contract CommitReveal2 is
                 keccak256(
                     abi.encode(
                         MESSAGE_TYPEHASH,
-                        Message({round: round, cv: cv})
+                        Message({timestamp: timestamp, cv: cv})
                     )
                 )
             );
@@ -301,6 +447,25 @@ contract CommitReveal2 is
         }
     }
 
+    function _efficientOneKeccak256(
+        bytes32 a
+    ) private pure returns (bytes32 value) {
+        assembly ("memory-safe") {
+            mstore(0x00, a)
+            value := keccak256(0x00, 0x20)
+        }
+    }
+
+    function _efficientTwoKeccak256(
+        bytes32 a
+    ) private pure returns (bytes32 value) {
+        assembly ("memory-safe") {
+            mstore(0x00, a)
+            mstore(0x00, keccak256(0x00, 0x20))
+            value := keccak256(0x00, 0x20)
+        }
+    }
+
     function unchecked_inc(uint256 i) private pure returns (uint256) {
         unchecked {
             return i + 1;
@@ -311,72 +476,55 @@ contract CommitReveal2 is
         return a > b ? a - b : b - a;
     }
 
-    /// *** Owner ***
-    function activate(address operator) external nonReentrant onlyOwner {
-        require(
-            s_depositAmount[operator] >= s_activationThreshold,
-            LessThanActivationThreshold()
-        );
-        _activate(operator);
-    }
-
-    function activate(
-        address[] calldata operators
-    ) external nonReentrant onlyOwner {
-        uint256 operatorsLength = operators.length;
-        for (uint256 i; i < operatorsLength; i = unchecked_inc(i)) {
-            address operator = operators[i];
-            require(
-                s_depositAmount[operator] >= s_activationThreshold,
-                LessThanActivationThreshold()
-            );
-            _activate(operator);
-        }
-    }
-
-    function deactivate(address operator) external nonReentrant onlyOwner {
-        uint256 activatedOperatorIndex = s_activatedOperatorOrder[operator];
-        require(activatedOperatorIndex != 0, OperatorNotActivated());
-        _deactivate(activatedOperatorIndex - 1, operator);
-    }
-
-    function deactivate(
-        address[] calldata operators
-    ) external nonReentrant onlyOwner {
-        uint256 operatorsLength = operators.length;
-        for (uint256 i; i < operatorsLength; i = unchecked_inc(i)) {
-            address operator = operators[i];
-            uint256 activatedOperatorIndex = s_activatedOperatorOrder[operator];
-            require(activatedOperatorIndex != 0, OperatorNotActivated());
-            _deactivate(activatedOperatorIndex - 1, operator);
-        }
-    }
-
     /// ** deposit and withdraw
-    function deposit() external payable nonReentrant {
+    function deposit() public payable {
         s_depositAmount[msg.sender] += msg.value;
     }
 
-    function withdraw(uint256 amount) external nonReentrant {
+    function depositAndActivate() external payable {
+        deposit();
+        activate();
+    }
+
+    function withdraw(uint256 amount) external {
         s_depositAmount[msg.sender] -= amount;
-        uint256 activatedOperatorIndex = s_activatedOperatorOrder[msg.sender];
+        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[
+            msg.sender
+        ];
         if (
-            activatedOperatorIndex != 0 &&
+            activatedOperatorIndex1Based != 0 &&
             s_depositAmount[msg.sender] < s_activationThreshold
-        ) _deactivate(activatedOperatorIndex - 1, msg.sender);
+        ) _deactivate(activatedOperatorIndex1Based - 1, msg.sender);
         payable(msg.sender).transfer(amount);
     }
 
-    function _activate(address operator) private {
-        require(s_activatedOperatorOrder[operator] == 0, AlreadyActivated());
-        s_activatedOperators.push(operator);
+    function activate() public {
+        require(s_isInProcess == NOT_IN_PROGRESS, InProcess());
+        require(
+            s_depositAmount[msg.sender] >= s_activationThreshold,
+            LessThanActivationThreshold()
+        );
+        require(
+            s_activatedOperatorIndex1Based[msg.sender] == 0,
+            AlreadyActivated()
+        );
+        s_activatedOperators.push(msg.sender);
         uint256 activatedOperatorLength = s_activatedOperators.length;
         require(
             activatedOperatorLength <= s_maxActivatedOperators,
             ActivatedOperatorsLimitReached()
         );
-        s_activatedOperatorOrder[operator] = activatedOperatorLength;
-        emit Activated(operator);
+        s_activatedOperatorIndex1Based[msg.sender] = activatedOperatorLength;
+        emit Activated(msg.sender);
+    }
+
+    function deactivate() external {
+        require(s_isInProcess == NOT_IN_PROGRESS, InProcess());
+        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[
+            msg.sender
+        ];
+        require(activatedOperatorIndex1Based != 0, OperatorNotActivated());
+        _deactivate(activatedOperatorIndex1Based - 1, msg.sender);
     }
 
     function _deactivate(
@@ -388,8 +536,10 @@ contract CommitReveal2 is
         ];
         s_activatedOperators[activatedOperatorIndex] = lastOperator;
         s_activatedOperators.pop();
-        s_activatedOperatorOrder[lastOperator] = activatedOperatorIndex + 1;
-        delete s_activatedOperatorOrder[operator];
+        s_activatedOperatorIndex1Based[lastOperator] =
+            activatedOperatorIndex +
+            1;
+        delete s_activatedOperatorIndex1Based[operator];
         emit DeActivated(operator);
     }
 
@@ -398,7 +548,7 @@ contract CommitReveal2 is
         bytes memory data,
         uint256 callbackGasLimit
     ) private returns (bool success) {
-        assembly {
+        assembly ("memory-safe") {
             let g := gas()
             // Compute g -= GAS_FOR_CALL_EXACT_CHECK and check for underflow
             // The gas actually passed to the callee is min(gasAmount, 63//64*gas available)
@@ -418,7 +568,7 @@ contract CommitReveal2 is
             }
             // solidity calls check that a contract actually exists at the destination, so we do the same
             if iszero(extcodesize(target)) {
-                revert(0, 0)
+                return(0, 0)
             }
             // call and return whether we succeeded. ignore return data
             // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
@@ -432,6 +582,5 @@ contract CommitReveal2 is
                 0
             )
         }
-        return success;
     }
 }
