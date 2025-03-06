@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 
 contract BaseTest is Test {
     bool private s_baseTestInitialized;
-    address internal constant OWNER =
+    address internal constant LEADERNODE =
         0xB68AA9E398c054da7EBAaA446292f611CA0CD52B;
     address[10] public s_anvilDefaultAddresses = [
         0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266,
@@ -37,26 +37,31 @@ contract BaseTest is Test {
         if (s_baseTestInitialized) return;
         s_baseTestInitialized = true;
 
-        // Set msg.sender to OWNER until changePrank or stopPrank is called
-        vm.startPrank(OWNER);
-        vm.deal(OWNER, 10000 ether);
+        // Set msg.sender to LEADERNODE until changePrank or stopPrank is called
+        vm.startPrank(LEADERNODE);
+        vm.deal(LEADERNODE, 10000 ether);
         for (uint256 i; i < 10; i++) {
             vm.deal(s_anvilDefaultAddresses[i], 10000 ether);
         }
     }
 
-    function getRandomAddresses(
-        uint256 from,
-        uint256 to
-    ) internal returns (address[] memory) {
-        uint256 length = to - from;
-        address[] memory addresses = new address[](length);
-        for (uint256 i = 0; i < length; ++i) {
-            addresses[i] = address(
-                uint160(uint256(keccak256(abi.encodePacked(i + from))))
-            );
-            vm.deal(addresses[i], 10000 ether);
-        }
-        return addresses;
+    function mine(uint256 second) public {
+        vm.warp(block.timestamp + second);
+        vm.roll(block.number + 1);
     }
+
+    // function getRandomAddresses(
+    //     uint256 from,
+    //     uint256 to
+    // ) internal returns (address[] memory) {
+    //     uint256 length = to - from;
+    //     address[] memory addresses = new address[](length);
+    //     for (uint256 i = 0; i < length; ++i) {
+    //         addresses[i] = address(
+    //             uint160(uint256(keccak256(abi.encodePacked(i + from))))
+    //         );
+    //         vm.deal(addresses[i], 10000 ether);
+    //     }
+    //     return addresses;
+    // }
 }
