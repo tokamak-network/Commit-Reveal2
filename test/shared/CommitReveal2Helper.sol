@@ -56,19 +56,6 @@ contract CommitReveal2Helper {
         cv = keccak256(abi.encodePacked(co));
     }
 
-    function _getEachPhaseStartOffset(
-        uint256[11] memory phaseDuration
-    ) internal pure returns (uint256[11] memory) {
-        uint256[11] memory eachPhaseStartOffset;
-        eachPhaseStartOffset[0] = 0;
-        for (uint256 i = 1; i < 11; i++) {
-            eachPhaseStartOffset[i] =
-                eachPhaseStartOffset[i - 1] +
-                phaseDuration[i - 1];
-        }
-        return eachPhaseStartOffset;
-    }
-
     function _diff(uint256 a, uint256 b) internal pure returns (uint256) {
         return a > b ? a - b : b - a;
     }
