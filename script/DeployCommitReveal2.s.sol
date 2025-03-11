@@ -16,10 +16,7 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
         NetworkHelperConfig.NetworkConfig
             memory activeNetworkConfig = networkHelperConfig
                 .getActiveNetworkConfig();
-        uint256[11] memory phaseStartOffsets;
-        phaseStartOffsets = _getEachPhaseStartOffset(
-            activeNetworkConfig.phaseDuration
-        );
+
         vm.startBroadcast(activeNetworkConfig.deployer);
         if (block.chainid == 31337) {
             commitReveal2 = address(
@@ -29,16 +26,11 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                     activeNetworkConfig.maxActivatedOperators,
                     activeNetworkConfig.name,
                     activeNetworkConfig.version,
-                    phaseStartOffsets[1],
-                    phaseStartOffsets[2],
-                    phaseStartOffsets[3],
-                    phaseStartOffsets[4],
-                    phaseStartOffsets[5],
-                    phaseStartOffsets[6],
-                    phaseStartOffsets[7],
-                    phaseStartOffsets[8],
-                    phaseStartOffsets[9],
-                    phaseStartOffsets[10]
+                    activeNetworkConfig.offChainSubmissionPeriod,
+                    activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
+                    activeNetworkConfig.onChainSubmissionPeriod,
+                    activeNetworkConfig.offChainSubmissionPeriodPerOperator,
+                    activeNetworkConfig.onChainSubmissionPeriodPerOperator
                 )
             );
         } else {
@@ -49,16 +41,11 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                     activeNetworkConfig.maxActivatedOperators,
                     activeNetworkConfig.name,
                     activeNetworkConfig.version,
-                    phaseStartOffsets[1],
-                    phaseStartOffsets[2],
-                    phaseStartOffsets[3],
-                    phaseStartOffsets[4],
-                    phaseStartOffsets[5],
-                    phaseStartOffsets[6],
-                    phaseStartOffsets[7],
-                    phaseStartOffsets[8],
-                    phaseStartOffsets[9],
-                    phaseStartOffsets[10]
+                    activeNetworkConfig.offChainSubmissionPeriod,
+                    activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
+                    activeNetworkConfig.onChainSubmissionPeriod,
+                    activeNetworkConfig.offChainSubmissionPeriodPerOperator,
+                    activeNetworkConfig.onChainSubmissionPeriodPerOperator
                 )
             );
         }

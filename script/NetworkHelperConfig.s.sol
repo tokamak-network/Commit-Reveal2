@@ -13,7 +13,11 @@ contract NetworkHelperConfig is Script, BaseTest {
         uint256 maxActivatedOperators;
         string name;
         string version;
-        uint256[11] phaseDuration;
+        uint256 offChainSubmissionPeriod;
+        uint256 requestOrSubmitOrFailDecisionPeriod;
+        uint256 onChainSubmissionPeriod;
+        uint256 offChainSubmissionPeriodPerOperator;
+        uint256 onChainSubmissionPeriodPerOperator;
         address deployer;
     }
 
@@ -35,18 +39,6 @@ contract NetworkHelperConfig is Script, BaseTest {
     }
 
     function getAnvilConfig() public pure returns (NetworkConfig memory) {
-        uint256[11] memory phaseDuration;
-        phaseDuration[0] = 60;
-        phaseDuration[1] = 60;
-        phaseDuration[2] = 60;
-        phaseDuration[3] = 60;
-        phaseDuration[4] = 60;
-        phaseDuration[5] = 60;
-        phaseDuration[6] = 60;
-        phaseDuration[7] = 60;
-        phaseDuration[8] = 60;
-        phaseDuration[9] = 60;
-        phaseDuration[10] = 60;
         return
             NetworkConfig({
                 activationThreshold: 0.1 ether,
@@ -54,7 +46,11 @@ contract NetworkHelperConfig is Script, BaseTest {
                 maxActivatedOperators: 10,
                 name: "Commit Reveal2",
                 version: "1",
-                phaseDuration: phaseDuration,
+                offChainSubmissionPeriod: 80,
+                requestOrSubmitOrFailDecisionPeriod: 40,
+                onChainSubmissionPeriod: 120,
+                offChainSubmissionPeriodPerOperator: 40,
+                onChainSubmissionPeriodPerOperator: 40,
                 deployer: LEADERNODE
             });
     }
@@ -64,18 +60,6 @@ contract NetworkHelperConfig is Script, BaseTest {
         pure
         returns (NetworkConfig memory)
     {
-        uint256[11] memory phaseDuration;
-        phaseDuration[0] = 60;
-        phaseDuration[1] = 60;
-        phaseDuration[2] = 60;
-        phaseDuration[3] = 60;
-        phaseDuration[4] = 60;
-        phaseDuration[5] = 60;
-        phaseDuration[6] = 60;
-        phaseDuration[7] = 60;
-        phaseDuration[8] = 60;
-        phaseDuration[9] = 60;
-        phaseDuration[10] = 60;
         return
             NetworkConfig({
                 activationThreshold: 0.1 ether,
@@ -83,7 +67,11 @@ contract NetworkHelperConfig is Script, BaseTest {
                 maxActivatedOperators: 10,
                 name: "Commit Reveal2",
                 version: "1",
-                phaseDuration: phaseDuration,
+                offChainSubmissionPeriod: 80,
+                requestOrSubmitOrFailDecisionPeriod: 40,
+                onChainSubmissionPeriod: 120,
+                offChainSubmissionPeriodPerOperator: 40,
+                onChainSubmissionPeriodPerOperator: 40,
                 deployer: 0xB68AA9E398c054da7EBAaA446292f611CA0CD52B
             });
     }
