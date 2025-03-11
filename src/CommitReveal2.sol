@@ -8,6 +8,7 @@ import {ConsumerBase} from "./ConsumerBase.sol";
 import {CommitReveal2Storage} from "./CommitReveal2Storage.sol";
 import {Sort} from "./Sort.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import {Bitmap} from "./libraries/Bitmap.sol";
 
 import {console2} from "forge-std/Test.sol";
 
@@ -17,36 +18,28 @@ contract CommitReveal2 is
     OptimismL1Fees,
     CommitReveal2Storage
 {
+    using Bitmap for mapping(uint248 => uint256);
+
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
         uint256 maxActivatedOperators,
         string memory name,
         string memory version,
-        uint256 phase1StartOffset,
-        uint256 phase2StartOffset,
-        uint256 phase3StartOffset,
-        uint256 phase4StartOffset,
-        uint256 phase5StartOffset,
-        uint256 phase6StartOffset,
-        uint256 phase7StartOffset,
-        uint256 phase8StartOffset,
-        uint256 phase9StartOffset,
-        uint256 phase10StartOffset
+        uint256 offChainSubmissionPeriod,
+        uint256 requestOrSubmitOrFailDecisionPeriod,
+        uint256 onChainSubmissionPeriod,
+        uint256 offChainSubmissionPeriodPerOperator,
+        uint256 onChainSubmissionPeriodPerOperator
     ) EIP712(name, version) Ownable(msg.sender) {
         s_activationThreshold = activationThreshold;
         s_flatFee = flatFee;
         s_maxActivatedOperators = maxActivatedOperators;
-        s_phase1StartOffset = phase1StartOffset;
-        s_phase2StartOffset = phase2StartOffset;
-        s_phase3StartOffset = phase3StartOffset;
-        s_phase4StartOffset = phase4StartOffset;
-        s_phase5StartOffset = phase5StartOffset;
-        s_phase6StartOffset = phase6StartOffset;
-        s_phase7StartOffset = phase7StartOffset;
-        s_phase8StartOffset = phase8StartOffset;
-        s_phase9StartOffset = phase9StartOffset;
-        s_phase10StartOffset = phase10StartOffset;
+        s_offChainSubmissionPeriod = offChainSubmissionPeriod;
+        s_requestOrSubmitOrFailDecisionPeriod = requestOrSubmitOrFailDecisionPeriod;
+        s_onChainSubmissionPeriod = onChainSubmissionPeriod;
+        s_offChainSubmissionPeriodPerOperator = offChainSubmissionPeriodPerOperator;
+        s_onChainSubmissionPeriodPerOperator = onChainSubmissionPeriodPerOperator;
     }
 
     function estimateRequestPrice(
@@ -72,7 +65,7 @@ contract CommitReveal2 is
 
     function requestRandomNumber(
         uint32 callbackGasLimit
-    ) external payable returns (uint256 round) {
+    ) external payable returns (uint256 newRound) {
         require(
             callbackGasLimit <= MAX_CALLBACK_GAS_LIMIT,
             ExceedCallbackGasLimit()
@@ -89,17 +82,24 @@ contract CommitReveal2 is
             InsufficientAmount()
         );
         unchecked {
-            round = s_nextRound++;
+            newRound = s_requestCount++;
         }
-        uint256 startTime = round > s_fulfilledCount ? 0 : block.timestamp;
-        s_requestInfo[round] = RequestInfo({
+        s_roundBitmap.flipBit(newRound);
+        uint256 startTime = s_currentRound > s_lastfulfilledRound
+            ? 0
+            : block.timestamp;
+        s_requestInfo[newRound] = RequestInfo({
             consumer: msg.sender,
             startTime: startTime,
             cost: msg.value,
             callbackGasLimit: callbackGasLimit
         });
-        s_isInProcess = IN_PROGRESS;
-        emit RandomNumberRequested(round, startTime, s_activatedOperators);
+        emit RandomNumberRequested(newRound, startTime, s_activatedOperators);
+        if (s_isInProcess == NOT_IN_PROGRESS) {
+            s_currentRound = newRound;
+            s_isInProcess = IN_PROGRESS;
+            emit IsInProcess(IN_PROGRESS);
+        }
     }
 
     function _calculateRequestPrice(
@@ -129,56 +129,282 @@ contract CommitReveal2 is
             _getL1CostWeiForCalldataSize(calldataSizeBytes2);
     }
 
-    // ** Commit Reveal2
-
-    // * Phase1: On-chain: Commit Submission Request
-    function requestToSubmitCV(uint256[] calldata indices) external onlyOwner {
-        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
-        require(block.timestamp >= startTime + s_phase1StartOffset, TooEarly());
-        require(block.timestamp < startTime + s_phase2StartOffset, TooLate());
+    // ** On-chain: Commit Submission Request
+    function requestToSubmitCv(uint256[] calldata indices) external onlyOwner {
+        uint256 round = s_currentRound;
+        require(
+            block.timestamp <
+                s_requestInfo[round].startTime +
+                    s_offChainSubmissionPeriod +
+                    s_requestOrSubmitOrFailDecisionPeriod,
+            TooLate()
+        );
         s_requestedToSubmitCVIndices = indices;
+        uint256 startTime = s_requestInfo[round].startTime;
         s_cvs[startTime] = new bytes32[](s_activatedOperators.length);
+        s_requestedToSubmitCVTimestamp = block.timestamp;
         emit RequestedToSubmitCV(startTime, indices);
     }
 
-    // * Phase2: On-chain: Commit Submission
-    function submitCV(bytes32 cv) external {
-        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
-        require(block.timestamp >= startTime + s_phase2StartOffset, TooEarly());
-        require(block.timestamp < startTime + s_phase3StartOffset, TooLate());
+    // ** On-chain: Merkle Root Submission
+    function submitMerkleRoot(bytes32 merkleRoot) external onlyOwner {
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
+        require(
+            block.timestamp <
+                startTime +
+                    s_offChainSubmissionPeriod +
+                    s_requestOrSubmitOrFailDecisionPeriod,
+            TooLate()
+        );
+        s_merkleRoot = merkleRoot;
+        s_merkleRootSubmittedTimestamp = block.timestamp;
+        s_isSubmittedMerkleRoot[startTime] = true;
+        emit MerkleRootSubmitted(startTime, merkleRoot);
+    }
+
+    function failToRequestSubmitCVAndSubmitMerkleRoot() external {
+        uint256 round = s_currentRound;
+        uint256 startTime = s_requestInfo[round].startTime;
+        // ** Not requested
+        require(s_cvs[startTime].length == 0, AlreadyRequestedToSubmitCV());
+        // ** MerkleRoot Not Submitted
+        require(
+            !s_isSubmittedMerkleRoot[startTime],
+            AlreadySubmittedMerkleRoot()
+        );
+        require(
+            block.timestamp >=
+                startTime +
+                    s_offChainSubmissionPeriod +
+                    s_requestOrSubmitOrFailDecisionPeriod,
+            TooEarly()
+        );
+        // ** slash the leadernode(owner)'s deposit
+        uint256 leaderNodeDeposit = s_depositAmount[owner()];
+        uint256 activationThreshold = s_activationThreshold;
+        if (leaderNodeDeposit > activationThreshold) {
+            unchecked {
+                s_depositAmount[owner()] -= activationThreshold;
+                s_depositAmount[msg.sender] += activationThreshold;
+            }
+            s_requestInfo[round].startTime = block.timestamp;
+            emit RandomNumberRequested(
+                round,
+                block.timestamp,
+                s_activatedOperators
+            );
+        } else {
+            s_isInProcess = NOT_IN_PROGRESS;
+            emit IsInProcess(NOT_IN_PROGRESS);
+        }
+    }
+
+    // ** On-chain: Commit Submission
+    function submitCv(bytes32 cv) external {
+        require(cv != 0x00, ShouldNotBeZero());
+        require(
+            block.timestamp <
+                s_requestedToSubmitCVTimestamp + s_onChainSubmissionPeriod,
+            TooLate()
+        );
         uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[
             msg.sender
         ] - 1;
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
         s_cvs[startTime][activatedOperatorIndex] = cv;
         emit CVSubmitted(startTime, cv, activatedOperatorIndex);
     }
 
+    function submitMerkleRootAfterDispute(
+        bytes32 merkleRoot
+    ) external onlyOwner {
+        require(
+            block.timestamp <
+                s_requestedToSubmitCVTimestamp +
+                    s_onChainSubmissionPeriod +
+                    s_requestOrSubmitOrFailDecisionPeriod,
+            TooLate()
+        );
+        s_merkleRoot = merkleRoot;
+        s_merkleRootSubmittedTimestamp = block.timestamp;
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
+        s_isSubmittedMerkleRoot[startTime] = true;
+        emit MerkleRootSubmitted(startTime, merkleRoot);
+    }
+
     // * Phase3: On-chain: Merkle Root Submission
     // * Or Restart this round
-    function phase2FailedAndRestart() external onlyOwner {}
-
-    function submitMerkleRoot(bytes32 merkleRoot) external onlyOwner {
-        uint256 round = s_fulfilledCount;
+    function failToSubmitCv() external {
+        // ** check if it's time to submit merkle root or to restart
+        uint256 round = s_currentRound;
         uint256 startTime = s_requestInfo[round].startTime;
-        require(block.timestamp >= startTime + s_phase3StartOffset, TooEarly());
-        require(block.timestamp < startTime + s_phase4StartOffset, TooLate());
-        s_merkleRoot = merkleRoot;
-        emit MerkleRootSubmitted(round, merkleRoot);
+        require(
+            block.timestamp >=
+                s_requestedToSubmitCVTimestamp + s_onChainSubmissionPeriod,
+            TooEarly()
+        );
+        // ** who didn't submi CV even though requested
+        uint256 requestedToSubmitCVLength = s_requestedToSubmitCVIndices.length;
+        uint256 activationThreshold = s_activationThreshold;
+        uint256 didntSubmitCVLength; // ** count of operators who didn't submit CV
+
+        bytes32[] storage s_cvsArray = s_cvs[startTime];
+        require(s_cvsArray.length > 0, CVNotRequested());
+        address[] memory addressToDeactivates = new address[](
+            requestedToSubmitCVLength
+        );
+        for (uint256 i; i < requestedToSubmitCVLength; i = unchecked_inc(i)) {
+            uint256 index = s_requestedToSubmitCVIndices[i];
+            if (s_cvsArray[index] == 0) {
+                address operator = s_activatedOperators[index];
+                uint256 updatedDepositAmount = s_depositAmount[operator] -
+                    activationThreshold;
+                s_depositAmount[operator] = updatedDepositAmount;
+                // ** slash deposit and deactivate if deposit is less than activationThreshold
+                if (updatedDepositAmount < activationThreshold) {
+                    unchecked {
+                        addressToDeactivates[didntSubmitCVLength++] = operator;
+                    }
+                }
+            }
+        }
+        for (uint256 i; i < didntSubmitCVLength; i = unchecked_inc(i)) {
+            address operator = addressToDeactivates[i];
+            _deactivate(s_activatedOperatorIndex1Based[operator] - 1, operator);
+        }
+        // ** distribute slashed amount to updated activated operators
+        uint256 updatedActivatedOperatorsLength = s_activatedOperators.length;
+        uint256 distributeSlashedAmount = (didntSubmitCVLength *
+            activationThreshold) / updatedActivatedOperatorsLength;
+        for (
+            uint256 i;
+            i < updatedActivatedOperatorsLength;
+            i = unchecked_inc(i)
+        ) {
+            s_depositAmount[s_activatedOperators[i]] += distributeSlashedAmount;
+        }
+
+        // ** restart or end this round
+        if (updatedActivatedOperatorsLength > 1) {
+            s_requestInfo[round].startTime = block.timestamp;
+            emit RandomNumberRequested(
+                round,
+                block.timestamp,
+                s_activatedOperators
+            );
+        } else {
+            s_isInProcess = NOT_IN_PROGRESS;
+            emit IsInProcess(NOT_IN_PROGRESS);
+        }
+    }
+
+    function failToSubmitMerkleRootAfterDispute() external {
+        uint256 round = s_currentRound;
+
+        require(
+            block.timestamp >=
+                s_requestedToSubmitCVTimestamp +
+                    s_onChainSubmissionPeriod + // disputeSubmission
+                    s_requestOrSubmitOrFailDecisionPeriod, // merkleRootSubmission,
+            TooEarly()
+        );
+        uint256 startTime = s_requestInfo[round].startTime;
+        require(s_cvs[startTime].length > 0, CVNotRequested());
+        require(
+            !s_isSubmittedMerkleRoot[startTime],
+            AlreadySubmittedMerkleRoot()
+        );
+        // ** slash the leadernode(owner)'s deposit
+        uint256 leaderNodeDeposit = s_depositAmount[owner()];
+        uint256 activationThreshold = s_activationThreshold;
+        if (leaderNodeDeposit > activationThreshold) {
+            unchecked {
+                s_depositAmount[owner()] -= activationThreshold;
+                s_depositAmount[msg.sender] += activationThreshold;
+            }
+            s_requestInfo[round].startTime = block.timestamp;
+            emit RandomNumberRequested(
+                round,
+                block.timestamp,
+                s_activatedOperators
+            );
+        } else {
+            s_isInProcess = NOT_IN_PROGRESS;
+            emit IsInProcess(NOT_IN_PROGRESS);
+        }
+    }
+
+    // The consumer can issue a refund || operators can activate, and if more than one operator is available, the round can be restarted.
+    function refund(uint256 round) external {
+        require(s_isInProcess == NOT_IN_PROGRESS, InProcess());
+        require(round < s_requestCount, InvalidRound());
+        require(round >= s_currentRound, InvalidRound());
+        RequestInfo storage requestInfo = s_requestInfo[round];
+        require(requestInfo.consumer == msg.sender, NotConsumer());
+        s_roundBitmap.flipBit(round); // 1 -> 0
+
+        // ** refund
+        uint256 cost = requestInfo.cost;
+        require(cost > 0, AlreadyRefunded());
+        requestInfo.cost = 0;
+        bool success;
+        assembly {
+            // Transfer the ETH and store if it succeeded or not.
+            success := call(gas(), caller(), cost, 0, 0, 0, 0)
+        }
+        require(success, TransferFailed());
+    }
+
+    function restartCurrentRound() external onlyOwner {
+        require(s_isInProcess == NOT_IN_PROGRESS, InProcess());
+        require(s_activatedOperators.length > 1, NotEnoughActivatedOperators());
+        uint256 nextRequestedRound;
+        bool requested;
+        uint256 requestCount = s_requestCount;
+        for (uint256 i; i < 10; i++) {
+            (nextRequestedRound, requested) = s_roundBitmap.nextRequestedRound(
+                s_currentRound
+            );
+            if (requested) {
+                s_currentRound = nextRequestedRound;
+                s_requestInfo[nextRequestedRound].startTime = block.timestamp;
+                emit RandomNumberRequested(
+                    nextRequestedRound,
+                    block.timestamp,
+                    s_activatedOperators
+                );
+                return;
+            }
+            if (nextRequestedRound >= requestCount) {
+                // && requested = false
+                s_currentRound = requestCount;
+                return;
+            }
+        }
+        s_currentRound = nextRequestedRound;
     }
 
     // * Phase5: On-chain: Reaveal-1 Submission Request
-    function requestToSubmitCO(
+    function requestToSubmitCo(
         uint256[] calldata indices,
         bytes32[] calldata cvs,
         uint8[] calldata vs,
         bytes32[] calldata rs,
         bytes32[] calldata ss
     ) external onlyOwner {
-        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
-        require(block.timestamp >= startTime + s_phase5StartOffset, TooEarly());
-        require(block.timestamp < startTime + s_phase6StartOffset, TooLate());
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
+        require(s_isSubmittedMerkleRoot[startTime], MerkleRootNotSubmitted());
+        require(
+            block.timestamp <
+                s_merkleRootSubmittedTimestamp +
+                    s_offChainSubmissionPeriod +
+                    s_requestOrSubmitOrFailDecisionPeriod,
+            TooLate()
+        );
         uint256 cvsLength = cvs.length;
         bytes32[] storage s_cvsArray = s_cvs[startTime];
+        if (s_cvsArray.length == 0)
+            s_cvs[startTime] = new bytes32[](s_activatedOperators.length);
         for (uint256 i; i < cvsLength; i = unchecked_inc(i)) {
             require(
                 ss[i] <=
@@ -214,14 +440,19 @@ contract CommitReveal2 is
             require(s_cvsArray[indices[i]] > 0, CVNotSubmitted(indices[i]));
         }
         s_requestedToSubmitCOIndices = indices;
+        s_requestedToSubmitCOTimestamp = block.timestamp;
+        // ** Not Complete
         emit RequestedToSubmitCO(startTime, indices);
     }
 
     // * Phase6: On-chain: Reaveal-1 Submission
-    function submitCO(bytes32 co) external {
-        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
-        require(block.timestamp >= startTime + s_phase6StartOffset, TooEarly());
-        require(block.timestamp < startTime + s_phase7StartOffset, TooLate());
+    function submitCo(bytes32 co) external {
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
+        require(
+            block.timestamp <
+                s_requestedToSubmitCOTimestamp + s_onChainSubmissionPeriod,
+            TooLate()
+        );
         uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[
             msg.sender
         ] - 1;
@@ -230,78 +461,168 @@ contract CommitReveal2 is
                 keccak256(abi.encodePacked(co)),
             InvalidCO()
         );
+        // ** Not Complete
         emit COSubmitted(startTime, co, activatedOperatorIndex);
     }
 
+    function failToSubmitCo() external {
+        // uint256 round = s_currentRound;
+        // uint256 startTime = s_requestInfo[round].startTime;
+        // require(
+        //     block.timestamp >=
+        //         s_requestedToSubmitCOTimestamp + s_onChainSubmissionPeriod,
+        //     TooEarly()
+        // );
+        // ** Not Complete
+    }
+
+    struct TempStackVariables {
+        // to avoid stack too deep error
+        uint256 startTime;
+        uint256 operatorsLength;
+        uint256 secretsLength;
+    }
+
     // * Phase8: On-chain: Reveal-2 Submission Request
-    function requestToSubmitSFromIndex(
-        uint256 k,
-        bytes32[] calldata cos,
+    function requestToSubmitS(
+        bytes32[] calldata cos, // all cos
+        bytes32[] calldata secrets, // already received off-chain
         Signature[] calldata signatures // used struct to avoid stack too deep error
     ) external onlyOwner {
-        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
-        require(block.timestamp >= startTime + s_phase8StartOffset, TooEarly());
-        require(block.timestamp < startTime + s_phase9StartOffset, TooLate());
-        bytes32[] storage s_cvsArray = s_cvs[startTime];
-        uint256 operatorsLength = s_activatedOperators.length;
-        uint256[] memory diffs = new uint256[](operatorsLength);
-        uint256[] memory revealOrders = new uint256[](operatorsLength);
-        uint256 rv = uint256(keccak256(abi.encodePacked(cos)));
-        uint256 i;
-        s_ss[startTime] = new bytes32[](operatorsLength);
-        do {
-            unchecked {
-                bytes32 cv = _efficientOneKeccak256(cos[--operatorsLength]);
-                if (s_cvsArray[operatorsLength] > 0) {
-                    require(s_cvsArray[operatorsLength] == cv, InvalidCO());
-                } else {
-                    require(
-                        signatures[i].s <=
-                            0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
-                        InvalidSignatureS()
+        TempStackVariables memory tempStackVariables = TempStackVariables({
+            startTime: s_requestInfo[s_currentRound].startTime,
+            operatorsLength: s_activatedOperators.length,
+            secretsLength: secrets.length
+        });
+        require(
+            (block.timestamp <
+                s_merkleRootSubmittedTimestamp +
+                    s_offChainSubmissionPeriod +
+                    (s_offChainSubmissionPeriodPerOperator *
+                        tempStackVariables.operatorsLength) +
+                    s_requestOrSubmitOrFailDecisionPeriod) ||
+                (block.timestamp <
+                    s_requestedToSubmitCOTimestamp +
+                        s_onChainSubmissionPeriod +
+                        (s_offChainSubmissionPeriodPerOperator *
+                            tempStackVariables.operatorsLength) +
+                        s_requestOrSubmitOrFailDecisionPeriod),
+            TooLate()
+        );
+        //uint256 operatorsLength = s_activatedOperators.length;
+        uint256[] memory diffs = new uint256[](
+            tempStackVariables.operatorsLength
+        );
+        uint256[] memory revealOrders = new uint256[](
+            tempStackVariables.operatorsLength
+        );
+        s_ss[tempStackVariables.startTime] = new bytes32[](
+            tempStackVariables.operatorsLength
+        );
+        bytes32[] storage s_cvsArray = s_cvs[tempStackVariables.startTime];
+        if (s_cvsArray.length == 0)
+            s_cvs[tempStackVariables.startTime] = new bytes32[](
+                tempStackVariables.operatorsLength
+            );
+        {
+            uint256 rv = uint256(keccak256(abi.encodePacked(cos)));
+            uint256 i;
+            do {
+                unchecked {
+                    bytes32 cv = _efficientOneKeccak256(
+                        cos[--tempStackVariables.operatorsLength]
                     );
-                    require(
-                        s_activatedOperatorIndex1Based[
-                            ecrecover(
-                                _hashTypedDataV4(
-                                    keccak256(
-                                        abi.encode(
-                                            MESSAGE_TYPEHASH,
-                                            Message({
-                                                timestamp: startTime,
-                                                cv: cv
-                                            })
+                    if (s_cvsArray[tempStackVariables.operatorsLength] > 0) {
+                        require(
+                            s_cvsArray[tempStackVariables.operatorsLength] ==
+                                cv,
+                            InvalidCO()
+                        );
+                    } else {
+                        require(
+                            signatures[i].s <=
+                                0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
+                            InvalidSignatureS()
+                        );
+                        require(
+                            s_activatedOperatorIndex1Based[
+                                ecrecover(
+                                    _hashTypedDataV4(
+                                        keccak256(
+                                            abi.encode(
+                                                MESSAGE_TYPEHASH,
+                                                Message({
+                                                    timestamp: tempStackVariables
+                                                        .startTime,
+                                                    cv: cv
+                                                })
+                                            )
                                         )
-                                    )
-                                ),
-                                signatures[i].v,
-                                signatures[i].r,
-                                signatures[i++].s
-                            )
-                        ] == operatorsLength + 1,
-                        InvalidSignature()
+                                    ),
+                                    signatures[i].v,
+                                    signatures[i].r,
+                                    signatures[i++].s
+                                )
+                            ] == tempStackVariables.operatorsLength + 1,
+                            InvalidSignature()
+                        );
+                        s_cvsArray[tempStackVariables.operatorsLength] = cv;
+                    }
+                    diffs[tempStackVariables.operatorsLength] = diff(
+                        rv,
+                        uint256(cv)
                     );
-                    s_cvsArray[operatorsLength] = cv;
+                    revealOrders[
+                        tempStackVariables.operatorsLength
+                    ] = tempStackVariables.operatorsLength;
                 }
-                diffs[operatorsLength] = diff(rv, uint256(cv));
-                revealOrders[operatorsLength] = operatorsLength;
-            }
-        } while (operatorsLength > 0);
+            } while (tempStackVariables.operatorsLength > 0);
+        }
         // ** calculate reveal order
         Sort.sort(diffs, revealOrders);
         s_revealOrders = revealOrders;
-        s_requestedToSubmitSFromIndexK = k;
-        emit RequestedToSubmitSFromIndex(startTime, k);
+
+        s_requestedToSubmitSFromIndexK = tempStackVariables.secretsLength;
+        emit RequestedToSubmitSFromIndexK(
+            tempStackVariables.startTime,
+            tempStackVariables.secretsLength
+        );
+        bytes32[] storage s_ssArray = s_ss[tempStackVariables.startTime];
+        while (tempStackVariables.secretsLength > 0) {
+            unchecked {
+                uint256 activatedOperatorIndex = revealOrders[
+                    --tempStackVariables.secretsLength
+                ];
+                bytes32 secret = secrets[tempStackVariables.secretsLength];
+                require(
+                    s_cvsArray[activatedOperatorIndex] ==
+                        _efficientTwoKeccak256(secret),
+                    InvalidS()
+                );
+                s_ssArray[activatedOperatorIndex] = secret;
+            }
+        }
+        s_previousSSubmitTimestamp = block.timestamp;
     }
 
     // * Phase9: On-chain: Reveal-2 Submission
     function submitS(bytes32 s) external {
-        uint256 startTime = s_requestInfo[s_fulfilledCount].startTime;
-        require(block.timestamp >= startTime + s_phase9StartOffset, TooEarly());
-        require(block.timestamp < startTime + s_phase10StartOffset, TooLate());
+        RequestInfo storage requestInfo = s_requestInfo[s_currentRound];
+        uint256 startTime = requestInfo.startTime;
+        require(
+            block.timestamp <
+                s_previousSSubmitTimestamp +
+                    s_onChainSubmissionPeriodPerOperator,
+            TooLate()
+        );
         uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[
             msg.sender
         ] - 1;
+        require(
+            s_cvs[startTime][activatedOperatorIndex] ==
+                _efficientTwoKeccak256(s),
+            InvalidS()
+        );
         unchecked {
             require(
                 s_revealOrders[s_requestedToSubmitSFromIndexK++] ==
@@ -309,14 +630,47 @@ contract CommitReveal2 is
                 InvalidRevealOrder()
             );
         }
-        require(
-            s_cvs[startTime][activatedOperatorIndex] ==
-                _efficientTwoKeccak256(s),
-            InvalidS()
-        );
-        s_ss[startTime][activatedOperatorIndex] = s;
         emit SSubmitted(startTime, s, activatedOperatorIndex);
+        s_ss[startTime][activatedOperatorIndex] = s;
+        uint256 round = s_currentRound;
+        if (
+            activatedOperatorIndex == s_revealOrders[s_revealOrders.length - 1]
+        ) {
+            // ** create random number
+            uint256 randomNumber = uint256(
+                keccak256(abi.encodePacked(s_ss[startTime]))
+            );
+            uint256 nextRound = unchecked_inc(round);
+            if (nextRound == s_requestCount) {
+                s_isInProcess = NOT_IN_PROGRESS;
+                emit IsInProcess(NOT_IN_PROGRESS);
+            } else {
+                s_requestInfo[nextRound].startTime = block.timestamp;
+                s_currentRound = nextRound;
+            }
+            s_depositAmount[
+                s_activatedOperators[activatedOperatorIndex]
+            ] += requestInfo.cost;
+            s_lastfulfilledRound = round;
+            emit RandomNumberGenerated(
+                round,
+                randomNumber,
+                _call(
+                    requestInfo.consumer,
+                    abi.encodeWithSelector(
+                        ConsumerBase.rawFulfillRandomNumber.selector,
+                        round,
+                        randomNumber
+                    ),
+                    requestInfo.callbackGasLimit
+                )
+            );
+        }
     }
+
+    function failToSubmitAllS() external {}
+
+    function failToGenerateRandomNumber() external {}
 
     function generateRandomNumber(
         bytes32[] calldata secrets,
@@ -324,15 +678,42 @@ contract CommitReveal2 is
         bytes32[] calldata rs,
         bytes32[] calldata ss
     ) external {
-        uint256 secretsLength = secrets.length;
-        require(secretsLength > 1, NotEnoughParticipatedOperators());
+        uint256 activatedOperatorsLength = s_activatedOperators.length;
+        require(
+            secrets.length == activatedOperatorsLength,
+            InvalidSecretLength()
+        );
+        require(
+            (block.timestamp <
+                s_merkleRootSubmittedTimestamp +
+                    s_offChainSubmissionPeriod +
+                    (s_offChainSubmissionPeriodPerOperator *
+                        activatedOperatorsLength) +
+                    s_requestOrSubmitOrFailDecisionPeriod) ||
+                (block.timestamp <
+                    s_requestedToSubmitCOTimestamp +
+                        s_onChainSubmissionPeriod +
+                        (s_offChainSubmissionPeriodPerOperator *
+                            activatedOperatorsLength) +
+                        s_requestOrSubmitOrFailDecisionPeriod),
+            TooLate()
+        );
 
-        bytes32[] memory cos = new bytes32[](secretsLength);
-        bytes32[] memory cvs = new bytes32[](secretsLength);
+        bytes32[] memory cos = new bytes32[](activatedOperatorsLength);
+        bytes32[] memory cvs = new bytes32[](activatedOperatorsLength);
 
-        for (uint256 i; i < secretsLength; i = unchecked_inc(i)) {
-            cos[i] = keccak256(abi.encodePacked(secrets[i]));
-            cvs[i] = keccak256(abi.encodePacked(cos[i]));
+        for (uint256 i; i < activatedOperatorsLength; i = unchecked_inc(i)) {
+            //cos[i] = keccak256(abi.encodePacked(secrets[i]));
+            //cvs[i] = keccak256(abi.encodePacked(cos[i]));
+            assembly ("memory-safe") {
+                mstore(0x00, calldataload(add(secrets.offset, mul(i, 0x20))))
+                let cosMemP := add(add(cos, 0x20), mul(i, 0x20))
+                mstore(cosMemP, keccak256(0x00, 0x20))
+                mstore(
+                    add(add(cvs, 0x20), mul(i, 0x20)),
+                    keccak256(cosMemP, 0x20)
+                )
+            }
         }
 
         // ** verify merkle root
@@ -342,43 +723,52 @@ contract CommitReveal2 is
         );
 
         // ** verify signer
-        uint256 round = s_fulfilledCount;
+        uint256 round = s_currentRound;
         RequestInfo storage requestInfo = s_requestInfo[round];
         uint256 startTimestamp = requestInfo.startTime;
-        address[] memory participatedOperators = new address[](secretsLength);
-        for (uint256 i; i < secretsLength; i = unchecked_inc(i)) {
+        for (uint256 i; i < activatedOperatorsLength; i = unchecked_inc(i)) {
             // signature malleability prevention
             require(
                 ss[i] <=
                     0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
                 InvalidSignatureS()
             );
-            address recoveredAddress = ecrecover(
-                _hashTypedDataV4(
-                    keccak256(
-                        abi.encode(
-                            MESSAGE_TYPEHASH,
-                            Message({timestamp: startTimestamp, cv: cvs[i]})
-                        )
-                    )
-                ),
-                vs[i],
-                rs[i],
-                ss[i]
-            );
-            participatedOperators[i] = recoveredAddress;
             require(
-                s_activatedOperatorIndex1Based[recoveredAddress] > 0,
+                s_activatedOperatorIndex1Based[
+                    ecrecover(
+                        _hashTypedDataV4(
+                            keccak256(
+                                abi.encode(
+                                    MESSAGE_TYPEHASH,
+                                    Message({
+                                        timestamp: startTimestamp,
+                                        cv: cvs[i]
+                                    })
+                                )
+                            )
+                        ),
+                        vs[i],
+                        rs[i],
+                        ss[i]
+                    )
+                ] > 0,
                 InvalidSignature()
             );
         }
+
         // ** create random number
         uint256 randomNumber = uint256(keccak256(abi.encodePacked(secrets)));
+        uint256 nextRound = unchecked_inc(round);
         unchecked {
-            if (++s_fulfilledCount == s_nextRound)
+            if (nextRound == s_requestCount) {
                 s_isInProcess = NOT_IN_PROGRESS;
-            else s_requestInfo[round + 1].startTime = block.timestamp;
+                emit IsInProcess(NOT_IN_PROGRESS);
+            } else {
+                s_requestInfo[nextRound].startTime = block.timestamp;
+                s_currentRound = nextRound;
+            }
         }
+        s_lastfulfilledRound = round;
         emit RandomNumberGenerated(
             round,
             randomNumber,
@@ -390,8 +780,7 @@ contract CommitReveal2 is
                     randomNumber
                 ),
                 requestInfo.callbackGasLimit
-            ),
-            participatedOperators
+            )
         );
     }
 
@@ -492,10 +881,16 @@ contract CommitReveal2 is
             msg.sender
         ];
         if (
-            activatedOperatorIndex1Based != 0 &&
+            activatedOperatorIndex1Based > 0 &&
             s_depositAmount[msg.sender] < s_activationThreshold
         ) _deactivate(activatedOperatorIndex1Based - 1, msg.sender);
-        payable(msg.sender).transfer(amount);
+        //payable(msg.sender).transfer(amount);
+        bool success;
+        assembly {
+            // Transfer the ETH and store if it succeeded or not.
+            success := call(gas(), caller(), amount, 0, 0, 0, 0)
+        }
+        require(success, TransferFailed());
     }
 
     function activate() public {
@@ -523,7 +918,6 @@ contract CommitReveal2 is
         uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[
             msg.sender
         ];
-        require(activatedOperatorIndex1Based != 0, OperatorNotActivated());
         _deactivate(activatedOperatorIndex1Based - 1, msg.sender);
     }
 
