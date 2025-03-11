@@ -28,9 +28,12 @@ contract NetworkHelperConfig is Script, BaseTest {
 
     constructor() {
         string memory key = "DEPLOYER";
-        string memory deployerString = vm.envString(key);
-        // deployer = address(bytes20(bytes(deployerString)));
-        deployer = Strings.parseAddress(deployerString);
+        if (vm.envExists(key)) {
+            deployer = vm.envAddress(key);
+        } else {
+            deployer = LEADERNODE;
+        }
+
         uint256 chainId = block.chainid;
         if (chainId == 111551119090)
             activeNetworkConfig = getThanosSepoliaConfig();
