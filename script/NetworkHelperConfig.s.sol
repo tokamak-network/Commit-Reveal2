@@ -32,6 +32,9 @@ contract NetworkHelperConfig is Script, BaseTest {
             deployer = vm.envAddress(key);
         } else {
             deployer = LEADERNODE;
+            console2.log(
+                "You didn't set the DEPLOYER env variable, using default"
+            );
         }
 
         uint256 chainId = block.chainid;

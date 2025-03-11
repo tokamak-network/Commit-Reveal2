@@ -10,8 +10,6 @@
 ## Quickstart
 
 ```
-git clone https://github.com/tokamak-network/Commit-Reveal2.git
-cd Commit-Reveal2
 make install
 make build
 ```
@@ -27,7 +25,8 @@ make test
 ### Set .env
 
 ```
-PRIVATE_KEY=<Private Key>
+PRIVATE_KEY=<Private Key of the DEPLOYER>
+DEPLOYER=<EOA ADDRESS>
 ETHERSCAN_API_KEY=<Etherscan API Key>
 SEPOLIA_RPC_URL=<Sepolia RPC URL>
 OP_SEPOLIA_RPC_URL=<Optimism Sepolia RPC URL>
