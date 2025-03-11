@@ -13,8 +13,12 @@ contract DeployConsumerExample is Script {
         public
         returns (ConsumerExample consumer)
     {
+        string memory contractName = (block.chainid == 31337 ||
+            block.chainid == 11155111)
+            ? "CommitReveal2L1"
+            : "CommitReveal2";
         address commitReveal2 = DevOpsTools.get_most_recent_deployment(
-            "CommitReveal2",
+            contractName,
             block.chainid
         );
         if (commitReveal2 == address(0)) revert CommitReveal2NotDeployed();
@@ -34,8 +38,6 @@ contract DeployConsumerExample is Script {
     }
 
     function run() public returns (ConsumerExample consumer) {
-        vm.startBroadcast();
         consumer = deployUsingDevOpsTools();
-        vm.stopBroadcast();
     }
 }

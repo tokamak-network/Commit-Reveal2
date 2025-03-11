@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {CommitReveal2} from "./../CommitReveal2.sol";
+import {CommitReveal2} from "./CommitReveal2.sol";
 
 contract CommitReveal2L1 is CommitReveal2 {
     constructor(
