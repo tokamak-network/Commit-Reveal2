@@ -41,6 +41,10 @@ abstract contract ConsumerBase {
         return requestId;
     }
 
+    function refund(uint256 round) external {
+        i_commitreveal2.refund(round);
+    }
+
     /**
      * @param round The round of the randomness
      * @param randomNumber the random number

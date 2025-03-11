@@ -10,16 +10,11 @@ contract CommitReveal2L1 is CommitReveal2 {
         uint256 maxActivatedOperators,
         string memory name,
         string memory version,
-        uint256 phase1StartOffset,
-        uint256 phase2StartOffset,
-        uint256 phase3StartOffset,
-        uint256 phase4StartOffset,
-        uint256 phase5StartOffset,
-        uint256 phase6StartOffset,
-        uint256 phase7StartOffset,
-        uint256 phase8StartOffset,
-        uint256 phase9StartOffset,
-        uint256 phase10StartOffset
+        uint256 offChainSubmissionPeriod,
+        uint256 requestOrSubmitOrFailDecisionPeriod,
+        uint256 onChainSubmissionPeriod,
+        uint256 offChainSubmissionPeriodPerOperator,
+        uint256 onChainSubmissionPeriodPerOperator
     )
         CommitReveal2(
             activationThreshold,
@@ -27,16 +22,11 @@ contract CommitReveal2L1 is CommitReveal2 {
             maxActivatedOperators,
             name,
             version,
-            phase1StartOffset,
-            phase2StartOffset,
-            phase3StartOffset,
-            phase4StartOffset,
-            phase5StartOffset,
-            phase6StartOffset,
-            phase7StartOffset,
-            phase8StartOffset,
-            phase9StartOffset,
-            phase10StartOffset
+            offChainSubmissionPeriod,
+            requestOrSubmitOrFailDecisionPeriod,
+            onChainSubmissionPeriod,
+            offChainSubmissionPeriodPerOperator,
+            onChainSubmissionPeriodPerOperator
         )
     {}
 

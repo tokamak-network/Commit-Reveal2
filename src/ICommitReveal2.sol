@@ -23,4 +23,6 @@ interface ICommitReveal2 {
         uint256 gasPrice,
         uint256 numOfOperators
     ) external view returns (uint256);
+
+    function refund(uint256 round) external;
 }
