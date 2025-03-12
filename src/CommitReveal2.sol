@@ -406,13 +406,14 @@ contract CommitReveal2 is
         if (s_cvsArray.length == 0)
             s_cvs[startTime] = new bytes32[](s_activatedOperators.length);
         for (uint256 i; i < cvsLength; i = unchecked_inc(i)) {
+            uint256 index = indices[i];
             require(
                 ss[i] <=
                     0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
                 InvalidSignatureS()
             );
             require(
-                indices[i] + 1 ==
+                index + 1 ==
                     s_activatedOperatorIndex1Based[
                         ecrecover(
                             _hashTypedDataV4(
@@ -433,7 +434,7 @@ contract CommitReveal2 is
                     ],
                 InvalidSignature()
             );
-            s_cvsArray[indices[i]] = cvs[i];
+            s_cvsArray[index] = cvs[i];
         }
         uint256 indicesLength = indices.length;
         for (uint256 i = cvsLength; i < indicesLength; i = unchecked_inc(i)) {
