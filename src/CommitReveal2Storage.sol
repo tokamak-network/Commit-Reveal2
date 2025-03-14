@@ -22,11 +22,9 @@ contract CommitReveal2Storage {
     }
 
     // * Errors
-    error LessThanActivationThreshold();
-    error AlreadyActivated();
+
     error OperatorNotActivated();
     error ExceedCallbackGasLimit();
-    error ActivatedOperatorsLimitReached();
     error NotEnoughActivatedOperators();
     error InsufficientAmount();
     error NotActivatedOperator();
@@ -34,27 +32,27 @@ contract CommitReveal2Storage {
     error InvalidSignatureS();
     error InvalidSignature();
     error InvalidSignatureLength();
-    error InProcess();
     error TooEarly();
     error TooLate();
-    error InvalidCO();
+    error InvalidCo();
     error InvalidS();
     error InvalidRevealOrder();
     error InvalidSecretLength();
     error ShouldNotBeZero();
     error NotConsumer();
-    error TransferFailed();
     error InvalidRound();
     error AlreadyRefunded();
     error AlreadySubmittedMerkleRoot();
-    error AlreadyRequestedToSubmitCV();
-    error CVNotRequested();
+    error AlreadyRequestedToSubmitCv();
+    error CvNotRequested();
     error MerkleRootNotSubmitted();
-    error CVNotSubmitted(uint256 index);
+    error NotHalted();
+    error ZeroLength();
+
+    error CvNotSubmitted(uint256 index);
 
     // * Events
-    event Activated(address operator);
-    event DeActivated(address operator);
+
     event RandomNumberRequested(
         uint256 round,
         uint256 timestamp,
@@ -67,35 +65,34 @@ contract CommitReveal2Storage {
         bool callbackSuccess
     );
 
-    event RequestedToSubmitCV(uint256 timestamp, uint256[] indices);
-    event RequestedToSubmitCO(uint256 timestamp, uint256[] indices);
-    event CVSubmitted(uint256 timestamp, bytes32 cv, uint256 index);
-    event COSubmitted(uint256 timestamp, bytes32 co, uint256 index);
+    event RequestedToSubmitCv(uint256 timestamp, uint256[] indices);
+    event RequestedToSubmitCo(uint256 timestamp, uint256[] indices);
+    event CvSubmitted(uint256 timestamp, bytes32 cv, uint256 index);
+    event CoSubmitted(uint256 timestamp, bytes32 co, uint256 index);
     event RequestedToSubmitSFromIndexK(uint256 timestamp, uint256 index);
     event SSubmitted(uint256 timestamp, bytes32 s, uint256 index);
     event IsInProcess(uint256 isInProcess);
 
     // * State Variables
     // ** public
-    uint256 public s_activationThreshold;
+
     uint256 public s_flatFee;
-    uint256 public s_maxActivatedOperators;
+
     uint256 public s_currentRound;
     uint256 public s_requestCount;
     uint256 public s_lastfulfilledRound;
 
     bytes32 public s_merkleRoot;
-    uint256 public s_isInProcess = NOT_IN_PROGRESS;
 
-    uint256 public s_requestedToSubmitCVTimestamp;
+    uint256 public s_requestedToSubmitCvTimestamp;
     uint256 public s_merkleRootSubmittedTimestamp;
-    uint256 public s_requestedToSubmitCOTimestamp;
+    uint256 public s_requestedToSubmitCoTimestamp;
     uint256 public s_previousSSubmitTimestamp;
 
     mapping(uint256 round => RequestInfo requestInfo) public s_requestInfo;
 
-    uint256[] public s_requestedToSubmitCVIndices;
-    uint256[] public s_requestedToSubmitCOIndices;
+    uint256[] public s_requestedToSubmitCvIndices;
+    uint256[] public s_requestedToSubmitCoIndices;
     uint256 public s_requestedToSubmitSFromIndexK;
     uint256[] public s_revealOrders;
 
@@ -104,14 +101,10 @@ contract CommitReveal2Storage {
     mapping(uint256 timestamp => bool) public s_isSubmittedMerkleRoot;
     mapping(uint256 timestamp => bytes32[]) public s_cvs;
     mapping(uint256 timestamp => bytes32[]) public s_ss;
-    mapping(address operator => uint256) public s_depositAmount;
-    mapping(address operator => uint256) public s_activatedOperatorIndex1Based;
 
     // ** internal
 
     // uint256 internal s_fulfilledCount;
-
-    address[] internal s_activatedOperators;
 
     uint256 internal s_offChainSubmissionPeriod;
     uint256 internal s_requestOrSubmitOrFailDecisionPeriod;
@@ -120,8 +113,7 @@ contract CommitReveal2Storage {
     uint256 internal s_onChainSubmissionPeriodPerOperator;
 
     // ** constant
-    uint256 internal constant NOT_IN_PROGRESS = 1;
-    uint256 internal constant IN_PROGRESS = 2;
+
     // uint256 internal constant MERKLEROOTSUB_RANDOMNUMGENERATE_GASUSED = 100000;
     uint256 internal constant MERKLEROOTSUB_CALLDATA_BYTES_SIZE = 68;
     // uint256 internal constant RANDOMNUMGENERATE_CALLDATA_BYTES_SIZE = 278;
@@ -130,13 +122,10 @@ contract CommitReveal2Storage {
     bytes32 internal constant MESSAGE_TYPEHASH =
         keccak256("Message(uint256 timestamp,bytes32 cv)");
 
-    // ** getter
-    // s_activatedOperators
-    function getActivatedOperators() external view returns (address[] memory) {
-        return s_activatedOperators;
-    }
+    // *** functions gasUsed;
+    uint256 internal constant FAILTOSUBMITCVORSUBMITMERKLEROOT_GASUSED = 123;
+    uint256 internal constant FAILTOSUBMITCV_GASUSED = 123;
 
-    function getActivatedOperatorsLength() external view returns (uint256) {
-        return s_activatedOperators.length;
-    }
+    // *** functions calldata size;
+    uint256 internal constant NO_CALLDATA_SIZE = 4;
 }

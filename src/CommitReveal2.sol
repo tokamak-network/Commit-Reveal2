@@ -3,20 +3,19 @@ pragma solidity ^0.8.28;
 
 import {ReentrancyGuardTransient} from "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 import {OptimismL1Fees} from "./OptimismL1Fees.sol";
-import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {ConsumerBase} from "./ConsumerBase.sol";
 import {CommitReveal2Storage} from "./CommitReveal2Storage.sol";
 import {Sort} from "./Sort.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import {Bitmap} from "./libraries/Bitmap.sol";
-
+import {OperatorManager} from "./OperatorManager.sol";
 import {console2} from "forge-std/Test.sol";
 
 contract CommitReveal2 is
     EIP712,
-    Ownable2Step,
     OptimismL1Fees,
-    CommitReveal2Storage
+    CommitReveal2Storage,
+    OperatorManager
 {
     using Bitmap for mapping(uint248 => uint256);
 
@@ -31,7 +30,9 @@ contract CommitReveal2 is
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator
-    ) EIP712(name, version) Ownable(msg.sender) {
+    ) payable EIP712(name, version) OperatorManager() {
+        require(msg.value >= activationThreshold);
+        s_depositAmount[msg.sender] = msg.value;
         s_activationThreshold = activationThreshold;
         s_flatFee = flatFee;
         s_maxActivatedOperators = maxActivatedOperators;
@@ -95,7 +96,7 @@ contract CommitReveal2 is
             callbackGasLimit: callbackGasLimit
         });
         emit RandomNumberRequested(newRound, startTime, s_activatedOperators);
-        if (s_isInProcess == NOT_IN_PROGRESS) {
+        if (s_isInProcess == COMPLETED) {
             s_currentRound = newRound;
             s_isInProcess = IN_PROGRESS;
             emit IsInProcess(IN_PROGRESS);
@@ -131,19 +132,102 @@ contract CommitReveal2 is
 
     // ** On-chain: Commit Submission Request
     function requestToSubmitCv(uint256[] calldata indices) external onlyOwner {
-        uint256 round = s_currentRound;
+        require(indices.length > 0, ZeroLength());
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
         require(
             block.timestamp <
-                s_requestInfo[round].startTime +
+                startTime +
                     s_offChainSubmissionPeriod +
                     s_requestOrSubmitOrFailDecisionPeriod,
             TooLate()
         );
-        s_requestedToSubmitCVIndices = indices;
-        uint256 startTime = s_requestInfo[round].startTime;
         s_cvs[startTime] = new bytes32[](s_activatedOperators.length);
-        s_requestedToSubmitCVTimestamp = block.timestamp;
-        emit RequestedToSubmitCV(startTime, indices);
+        s_requestedToSubmitCvIndices = indices;
+        s_requestedToSubmitCvTimestamp = block.timestamp;
+        emit RequestedToSubmitCv(startTime, indices);
+    }
+
+    // address를 제출했다면
+
+    // ** On-chain: Commit Submission
+    function submitCv(bytes32 cv) external {
+        require(cv != 0x00, ShouldNotBeZero());
+        require(
+            block.timestamp <
+                s_requestedToSubmitCvTimestamp + s_onChainSubmissionPeriod,
+            TooLate()
+        );
+        uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[
+            msg.sender
+        ] - 1;
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
+        s_cvs[startTime][activatedOperatorIndex] = cv;
+        emit CvSubmitted(startTime, cv, activatedOperatorIndex);
+    }
+
+    // * On-chain: Merkle Root Submission
+    // * Or Restart this round
+    function failToSubmitCv() external {
+        // ** check if it's time to submit merkle root or to restart
+        uint256 round = s_currentRound;
+        uint256 startTime = s_requestInfo[round].startTime;
+        bytes32[] storage s_cvsArray = s_cvs[startTime];
+        require(s_cvsArray.length > 0, CvNotRequested());
+        require(
+            block.timestamp >=
+                s_requestedToSubmitCvTimestamp + s_onChainSubmissionPeriod,
+            TooEarly()
+        );
+        // ** who didn't submi CV even though requested
+        uint256 requestedToSubmitCVLength = s_requestedToSubmitCvIndices.length;
+        uint256 activationThreshold = s_activationThreshold;
+        uint256 didntSubmitCVLength; // ** count of operators who didn't submit CV
+        address[] memory addressToDeactivates = new address[](
+            requestedToSubmitCVLength
+        );
+        for (uint256 i; i < requestedToSubmitCVLength; i = unchecked_inc(i)) {
+            uint256 index1Based = s_requestedToSubmitCvIndices[i];
+            if (s_cvsArray[index1Based] == 0) {
+                // ** slash deposit and deactivate
+                unchecked {
+                    addressToDeactivates[
+                        didntSubmitCVLength++
+                    ] = s_activatedOperators[index1Based];
+                }
+            }
+        }
+
+        // ** return gas fee
+        uint256 returnGasFee = tx.gasprice * FAILTOSUBMITCV_GASUSED; // + L1Gas
+        s_depositAmount[msg.sender] += returnGasFee;
+
+        uint256 slashRewardPerOperator = s_slashRewardPerOperator;
+        uint256 updatedSlashRewardPerOperator = slashRewardPerOperator +
+            (activationThreshold * didntSubmitCVLength - returnGasFee) /
+            (s_activatedOperators.length - didntSubmitCVLength + 1); // 1 for owner
+        // ** update global slash reward
+        s_slashRewardPerOperator = updatedSlashRewardPerOperator;
+
+        for (uint256 i; i < didntSubmitCVLength; i = unchecked_inc(i)) {
+            // *** update each slash reward
+            address operator = addressToDeactivates[i];
+            uint256 accumulatedReward = slashRewardPerOperator -
+                s_slashRewardPerOperatorPaid[operator];
+            s_slashRewardPerOperatorPaid[
+                operator
+            ] = updatedSlashRewardPerOperator;
+
+            // *** update deposit amount
+            s_depositAmount[operator] =
+                s_depositAmount[operator] -
+                activationThreshold +
+                accumulatedReward;
+            _deactivate(s_activatedOperatorIndex1Based[operator] - 1, operator);
+        }
+
+        // ** restart or end this round
+        s_isInProcess = HALTED;
+        emit IsInProcess(HALTED);
     }
 
     // ** On-chain: Merkle Root Submission
@@ -162,11 +246,10 @@ contract CommitReveal2 is
         emit MerkleRootSubmitted(startTime, merkleRoot);
     }
 
-    function failToRequestSubmitCVAndSubmitMerkleRoot() external {
-        uint256 round = s_currentRound;
-        uint256 startTime = s_requestInfo[round].startTime;
+    function failToRequestSubmitCvOrSubmitMerkleRoot() external {
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
         // ** Not requested
-        require(s_cvs[startTime].length == 0, AlreadyRequestedToSubmitCV());
+        require(s_cvs[startTime].length == 0, AlreadyRequestedToSubmitCv());
         // ** MerkleRoot Not Submitted
         require(
             !s_isSubmittedMerkleRoot[startTime],
@@ -180,39 +263,20 @@ contract CommitReveal2 is
             TooEarly()
         );
         // ** slash the leadernode(owner)'s deposit
-        uint256 leaderNodeDeposit = s_depositAmount[owner()];
         uint256 activationThreshold = s_activationThreshold;
-        if (leaderNodeDeposit > activationThreshold) {
-            unchecked {
-                s_depositAmount[owner()] -= activationThreshold;
-                s_depositAmount[msg.sender] += activationThreshold;
-            }
-            s_requestInfo[round].startTime = block.timestamp;
-            emit RandomNumberRequested(
-                round,
-                block.timestamp,
-                s_activatedOperators
-            );
-        } else {
-            s_isInProcess = NOT_IN_PROGRESS;
-            emit IsInProcess(NOT_IN_PROGRESS);
+        uint256 returnGasFee = tx.gasprice *
+            FAILTOSUBMITCVORSUBMITMERKLEROOT_GASUSED; // + L1Gas
+        unchecked {
+            s_depositAmount[owner] -= activationThreshold;
+            s_depositAmount[msg.sender] += returnGasFee;
         }
-    }
+        uint256 delta = (activationThreshold - returnGasFee) /
+            s_activatedOperators.length;
+        s_slashRewardPerOperator += delta;
+        s_slashRewardPerOperatorPaid[owner] += delta;
 
-    // ** On-chain: Commit Submission
-    function submitCv(bytes32 cv) external {
-        require(cv != 0x00, ShouldNotBeZero());
-        require(
-            block.timestamp <
-                s_requestedToSubmitCVTimestamp + s_onChainSubmissionPeriod,
-            TooLate()
-        );
-        uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[
-            msg.sender
-        ] - 1;
-        uint256 startTime = s_requestInfo[s_currentRound].startTime;
-        s_cvs[startTime][activatedOperatorIndex] = cv;
-        emit CVSubmitted(startTime, cv, activatedOperatorIndex);
+        s_isInProcess = HALTED;
+        emit IsInProcess(HALTED);
     }
 
     function submitMerkleRootAfterDispute(
@@ -220,7 +284,7 @@ contract CommitReveal2 is
     ) external onlyOwner {
         require(
             block.timestamp <
-                s_requestedToSubmitCVTimestamp +
+                s_requestedToSubmitCvTimestamp +
                     s_onChainSubmissionPeriod +
                     s_requestOrSubmitOrFailDecisionPeriod,
             TooLate()
@@ -232,94 +296,28 @@ contract CommitReveal2 is
         emit MerkleRootSubmitted(startTime, merkleRoot);
     }
 
-    // * Phase3: On-chain: Merkle Root Submission
-    // * Or Restart this round
-    function failToSubmitCv() external {
-        // ** check if it's time to submit merkle root or to restart
-        uint256 round = s_currentRound;
-        uint256 startTime = s_requestInfo[round].startTime;
-        require(
-            block.timestamp >=
-                s_requestedToSubmitCVTimestamp + s_onChainSubmissionPeriod,
-            TooEarly()
-        );
-        // ** who didn't submi CV even though requested
-        uint256 requestedToSubmitCVLength = s_requestedToSubmitCVIndices.length;
-        uint256 activationThreshold = s_activationThreshold;
-        uint256 didntSubmitCVLength; // ** count of operators who didn't submit CV
-
-        bytes32[] storage s_cvsArray = s_cvs[startTime];
-        require(s_cvsArray.length > 0, CVNotRequested());
-        address[] memory addressToDeactivates = new address[](
-            requestedToSubmitCVLength
-        );
-        for (uint256 i; i < requestedToSubmitCVLength; i = unchecked_inc(i)) {
-            uint256 index = s_requestedToSubmitCVIndices[i];
-            if (s_cvsArray[index] == 0) {
-                address operator = s_activatedOperators[index];
-                uint256 updatedDepositAmount = s_depositAmount[operator] -
-                    activationThreshold;
-                s_depositAmount[operator] = updatedDepositAmount;
-                // ** slash deposit and deactivate if deposit is less than activationThreshold
-                if (updatedDepositAmount < activationThreshold) {
-                    unchecked {
-                        addressToDeactivates[didntSubmitCVLength++] = operator;
-                    }
-                }
-            }
-        }
-        for (uint256 i; i < didntSubmitCVLength; i = unchecked_inc(i)) {
-            address operator = addressToDeactivates[i];
-            _deactivate(s_activatedOperatorIndex1Based[operator] - 1, operator);
-        }
-        // ** distribute slashed amount to updated activated operators
-        uint256 updatedActivatedOperatorsLength = s_activatedOperators.length;
-        uint256 distributeSlashedAmount = (didntSubmitCVLength *
-            activationThreshold) / updatedActivatedOperatorsLength;
-        for (
-            uint256 i;
-            i < updatedActivatedOperatorsLength;
-            i = unchecked_inc(i)
-        ) {
-            s_depositAmount[s_activatedOperators[i]] += distributeSlashedAmount;
-        }
-
-        // ** restart or end this round
-        if (updatedActivatedOperatorsLength > 1) {
-            s_requestInfo[round].startTime = block.timestamp;
-            emit RandomNumberRequested(
-                round,
-                block.timestamp,
-                s_activatedOperators
-            );
-        } else {
-            s_isInProcess = NOT_IN_PROGRESS;
-            emit IsInProcess(NOT_IN_PROGRESS);
-        }
-    }
-
     function failToSubmitMerkleRootAfterDispute() external {
         uint256 round = s_currentRound;
 
         require(
             block.timestamp >=
-                s_requestedToSubmitCVTimestamp +
+                s_requestedToSubmitCvTimestamp +
                     s_onChainSubmissionPeriod + // disputeSubmission
                     s_requestOrSubmitOrFailDecisionPeriod, // merkleRootSubmission,
             TooEarly()
         );
         uint256 startTime = s_requestInfo[round].startTime;
-        require(s_cvs[startTime].length > 0, CVNotRequested());
+        require(s_cvs[startTime].length > 0, CvNotRequested());
         require(
             !s_isSubmittedMerkleRoot[startTime],
             AlreadySubmittedMerkleRoot()
         );
         // ** slash the leadernode(owner)'s deposit
-        uint256 leaderNodeDeposit = s_depositAmount[owner()];
+        uint256 leaderNodeDepositAmount = s_depositAmount[owner];
         uint256 activationThreshold = s_activationThreshold;
-        if (leaderNodeDeposit > activationThreshold) {
+        if (leaderNodeDepositAmount > activationThreshold) {
             unchecked {
-                s_depositAmount[owner()] -= activationThreshold;
+                s_depositAmount[owner] -= activationThreshold;
                 s_depositAmount[msg.sender] += activationThreshold;
             }
             s_requestInfo[round].startTime = block.timestamp;
@@ -329,14 +327,13 @@ contract CommitReveal2 is
                 s_activatedOperators
             );
         } else {
-            s_isInProcess = NOT_IN_PROGRESS;
-            emit IsInProcess(NOT_IN_PROGRESS);
+            s_isInProcess = HALTED;
+            emit IsInProcess(HALTED);
         }
     }
 
     // The consumer can issue a refund || operators can activate, and if more than one operator is available, the round can be restarted.
-    function refund(uint256 round) external {
-        require(s_isInProcess == NOT_IN_PROGRESS, InProcess());
+    function refund(uint256 round) external notInProcess {
         require(round < s_requestCount, InvalidRound());
         require(round >= s_currentRound, InvalidRound());
         RequestInfo storage requestInfo = s_requestInfo[round];
@@ -355,19 +352,22 @@ contract CommitReveal2 is
         require(success, TransferFailed());
     }
 
-    function restartCurrentRound() external onlyOwner {
-        require(s_isInProcess == NOT_IN_PROGRESS, InProcess());
+    function resume() external onlyOwner {
+        require(s_isInProcess == HALTED, NotHalted());
         require(s_activatedOperators.length > 1, NotEnoughActivatedOperators());
-        uint256 nextRequestedRound;
+        uint256 nextRequestedRound = s_currentRound;
         bool requested;
         uint256 requestCount = s_requestCount;
         for (uint256 i; i < 10; i++) {
             (nextRequestedRound, requested) = s_roundBitmap.nextRequestedRound(
-                s_currentRound
+                nextRequestedRound
             );
             if (requested) {
                 s_currentRound = nextRequestedRound;
+                // s_lastfulfilledRound = nextRequestedRound - 1;
                 s_requestInfo[nextRequestedRound].startTime = block.timestamp;
+                s_isInProcess = IN_PROGRESS;
+                emit IsInProcess(IN_PROGRESS);
                 emit RandomNumberRequested(
                     nextRequestedRound,
                     block.timestamp,
@@ -377,7 +377,10 @@ contract CommitReveal2 is
             }
             if (nextRequestedRound >= requestCount) {
                 // && requested = false
+                s_isInProcess = COMPLETED;
+                s_lastfulfilledRound = requestCount;
                 s_currentRound = requestCount;
+                emit IsInProcess(COMPLETED);
                 return;
             }
         }
@@ -438,12 +441,12 @@ contract CommitReveal2 is
         }
         uint256 indicesLength = indices.length;
         for (uint256 i = cvsLength; i < indicesLength; i = unchecked_inc(i)) {
-            require(s_cvsArray[indices[i]] > 0, CVNotSubmitted(indices[i]));
+            require(s_cvsArray[indices[i]] > 0, CvNotSubmitted(indices[i]));
         }
-        s_requestedToSubmitCOIndices = indices;
-        s_requestedToSubmitCOTimestamp = block.timestamp;
+        s_requestedToSubmitCoIndices = indices;
+        s_requestedToSubmitCoTimestamp = block.timestamp;
         // ** Not Complete
-        emit RequestedToSubmitCO(startTime, indices);
+        emit RequestedToSubmitCo(startTime, indices);
     }
 
     // * Phase6: On-chain: Reaveal-1 Submission
@@ -451,7 +454,7 @@ contract CommitReveal2 is
         uint256 startTime = s_requestInfo[s_currentRound].startTime;
         require(
             block.timestamp <
-                s_requestedToSubmitCOTimestamp + s_onChainSubmissionPeriod,
+                s_requestedToSubmitCoTimestamp + s_onChainSubmissionPeriod,
             TooLate()
         );
         uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[
@@ -460,10 +463,10 @@ contract CommitReveal2 is
         require(
             s_cvs[startTime][activatedOperatorIndex] ==
                 keccak256(abi.encodePacked(co)),
-            InvalidCO()
+            InvalidCo()
         );
         // ** Not Complete
-        emit COSubmitted(startTime, co, activatedOperatorIndex);
+        emit CoSubmitted(startTime, co, activatedOperatorIndex);
     }
 
     function failToSubmitCo() external {
@@ -471,7 +474,7 @@ contract CommitReveal2 is
         // uint256 startTime = s_requestInfo[round].startTime;
         // require(
         //     block.timestamp >=
-        //         s_requestedToSubmitCOTimestamp + s_onChainSubmissionPeriod,
+        //         s_requestedToSubmitCoTimestamp + s_onChainSubmissionPeriod,
         //     TooEarly()
         // );
         // ** Not Complete
@@ -503,7 +506,7 @@ contract CommitReveal2 is
                         tempStackVariables.operatorsLength) +
                     s_requestOrSubmitOrFailDecisionPeriod) ||
                 (block.timestamp <
-                    s_requestedToSubmitCOTimestamp +
+                    s_requestedToSubmitCoTimestamp +
                         s_onChainSubmissionPeriod +
                         (s_offChainSubmissionPeriodPerOperator *
                             tempStackVariables.operatorsLength) +
@@ -537,7 +540,7 @@ contract CommitReveal2 is
                         require(
                             s_cvsArray[tempStackVariables.operatorsLength] ==
                                 cv,
-                            InvalidCO()
+                            InvalidCo()
                         );
                     } else {
                         require(
@@ -643,8 +646,8 @@ contract CommitReveal2 is
             );
             uint256 nextRound = unchecked_inc(round);
             if (nextRound == s_requestCount) {
-                s_isInProcess = NOT_IN_PROGRESS;
-                emit IsInProcess(NOT_IN_PROGRESS);
+                s_isInProcess = COMPLETED;
+                emit IsInProcess(COMPLETED);
             } else {
                 s_requestInfo[nextRound].startTime = block.timestamp;
                 s_currentRound = nextRound;
@@ -680,6 +683,7 @@ contract CommitReveal2 is
         bytes32[] calldata ss
     ) external {
         uint256 activatedOperatorsLength = s_activatedOperators.length;
+        // *** All secrets are submitted
         require(
             secrets.length == activatedOperatorsLength,
             InvalidSecretLength()
@@ -692,7 +696,7 @@ contract CommitReveal2 is
                         activatedOperatorsLength) +
                     s_requestOrSubmitOrFailDecisionPeriod) ||
                 (block.timestamp <
-                    s_requestedToSubmitCOTimestamp +
+                    s_requestedToSubmitCoTimestamp +
                         s_onChainSubmissionPeriod +
                         (s_offChainSubmissionPeriodPerOperator *
                             activatedOperatorsLength) +
@@ -762,14 +766,15 @@ contract CommitReveal2 is
         uint256 nextRound = unchecked_inc(round);
         unchecked {
             if (nextRound == s_requestCount) {
-                s_isInProcess = NOT_IN_PROGRESS;
-                emit IsInProcess(NOT_IN_PROGRESS);
+                s_isInProcess = COMPLETED;
+                emit IsInProcess(COMPLETED);
             } else {
                 s_requestInfo[nextRound].startTime = block.timestamp;
                 s_currentRound = nextRound;
             }
         }
         s_lastfulfilledRound = round;
+        // reward the last revealer
         emit RandomNumberGenerated(
             round,
             randomNumber,
@@ -867,76 +872,6 @@ contract CommitReveal2 is
     }
 
     /// ** deposit and withdraw
-    function deposit() public payable {
-        s_depositAmount[msg.sender] += msg.value;
-    }
-
-    function depositAndActivate() external payable {
-        deposit();
-        activate();
-    }
-
-    function withdraw(uint256 amount) external {
-        s_depositAmount[msg.sender] -= amount;
-        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[
-            msg.sender
-        ];
-        if (
-            activatedOperatorIndex1Based > 0 &&
-            s_depositAmount[msg.sender] < s_activationThreshold
-        ) _deactivate(activatedOperatorIndex1Based - 1, msg.sender);
-        //payable(msg.sender).transfer(amount);
-        bool success;
-        assembly {
-            // Transfer the ETH and store if it succeeded or not.
-            success := call(gas(), caller(), amount, 0, 0, 0, 0)
-        }
-        require(success, TransferFailed());
-    }
-
-    function activate() public {
-        require(s_isInProcess == NOT_IN_PROGRESS, InProcess());
-        require(
-            s_depositAmount[msg.sender] >= s_activationThreshold,
-            LessThanActivationThreshold()
-        );
-        require(
-            s_activatedOperatorIndex1Based[msg.sender] == 0,
-            AlreadyActivated()
-        );
-        s_activatedOperators.push(msg.sender);
-        uint256 activatedOperatorLength = s_activatedOperators.length;
-        require(
-            activatedOperatorLength <= s_maxActivatedOperators,
-            ActivatedOperatorsLimitReached()
-        );
-        s_activatedOperatorIndex1Based[msg.sender] = activatedOperatorLength;
-        emit Activated(msg.sender);
-    }
-
-    function deactivate() external {
-        require(s_isInProcess == NOT_IN_PROGRESS, InProcess());
-        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[
-            msg.sender
-        ];
-        _deactivate(activatedOperatorIndex1Based - 1, msg.sender);
-    }
-
-    function _deactivate(
-        uint256 activatedOperatorIndex,
-        address operator
-    ) private {
-        address lastOperator = s_activatedOperators[
-            s_activatedOperators.length - 1
-        ];
-        s_activatedOperators[activatedOperatorIndex] = lastOperator;
-        s_activatedOperators.pop();
-        s_activatedOperatorIndex1Based[lastOperator] =
-            activatedOperatorIndex +
-            1;
-        delete s_activatedOperatorIndex1Based[operator];
-        emit DeActivated(operator);
-    }
 
     function _call(
         address target,
