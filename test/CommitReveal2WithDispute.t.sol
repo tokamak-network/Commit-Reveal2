@@ -28,11 +28,11 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
     uint8[] public s_vs;
     bytes32[] public s_rs;
     bytes32[] public s_ss;
-
     uint256 public s_rv;
-
     bool public s_fulfilled;
     uint256 public s_randomNumber;
+
+    uint256[] public s_depositAmounts;
 
     // ** Variables for Dispute
     CommitReveal2L1.Signature[] public s_sigsDidntSubmitCv;
@@ -43,7 +43,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
     uint8[] public s_vsToSubmit;
     bytes32[] public s_rsToSubmit;
     bytes32[] public s_ssToSubmit;
-
     uint256[] public s_tempArray;
 
     // ** constants
@@ -206,6 +205,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             revealOrders[i] = i;
         }
         Sort.sort(diffs, revealOrders);
+        for (uint256 i; i < diffs.length; i++) {
+            console2.log(diffs[i], revealOrders[i]);
+        }
 
         // *** Let's assume the k of 0, 1, 2, 3 submitted their s_secrets off-chain
 
@@ -738,5 +740,97 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         }
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(7);
         console2.log(s_fulfilled, s_randomNumber);
+
+        // * i. 1 -> 5, round: 8
+        // ** 5.
+        (, s_startTimestamp, , ) = s_commitReveal2.s_requestInfo(8);
+        // ** s_offChainSubmissionPeriod passed
+        mine(s_activeNetworkConfig.offChainSubmissionPeriod);
+        // ** s_requestOrSubmitOrFailDecisionPeriod passed
+        mine(s_activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod);
+
+        vm.deal(makeAddr("any"), 10000 ether);
+        vm.startPrank(makeAddr("any"));
+        s_commitReveal2.failToRequestSubmitCvOrSubmitMerkleRoot();
+        mine(1);
+        // *** After the protocol halts, the round can be restarted or the consumer can refund the round.
+        // *** let's refund the round 8 and start from round 9
+        s_consumerExample.refund(8);
+        mine(1);
+        vm.stopPrank();
+
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.resume();
+
+        // With currentRound=8, lastFulfilledRound=7, and requestCount=9, let's call requestRandomNumber 3 more times.
+        for (uint256 i; i < 3; i++) {
+            s_consumerExample.requestRandomNumber{value: s_requestFee}();
+        }
+        mine(1);
+
+        // * j. 1 -> 3 -> 4 -> 7, round: 9
+        (, s_startTimestamp, , ) = s_commitReveal2.s_requestInfo(
+            s_commitReveal2.s_currentRound()
+        );
+        // ** Off-chain: Cvi Submission
+        for (uint256 i; i < s_anvilDefaultAddresses.length; i++) {
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
+            (s_vs[i], s_rs[i], s_ss[i]) = vm.sign(
+                s_anvilDefaultPrivateKeys[i],
+                _getTypedDataHash(s_startTimestamp, s_cvs[i])
+            );
+        }
+
+        // ** 3. requestToSubmitCv()
+        // *** The leadernode requests the operators index 0,2,4,6,8 to submit their cv
+        mine(1);
+        s_tempArray = [0, 2, 4, 6, 8];
+        s_requestedToSubmitCvIndices = new uint256[](5);
+        for (uint256 i; i < 5; i++) {
+            s_requestedToSubmitCvIndices[i] = s_tempArray[i];
+        }
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.requestToSubmitCv(s_requestedToSubmitCvIndices);
+        mine(1);
+
+        // ** 4. submitCv()
+        // *** Only the operators index 0, 4 submit their cv
+        vm.stopPrank();
+        vm.startPrank(s_anvilDefaultAddresses[0]);
+        s_commitReveal2.submitCv(s_cvs[0]);
+        mine(1);
+        vm.stopPrank();
+        vm.startPrank(s_anvilDefaultAddresses[4]);
+        s_commitReveal2.submitCv(s_cvs[4]);
+        mine(1);
+        vm.stopPrank();
+
+        // ** 7. failToSubmitCv()
+        s_depositAmounts = new uint256[](10);
+        for (uint256 i; i < 10; i++) {
+            s_depositAmounts[i] = s_commitReveal2.s_depositAmount(
+                s_anvilDefaultAddresses[i]
+            );
+            console2.log(s_depositAmounts[i]);
+        }
+
+        mine(s_activeNetworkConfig.onChainSubmissionPeriod);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.failToSubmitCv();
+        mine(1);
+        vm.stopPrank();
+        // ** slashed indices
+        console2.log(s_requestFee);
+        console2.log("----");
+        for (uint256 i; i < 10; i++) {
+            console2.log(
+                s_commitReveal2.s_activatedOperatorIndex1Based(
+                    s_anvilDefaultAddresses[i]
+                )
+            );
+            console2.log(
+                s_commitReveal2.s_depositAmount(s_anvilDefaultAddresses[i])
+            );
+        }
     }
 }
