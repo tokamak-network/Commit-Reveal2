@@ -16,6 +16,7 @@ contract CommitReveal2L1 is CommitReveal2 {
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator
     )
+        payable
         CommitReveal2(
             activationThreshold,
             flatFee,
