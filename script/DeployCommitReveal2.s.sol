@@ -20,7 +20,9 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
         vm.startBroadcast(activeNetworkConfig.deployer);
         if (block.chainid == 31337 || block.chainid == 11155111) {
             commitReveal2 = address(
-                new CommitReveal2L1(
+                new CommitReveal2L1{
+                    value: activeNetworkConfig.activationThreshold
+                }(
                     activeNetworkConfig.activationThreshold,
                     activeNetworkConfig.flatFee,
                     activeNetworkConfig.maxActivatedOperators,
@@ -35,7 +37,9 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
             );
         } else {
             commitReveal2 = address(
-                new CommitReveal2(
+                new CommitReveal2{
+                    value: activeNetworkConfig.activationThreshold
+                }(
                     activeNetworkConfig.activationThreshold,
                     activeNetworkConfig.flatFee,
                     activeNetworkConfig.maxActivatedOperators,
