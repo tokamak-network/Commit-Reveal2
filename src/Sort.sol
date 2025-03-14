@@ -7,10 +7,11 @@ library Sort {
         uint256[] memory index
     ) internal pure {
         _quickSort(_begin(array), _end(array), _begin(index), _end(index));
+        // ascending order
     }
 
-    function lt(uint256 a, uint256 b) private pure returns (bool) {
-        return a < b;
+    function gt(uint256 a, uint256 b) private pure returns (bool) {
+        return a > b;
     }
 
     /**
@@ -74,7 +75,7 @@ library Sort {
             uint256 itIndex = beginIndex + 0x20;
 
             for (uint256 it = begin + 0x20; it < end; it += 0x20) {
-                if (lt(_mload(it), pivot)) {
+                if (gt(_mload(it), pivot)) {
                     // If the value stored at the iterator's position comes before the pivot, we increment the
                     // position of the pivot and move the value there.
                     pos += 0x20;
