@@ -7,7 +7,7 @@ library Sort {
         uint256[] memory index
     ) internal pure {
         _quickSort(_begin(array), _end(array), _begin(index), _end(index));
-        // ascending order
+        // descending order
     }
 
     function gt(uint256 a, uint256 b) private pure returns (bool) {

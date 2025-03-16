@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
+import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 import {CommitReveal2Storage} from "./../../src/CommitReveal2.sol";
-import {Vm} from "forge-std/Test.sol";
+import {console2} from "forge-std/Test.sol";
 
 contract CommitReveal2Helper {
     uint256 private s_nonce;
@@ -58,6 +59,38 @@ contract CommitReveal2Helper {
 
     function _diff(uint256 a, uint256 b) internal pure returns (uint256) {
         return a > b ? a - b : b - a;
+    }
+
+    function consoleDeposits(
+        CommitReveal2 commitReveal2,
+        address[10] memory operators,
+        address leaderNode
+    ) internal view {
+        for (uint256 i = 0; i < operators.length; i++) {
+            console2.log(commitReveal2.s_depositAmount(operators[i]));
+        }
+        console2.log(commitReveal2.s_depositAmount(leaderNode));
+        console2.log("--------------------");
+    }
+
+    function consoleSlashRewardAccumulated(
+        CommitReveal2 commitReveal2,
+        address[10] memory operators,
+        address leaderNode
+    ) internal view {
+        uint256 globalSlashRewardPerOperator = commitReveal2
+            .s_slashRewardPerOperator();
+        for (uint256 i = 0; i < operators.length; i++) {
+            console2.log(
+                globalSlashRewardPerOperator -
+                    commitReveal2.s_slashRewardPerOperatorPaid(operators[i])
+            );
+        }
+        console2.log(
+            globalSlashRewardPerOperator -
+                commitReveal2.s_slashRewardPerOperatorPaid(leaderNode)
+        );
+        console2.log("--------------------");
     }
 
     function _getTypedDataHash(

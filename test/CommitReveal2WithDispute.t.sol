@@ -169,9 +169,28 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
+
+        // *** calculate reveal order
+        uint256[] memory diffs = new uint256[](s_anvilDefaultAddresses.length);
+        uint256[] memory revealOrders = new uint256[](
+            s_anvilDefaultAddresses.length
+        );
+        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        for (uint256 i; i < s_anvilDefaultAddresses.length; i++) {
+            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            revealOrders[i] = i;
+        }
+        Sort.sort(diffs, revealOrders);
+
         // ** 12. generateRandomNumber()
         mine(1);
-        s_commitReveal2.generateRandomNumber(s_secrets, s_vs, s_rs, s_ss);
+        s_commitReveal2.generateRandomNumber(
+            s_secrets,
+            s_vs,
+            s_rs,
+            s_ss,
+            revealOrders
+        );
         mine(1);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(0);
         console2.log(s_fulfilled, s_randomNumber);
@@ -195,19 +214,14 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         // ** 13. requestToSubmitS()
         // *** - calculate reveal order
-        uint256[] memory diffs = new uint256[](s_anvilDefaultAddresses.length);
-        uint256[] memory revealOrders = new uint256[](
-            s_anvilDefaultAddresses.length
-        );
+        diffs = new uint256[](s_anvilDefaultAddresses.length);
+        revealOrders = new uint256[](s_anvilDefaultAddresses.length);
         s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
         for (uint256 i; i < s_anvilDefaultAddresses.length; i++) {
             diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
             revealOrders[i] = i;
         }
         Sort.sort(diffs, revealOrders);
-        for (uint256 i; i < diffs.length; i++) {
-            console2.log(diffs[i], revealOrders[i]);
-        }
 
         // *** Let's assume the k of 0, 1, 2, 3 submitted their s_secrets off-chain
 
@@ -311,10 +325,26 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             vm.stopPrank();
         }
 
+        // *** caculate reveal order
+        diffs = new uint256[](s_anvilDefaultAddresses.length);
+        revealOrders = new uint256[](s_anvilDefaultAddresses.length);
+        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        for (uint256 i; i < s_anvilDefaultAddresses.length; i++) {
+            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            revealOrders[i] = i;
+        }
+        Sort.sort(diffs, revealOrders);
+
         // ** 12. generateRandomNumber()
         mine(1);
         // any operator can generate the random number
-        s_commitReveal2.generateRandomNumber(s_secrets, s_vs, s_rs, s_ss);
+        s_commitReveal2.generateRandomNumber(
+            s_secrets,
+            s_vs,
+            s_rs,
+            s_ss,
+            revealOrders
+        );
         mine(1);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(
             s_commitReveal2.s_currentRound()
@@ -466,9 +496,25 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.submitMerkleRootAfterDispute(_createMerkleRoot(s_cvs));
         mine(1);
 
+        // *** caculate reveal order
+        diffs = new uint256[](s_anvilDefaultAddresses.length);
+        revealOrders = new uint256[](s_anvilDefaultAddresses.length);
+        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        for (uint256 i; i < s_anvilDefaultAddresses.length; i++) {
+            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            revealOrders[i] = i;
+        }
+        Sort.sort(diffs, revealOrders);
+
         // ** 12. generateRandomNumber()
         mine(1);
-        s_commitReveal2.generateRandomNumber(s_secrets, s_vs, s_rs, s_ss);
+        s_commitReveal2.generateRandomNumber(
+            s_secrets,
+            s_vs,
+            s_rs,
+            s_ss,
+            revealOrders
+        );
         mine(1);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(4);
         console2.log(s_fulfilled, s_randomNumber);
@@ -640,9 +686,25 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             vm.stopPrank();
         }
 
+        // *** caculate reveal order
+        diffs = new uint256[](s_anvilDefaultAddresses.length);
+        revealOrders = new uint256[](s_anvilDefaultAddresses.length);
+        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        for (uint256 i; i < s_anvilDefaultAddresses.length; i++) {
+            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            revealOrders[i] = i;
+        }
+        Sort.sort(diffs, revealOrders);
+
         // ** 12. generateRandomNumber()
         mine(1);
-        s_commitReveal2.generateRandomNumber(s_secrets, s_vs, s_rs, s_ss);
+        s_commitReveal2.generateRandomNumber(
+            s_secrets,
+            s_vs,
+            s_rs,
+            s_ss,
+            revealOrders
+        );
         mine(1);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(6);
         console2.log(s_fulfilled, s_randomNumber);
@@ -741,6 +803,13 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(7);
         console2.log(s_fulfilled, s_randomNumber);
 
+        consoleDeposits(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE);
+        consoleSlashRewardAccumulated(
+            s_commitReveal2,
+            s_anvilDefaultAddresses,
+            LEADERNODE
+        );
+
         // * i. 1 -> 5, round: 8
         // ** 5.
         (, s_startTimestamp, , ) = s_commitReveal2.s_requestInfo(8);
@@ -754,13 +823,32 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToRequestSubmitCvOrSubmitMerkleRoot();
         mine(1);
         // *** After the protocol halts, the round can be restarted or the consumer can refund the round.
+
+        console2.log("After failToRequestSubmitCvOrSubmitMerkleRoot");
+        consoleDeposits(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE);
+        consoleSlashRewardAccumulated(
+            s_commitReveal2,
+            s_anvilDefaultAddresses,
+            LEADERNODE
+        );
+
         // *** let's refund the round 8 and start from round 9
         s_consumerExample.refund(8);
         mine(1);
         vm.stopPrank();
 
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.resume();
+        s_commitReveal2.resume{
+            value: s_activeNetworkConfig.activationThreshold
+        }();
+
+        console2.log("After resume");
+        consoleDeposits(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE);
+        consoleSlashRewardAccumulated(
+            s_commitReveal2,
+            s_anvilDefaultAddresses,
+            LEADERNODE
+        );
 
         // With currentRound=8, lastFulfilledRound=7, and requestCount=9, let's call requestRandomNumber 3 more times.
         for (uint256 i; i < 3; i++) {
@@ -805,32 +893,19 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
-        // ** 7. failToSubmitCv()
-        s_depositAmounts = new uint256[](10);
-        for (uint256 i; i < 10; i++) {
-            s_depositAmounts[i] = s_commitReveal2.s_depositAmount(
-                s_anvilDefaultAddresses[i]
-            );
-            console2.log(s_depositAmounts[i]);
-        }
-
+        // ** 7. failToSubmitCv(), the operator index 2, 6, 8 fail to submit their cv
         mine(s_activeNetworkConfig.onChainSubmissionPeriod);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.failToSubmitCv();
         mine(1);
         vm.stopPrank();
-        // ** slashed indices
-        console2.log(s_requestFee);
-        console2.log("----");
-        for (uint256 i; i < 10; i++) {
-            console2.log(
-                s_commitReveal2.s_activatedOperatorIndex1Based(
-                    s_anvilDefaultAddresses[i]
-                )
-            );
-            console2.log(
-                s_commitReveal2.s_depositAmount(s_anvilDefaultAddresses[i])
-            );
-        }
+
+        console2.log("After 2, 6, 8 failToSubmitCv");
+        consoleDeposits(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE);
+        consoleSlashRewardAccumulated(
+            s_commitReveal2,
+            s_anvilDefaultAddresses,
+            LEADERNODE
+        );
     }
 }
