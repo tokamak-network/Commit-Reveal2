@@ -48,6 +48,8 @@ contract CommitReveal2Storage {
     error MerkleRootNotSubmitted();
     error NotHalted();
     error ZeroLength();
+    error LeaderLowDeposit();
+    error RevealNotInDescendingOrder(); // 0x24f1948e
 
     error CvNotSubmitted(uint256 index);
 

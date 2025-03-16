@@ -73,6 +73,7 @@ contract CommitReveal2 is
         );
         uint256 activatedOperatorsLength = s_activatedOperators.length;
         require(activatedOperatorsLength > 1, NotEnoughActivatedOperators());
+        require(s_depositAmount[owner] >= s_activationThreshold, LeaderLowDeposit());
         require(
             msg.value >=
                 _calculateRequestPrice(
@@ -226,8 +227,17 @@ contract CommitReveal2 is
         }
 
         // ** restart or end this round
-        s_isInProcess = HALTED;
-        emit IsInProcess(HALTED);
+        if (s_activatedOperators.length > 1) {
+            s_requestInfo[round].startTime = block.timestamp;
+            emit RandomNumberRequested(
+                round,
+                block.timestamp,
+                s_activatedOperators
+            );
+        } else {
+            s_isInProcess = HALTED;
+            emit IsInProcess(HALTED);
+        }
     }
 
     // ** On-chain: Merkle Root Submission
@@ -352,9 +362,11 @@ contract CommitReveal2 is
         require(success, TransferFailed());
     }
 
-    function resume() external onlyOwner {
+    function resume() external payable onlyOwner {
         require(s_isInProcess == HALTED, NotHalted());
         require(s_activatedOperators.length > 1, NotEnoughActivatedOperators());
+        s_depositAmount[owner] += msg.value;
+        require(s_depositAmount[owner] >= s_activationThreshold, LeaderLowDeposit());
         uint256 nextRequestedRound = s_currentRound;
         bool requested;
         uint256 requestCount = s_requestCount;
@@ -572,7 +584,7 @@ contract CommitReveal2 is
                         );
                         s_cvsArray[tempStackVariables.operatorsLength] = cv;
                     }
-                    diffs[tempStackVariables.operatorsLength] = diff(
+                    diffs[tempStackVariables.operatorsLength] = _diff(
                         rv,
                         uint256(cv)
                     );
@@ -680,7 +692,8 @@ contract CommitReveal2 is
         bytes32[] calldata secrets,
         uint8[] calldata vs,
         bytes32[] calldata rs,
-        bytes32[] calldata ss
+        bytes32[] calldata ss,
+        uint256[] calldata revealOrders
     ) external {
         uint256 activatedOperatorsLength = s_activatedOperators.length;
         // *** All secrets are submitted
@@ -706,11 +719,14 @@ contract CommitReveal2 is
 
         bytes32[] memory cos = new bytes32[](activatedOperatorsLength);
         bytes32[] memory cvs = new bytes32[](activatedOperatorsLength);
-
-        for (uint256 i; i < activatedOperatorsLength; i = unchecked_inc(i)) {
-            //cos[i] = keccak256(abi.encodePacked(secrets[i]));
-            //cvs[i] = keccak256(abi.encodePacked(cos[i]));
-            assembly ("memory-safe") {
+        assembly ("memory-safe") {
+            for {
+                let i := 0
+            } lt(i, activatedOperatorsLength) {
+                i := add(i, 1)
+            } {
+                //cos[i] = keccak256(abi.encodePacked(secrets[i]));
+                //cvs[i] = keccak256(abi.encodePacked(cos[i]));
                 mstore(0x00, calldataload(add(secrets.offset, mul(i, 0x20))))
                 let cosMemP := add(add(cos, 0x20), mul(i, 0x20))
                 mstore(cosMemP, keccak256(0x00, 0x20))
@@ -718,6 +734,51 @@ contract CommitReveal2 is
                     add(add(cvs, 0x20), mul(i, 0x20)),
                     keccak256(cosMemP, 0x20)
                 )
+            }
+
+            // ** verify reveal order
+            /**
+             * uint256 rv = uint256(keccak256(abi.encodePacked(cos)));
+             * for (uint256 i = 1; i < secretsLength; i = unchecked_inc(i)) {
+             * require(
+             *    diff(rv, cvs[revealOrders[i - 1]]) >
+             *        diff(rv, cvs[revealOrders[i]]),
+             *    RevealNotInAscendingOrder()
+             * );
+             *
+             * uint256 before = diff(rv, cvs[revealOrders[0]]);
+             * for (uint256 i = 1; i < secretsLength; i = unchecked_inc(i)) {
+             *  uint256 after = diff(rv, cvs[revealOrders[i]]);
+             *  require(before >= after, RevealNotInAscendingOrder());
+             *  before = after;
+             * }
+             *
+             */
+            function _diff(a, b) -> c {
+                switch gt(a, b)
+                case true {
+                    c := sub(a, b)
+                }
+                default {
+                    c := sub(b, a)
+                }
+            }
+            let rv := keccak256(
+                add(cos, 0x20),
+                mul(0x20, activatedOperatorsLength)
+            )
+            let before := _diff(rv, mload(add(cvs, add(0x20, mul(calldataload(revealOrders.offset), 0x20)))))
+            for {
+                let i := 1
+            } lt(i, activatedOperatorsLength) {
+                i := add(i, 1)
+            } {
+                let after := _diff(rv, mload(add(cvs, add(0x20, mul(calldataload(add(revealOrders.offset, mul(i, 0x20))), 0x20)))))
+                if lt(before, after) {
+                    mstore(0, 0x24f1948e) // selector for RevealNotInDescendingOrder()
+                    revert(0x1c, 0x04)
+                }
+                before := after
             }
         }
 
@@ -775,6 +836,9 @@ contract CommitReveal2 is
         }
         s_lastfulfilledRound = round;
         // reward the last revealer
+        s_depositAmount[
+                s_activatedOperators[revealOrders[activatedOperatorsLength - 1]]
+            ] += requestInfo.cost;
         emit RandomNumberGenerated(
             round,
             randomNumber,
@@ -867,8 +931,16 @@ contract CommitReveal2 is
         }
     }
 
-    function diff(uint256 a, uint256 b) private pure returns (uint256) {
-        return a > b ? a - b : b - a;
+    function _diff(uint256 a, uint256 b) private pure returns (uint256 c) {
+        assembly ("memory-safe") {
+            switch gt(a, b)
+            case true {
+                c := sub(a, b)
+            }
+            default {
+                c := sub(b, a)
+            }
+        }
     }
 
     /// ** deposit and withdraw
