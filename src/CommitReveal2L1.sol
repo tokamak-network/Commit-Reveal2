@@ -31,14 +31,12 @@ contract CommitReveal2L1 is CommitReveal2 {
         )
     {}
 
-    function _calculateRequestPrice(
-        uint256 callbackGasLimit,
-        uint256 gasPrice,
-        uint256 numOfOperators
-    ) internal view override returns (uint256) {
-        return
-            (gasPrice *
-                (callbackGasLimit + (21119 * numOfOperators + 134334))) +
-            s_flatFee;
+    function _calculateRequestPrice(uint256 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
+        internal
+        view
+        override
+        returns (uint256)
+    {
+        return (gasPrice * (callbackGasLimit + (211 * numOfOperators + 1344))) + s_flatFee;
     }
 }

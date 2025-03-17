@@ -33,11 +33,11 @@ contract CommitReveal2Storage {
     error InvalidSignature();
     error InvalidSignatureLength();
     error TooEarly();
-    error TooLate();
+    error TooLate(); // 0xecdd1c29
     error InvalidCo();
     error InvalidS();
     error InvalidRevealOrder();
-    error InvalidSecretLength();
+    error InvalidSecretLength(); // 0xe0767fa4
     error ShouldNotBeZero();
     error NotConsumer();
     error InvalidRound();
@@ -49,23 +49,16 @@ contract CommitReveal2Storage {
     error NotHalted();
     error ZeroLength();
     error LeaderLowDeposit();
+    error ETHTransferFailed(); // 0xb12d13eb
     error RevealNotInDescendingOrder(); // 0x24f1948e
 
     error CvNotSubmitted(uint256 index);
 
     // * Events
 
-    event RandomNumberRequested(
-        uint256 round,
-        uint256 timestamp,
-        address[] activatedOperators
-    );
+    event RandomNumberRequested(uint256 round, uint256 timestamp, address[] activatedOperators);
     event MerkleRootSubmitted(uint256 timestamp, bytes32 merkleRoot);
-    event RandomNumberGenerated(
-        uint256 round,
-        uint256 randomNumber,
-        bool callbackSuccess
-    );
+    event RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess);
 
     event RequestedToSubmitCv(uint256 timestamp, uint256[] indices);
     event RequestedToSubmitCo(uint256 timestamp, uint256[] indices);
@@ -101,6 +94,7 @@ contract CommitReveal2Storage {
     mapping(uint248 wordPos => uint256) public s_roundBitmap;
 
     mapping(uint256 timestamp => bool) public s_isSubmittedMerkleRoot;
+    mapping(uint256 timestamp => uint256) public s_requestToSubmitCoBitmap;
     mapping(uint256 timestamp => bytes32[]) public s_cvs;
     mapping(uint256 timestamp => bytes32[]) public s_ss;
 
@@ -121,11 +115,11 @@ contract CommitReveal2Storage {
     // uint256 internal constant RANDOMNUMGENERATE_CALLDATA_BYTES_SIZE = 278;
     uint256 internal constant MAX_CALLBACK_GAS_LIMIT = 2500000;
     uint256 internal constant GAS_FOR_CALL_EXACT_CHECK = 5_000;
-    bytes32 internal constant MESSAGE_TYPEHASH =
-        keccak256("Message(uint256 timestamp,bytes32 cv)");
+    bytes32 internal constant MESSAGE_TYPEHASH = keccak256("Message(uint256 timestamp,bytes32 cv)");
 
     // *** functions gasUsed;
     uint256 internal constant FAILTOSUBMITCVORSUBMITMERKLEROOT_GASUSED = 123;
+    uint256 internal constant FAILTOSUBMITMERKLEROOTAFTERDISPUTE_GASUSED = 123;
     uint256 internal constant FAILTOSUBMITCV_GASUSED = 123;
 
     // *** functions calldata size;
