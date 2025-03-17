@@ -51,20 +51,11 @@ contract OperatorManager is Ownable {
     function activate() public notInProcess {
         // *** leaderNode doesn't activate
         require(msg.sender != owner(), OwnerCannotActivate());
-        require(
-            s_depositAmount[msg.sender] >= s_activationThreshold,
-            LessThanActivationThreshold()
-        );
-        require(
-            s_activatedOperatorIndex1Based[msg.sender] == 0,
-            AlreadyActivated()
-        );
+        require(s_depositAmount[msg.sender] >= s_activationThreshold, LessThanActivationThreshold());
+        require(s_activatedOperatorIndex1Based[msg.sender] == 0, AlreadyActivated());
         s_activatedOperators.push(msg.sender);
         uint256 activatedOperatorLength = s_activatedOperators.length;
-        require(
-            activatedOperatorLength <= s_maxActivatedOperators,
-            ActivatedOperatorsLimitReached()
-        );
+        require(activatedOperatorLength <= s_maxActivatedOperators, ActivatedOperatorsLimitReached());
         s_activatedOperatorIndex1Based[msg.sender] = activatedOperatorLength;
 
         // ** initialize slashRewardPerOperatorPaid
@@ -79,52 +70,47 @@ contract OperatorManager is Ownable {
 
     function withdraw() external notInProcess {
         // *** Deactivate
-        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[
-            msg.sender
-        ];
-        if (activatedOperatorIndex1Based > 0)
+        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[msg.sender];
+
+        uint256 amount;
+        uint256 currentSlashRewardPerOperator = s_slashRewardPerOperator;
+
+        if (activatedOperatorIndex1Based > 0) {
             _deactivate(activatedOperatorIndex1Based - 1, msg.sender);
+            amount =
+                s_depositAmount[msg.sender] + currentSlashRewardPerOperator - s_slashRewardPerOperatorPaid[msg.sender];
+        } else if (msg.sender == owner()) {
+            amount =
+                s_depositAmount[msg.sender] + currentSlashRewardPerOperator - s_slashRewardPerOperatorPaid[msg.sender];
+        } else {
+            amount = s_depositAmount[msg.sender];
+        }
 
         // *** update slash reward
-        uint256 currentSlashRewardPerOperator = s_slashRewardPerOperator;
-        uint256 amount = s_depositAmount[msg.sender] +
-            currentSlashRewardPerOperator -
-            s_slashRewardPerOperatorPaid[msg.sender];
-        s_slashRewardPerOperatorPaid[
-            msg.sender
-        ] = currentSlashRewardPerOperator;
+        s_slashRewardPerOperatorPaid[msg.sender] = currentSlashRewardPerOperator;
 
         // *** Transfer
         s_depositAmount[msg.sender] = 0;
-        bool success;
-        assembly {
-            // Transfer the ETH and store if it succeeded or not.
-            success := call(gas(), caller(), amount, 0, 0, 0, 0)
+        assembly ("memory-safe") {
+            // Transfer the ETH and check if it succeeded or not.
+            if iszero(call(gas(), caller(), amount, 0x00, 0x00, 0x00, 0x00)) {
+                mstore(0x00, 0xb12d13eb) // `ETHTransferFailed()`.
+                revert(0x1c, 0x04)
+            }
         }
-        require(success, TransferFailed());
     }
 
     function deactivate() external notInProcess {
-        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[
-            msg.sender
-        ];
+        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[msg.sender];
         _deactivate(activatedOperatorIndex1Based - 1, msg.sender);
     }
 
     function claimSlashReward() external {
-        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[
-            msg.sender
-        ];
-        require(
-            activatedOperatorIndex1Based > 0,
-            OnlyActivatedOperatorCanClaim()
-        );
+        uint256 activatedOperatorIndex1Based = s_activatedOperatorIndex1Based[msg.sender];
+        require(activatedOperatorIndex1Based > 0, OnlyActivatedOperatorCanClaim());
         uint256 currentSlashRewardPerOperator = s_slashRewardPerOperator;
-        uint256 amount = currentSlashRewardPerOperator -
-            s_slashRewardPerOperatorPaid[msg.sender];
-        s_slashRewardPerOperatorPaid[
-            msg.sender
-        ] = currentSlashRewardPerOperator;
+        uint256 amount = currentSlashRewardPerOperator - s_slashRewardPerOperatorPaid[msg.sender];
+        s_slashRewardPerOperatorPaid[msg.sender] = currentSlashRewardPerOperator;
         bool success;
         assembly {
             // Transfer the ETH and store if it succeeded or not.
@@ -143,18 +129,19 @@ contract OperatorManager is Ownable {
         return s_activatedOperators.length;
     }
 
-    function _deactivate(
-        uint256 activatedOperatorIndex,
-        address operator
-    ) internal {
-        address lastOperator = s_activatedOperators[
-            s_activatedOperators.length - 1
-        ];
+    // ** For Testing
+    function getDepositPlusSlashReward(address operator) external view returns (uint256) {
+        if (owner() != operator && s_activatedOperatorIndex1Based[operator] == 0) {
+            return s_depositAmount[operator];
+        }
+        return s_depositAmount[operator] + s_slashRewardPerOperator - s_slashRewardPerOperatorPaid[operator];
+    }
+
+    function _deactivate(uint256 activatedOperatorIndex, address operator) internal {
+        address lastOperator = s_activatedOperators[s_activatedOperators.length - 1];
         if (lastOperator != operator) {
             s_activatedOperators[activatedOperatorIndex] = lastOperator;
-            s_activatedOperatorIndex1Based[lastOperator] =
-                activatedOperatorIndex +
-                1;
+            s_activatedOperatorIndex1Based[lastOperator] = activatedOperatorIndex + 1;
         }
         s_activatedOperators.pop();
         delete s_activatedOperatorIndex1Based[operator];

@@ -49,6 +49,7 @@ contract CommitReveal2Storage {
     error NotHalted();
     error ZeroLength();
     error LeaderLowDeposit();
+    error CoNotRequested();
     error ETHTransferFailed(); // 0xb12d13eb
     error RevealNotInDescendingOrder(); // 0x24f1948e
 
@@ -121,6 +122,7 @@ contract CommitReveal2Storage {
     uint256 internal constant FAILTOSUBMITCVORSUBMITMERKLEROOT_GASUSED = 123;
     uint256 internal constant FAILTOSUBMITMERKLEROOTAFTERDISPUTE_GASUSED = 123;
     uint256 internal constant FAILTOSUBMITCV_GASUSED = 123;
+    uint256 internal constant FAILTOSUBMITCO_GASUSED = 123;
 
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
