@@ -10,5 +10,5 @@ ffi = true
 # Whether to cache builds or not
 cache = true
 fs_permissions = [{ access = "read", path = "./"}]
-remappings = ["@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/", "@solmate/=lib/solmate/"]
+remappings = ["@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/", "@solmate/=lib/solmate/", "@solady/=lib/solady/"]
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
