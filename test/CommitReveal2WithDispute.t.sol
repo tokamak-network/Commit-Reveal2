@@ -31,7 +31,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
     uint256 public s_rv;
     bool public s_fulfilled;
     uint256 public s_randomNumber;
-
+    address[] public s_activatedOperators;
     uint256[] public s_depositAmounts;
 
     // ** Variables for Dispute
@@ -907,5 +907,116 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_anvilDefaultAddresses,
             LEADERNODE
         );
+
+        // * k. 1 -> 3 -> 7, round: 9
+        // ** 3. requestToSubmitCv()
+        // *** The leadernode requests the operators index 0 to submit their cv
+        mine(1);
+        s_requestedToSubmitCvIndices = new uint256[](1);
+        s_requestedToSubmitCvIndices[0] = 0;
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.requestToSubmitCv(s_requestedToSubmitCvIndices);
+        mine(1);
+
+        // ** No one submits their cv
+        mine(s_activeNetworkConfig.onChainSubmissionPeriod);
+
+        // ** 7. failToSubmitCv(), the operator index 0 fail to submit their cv
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.failToSubmitCv();
+        mine(1);
+        vm.stopPrank();
+
+        // * l. 1 -> 3 -> 4 -> 8, round 9, operatorNum = 6
+        // ** 3. requestToSubmitCv()
+        // *** The leadernode requests the operators index 1, 3, 5 to submit their cv
+        mine(1);
+        s_tempArray = [1, 3, 5];
+        s_requestedToSubmitCvIndices = new uint256[](3);
+        for (uint256 i; i < 3; i++) {
+            s_requestedToSubmitCvIndices[i] = s_tempArray[i];
+        }
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.requestToSubmitCv(s_requestedToSubmitCvIndices);
+        mine(1);
+
+        // ** 4. submitCv()
+        // *** The operators index 1, 3, 5 submit their cv
+        vm.stopPrank();
+        for (uint256 i; i < 3; i++) {
+            vm.startPrank(s_anvilDefaultAddresses[s_tempArray[i]]);
+            s_commitReveal2.submitCv(s_cvs[s_tempArray[i]]);
+            mine(1);
+            vm.stopPrank();
+        }
+
+        // ** 8. failToSubmitMerkleRootAfterDispute()
+        mine(s_activeNetworkConfig.onChainSubmissionPeriod);
+        mine(s_activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod);
+        vm.startPrank(s_anvilDefaultAddresses[0]);
+        s_commitReveal2.failToSubmitMerkleRootAfterDispute();
+        mine(1);
+        vm.stopPrank();
+
+        // ** let's resume the round 9
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.resume{
+            value: s_activeNetworkConfig.activationThreshold
+        }();
+        mine(1);
+        vm.stopPrank();
+
+        // * m. 1 -> 2 -> 9 -> 11, round: 9, operatorNum = 6
+        // ** Off-chain: Cvi Submission
+        (, s_startTimestamp, , ) = s_commitReveal2.s_requestInfo(
+            s_commitReveal2.s_currentRound()
+        );
+        s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
+            (s_vs[i], s_rs[i], s_ss[i]) = vm.sign(
+                s_privateKeys[s_activatedOperators[i]],
+                _getTypedDataHash(s_startTimestamp, s_cvs[i])
+            );
+        }
+
+        // ** 2. submitMerkleRoot()
+        mine(1);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
+        mine(1);
+
+        // ** 9. requestToSubmitCo()
+        // *** Let's request operator index 2, 3 to submit their Co
+        s_tempArray = [2, 3];
+        s_requestedToSubmitCoIndices = new uint256[](2);
+        for (uint256 i; i < 2; i++) {
+            s_requestedToSubmitCoIndices[i] = s_tempArray[i];
+        }
+        // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
+        // *** In m case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
+        s_cvsToSubmit = new bytes32[](2);
+        s_vsToSubmit = new uint8[](2);
+        s_rsToSubmit = new bytes32[](2);
+        s_ssToSubmit = new bytes32[](2);
+        for (uint256 i; i < 2; i++) {
+            s_cvsToSubmit[i] = s_cvs[s_tempArray[i]];
+            s_vsToSubmit[i] = s_vs[s_tempArray[i]];
+            s_rsToSubmit[i] = s_rs[s_tempArray[i]];
+            s_ssToSubmit[i] = s_ss[s_tempArray[i]];
+        }
+        mine(1);
+        s_commitReveal2.requestToSubmitCo(
+            s_requestedToSubmitCoIndices,
+            s_cvsToSubmit,
+            s_vsToSubmit,
+            s_rsToSubmit,
+            s_ssToSubmit
+        );
+        mine(1);
+
+        // ** 11. failToSubmitCo()
+        // *** The operators index 2, 3 fail to submit their Co
+        mine(s_activeNetworkConfig.onChainSubmissionPeriod);
     }
 }
