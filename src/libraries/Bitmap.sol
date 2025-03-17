@@ -5,19 +5,14 @@ pragma solidity 0.8.28;
 /// @notice Stores a packed mapping of round to its requested state
 /// @notice The mapping uses uint248 for keys since rounds are represented as uint256 and there are 256 (2^8) values per word.
 library Bitmap {
-    function position(
-        uint256 round
-    ) internal pure returns (uint248 wordPos, uint8 bitPos) {
+    function position(uint256 round) internal pure returns (uint248 wordPos, uint8 bitPos) {
         assembly ("memory-safe") {
             wordPos := shr(8, round)
             bitPos := and(round, 0xff)
         }
     }
 
-    function flipBit(
-        mapping(uint248 => uint256) storage self,
-        uint256 round
-    ) internal {
+    function flipBit(mapping(uint248 => uint256) storage self, uint256 round) internal {
         assembly ("memory-safe") {
             // calculate the storage slot corresponding to the round
             // wordPos = round >> 8
@@ -32,10 +27,11 @@ library Bitmap {
     }
 
     /// @notice includes the round itself
-    function nextRequestedRound(
-        mapping(uint248 => uint256) storage self,
-        uint256 round
-    ) internal view returns (uint256 next, bool requested) {
+    function nextRequestedRound(mapping(uint248 => uint256) storage self, uint256 round)
+        internal
+        view
+        returns (uint256 next, bool requested)
+    {
         unchecked {
             (uint248 wordPos, uint8 bitPos) = position(round);
             // all the 1s at or to the left of the bitPos
@@ -44,9 +40,7 @@ library Bitmap {
 
             // if there are no requested rounds to the left of the current round, return leftmost in the word
             requested = masked != 0;
-            next = requested
-                ? round + leastSignificantBit(masked) - bitPos
-                : round + type(uint8).max - bitPos;
+            next = requested ? round + leastSignificantBit(masked) - bitPos : round + type(uint8).max - bitPos;
         }
     }
 

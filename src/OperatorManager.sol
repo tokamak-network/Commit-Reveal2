@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {Owned} from "@solmate/src/auth/Owned.sol";
+// import {Owned} from "@solmate/src/auth/Owned.sol";
+import {Ownable} from "@solady/src/auth/Ownable.sol";
 
-contract OperatorManager is Owned {
+contract OperatorManager is Ownable {
     // * State Variables
     mapping(address operator => uint256) public s_depositAmount;
     mapping(address operator => uint256) public s_activatedOperatorIndex1Based;
@@ -34,7 +35,9 @@ contract OperatorManager is Owned {
     error AlreadyActivated();
     error ActivatedOperatorsLimitReached();
 
-    constructor() Owned(msg.sender) {}
+    constructor() {
+        _initializeOwner(msg.sender);
+    }
 
     modifier notInProcess() {
         require(s_isInProcess != IN_PROGRESS, InProcess());
@@ -47,7 +50,7 @@ contract OperatorManager is Owned {
 
     function activate() public notInProcess {
         // *** leaderNode doesn't activate
-        require(msg.sender != owner, OwnerCannotActivate());
+        require(msg.sender != owner(), OwnerCannotActivate());
         require(
             s_depositAmount[msg.sender] >= s_activationThreshold,
             LessThanActivationThreshold()

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 import {IOVM_GasPriceOracle} from "./IOVM_GasPriceOracle.sol";
-import {Owned} from "@solmate/src/auth/Owned.sol";
+import {Ownable} from "@solady/src/auth/Ownable.sol";
 
-abstract contract OptimismL1Fees is Owned {
+abstract contract OptimismL1Fees is Ownable {
     /// @dev This is the padding size for unsigned RLP-encoded transaction without the signature data
     /// @dev The padding size was estimated based on hypothetical max RLP-encoded transaction size
     uint256 private constant L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE = 71;

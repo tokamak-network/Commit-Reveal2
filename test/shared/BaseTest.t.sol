@@ -5,8 +5,8 @@ import {Test} from "forge-std/Test.sol";
 
 contract BaseTest is Test {
     bool private s_baseTestInitialized;
-    address internal constant LEADERNODE =
-        0xB68AA9E398c054da7EBAaA446292f611CA0CD52B;
+    address internal constant LEADERNODE = 0xBcd4042DE499D14e55001CcbB24a551F3b954096;
+    uint256 internal constant LEADERNODE_PRIVATEKEY = 0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897;
     address[10] public s_anvilDefaultAddresses = [
         0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266,
         0x70997970C51812dc3A010C7d01b50e0d17dc79C8,
@@ -31,6 +31,7 @@ contract BaseTest is Test {
         0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97,
         0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
     ];
+    mapping(address => uint256) public s_privateKeys;
 
     function setUp() public virtual {
         // BaseTest.setUp is often called multiple times from tests' setUp due to inheritance
@@ -42,6 +43,7 @@ contract BaseTest is Test {
         vm.deal(LEADERNODE, 10000 ether);
         for (uint256 i; i < 10; i++) {
             vm.deal(s_anvilDefaultAddresses[i], 10000 ether);
+            s_privateKeys[s_anvilDefaultAddresses[i]] = s_anvilDefaultPrivateKeys[i];
         }
     }
 
