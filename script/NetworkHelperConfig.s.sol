@@ -8,7 +8,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract NetworkHelperConfig is Script, BaseTest {
-    address public deployer;
+    address public s_deployer;
 
     struct NetworkConfig {
         uint256 activationThreshold;
@@ -29,100 +29,90 @@ contract NetworkHelperConfig is Script, BaseTest {
     constructor() {
         string memory key = "DEPLOYER";
         if (vm.envExists(key)) {
-            deployer = vm.envAddress(key);
+            s_deployer = vm.envAddress(key);
         } else {
-            deployer = LEADERNODE;
-            console2.log(
-                "You didn't set the DEPLOYER env variable, using default"
-            );
+            s_deployer = LEADERNODE;
+            console2.log("You didn't set the DEPLOYER env variable, using default");
         }
 
         uint256 chainId = block.chainid;
-        if (chainId == 111551119090)
+        if (chainId == 111551119090) {
             activeNetworkConfig = getThanosSepoliaConfig();
-        else if (chainId == 31337) activeNetworkConfig = getAnvilConfig();
-        else if (chainId == 11155420)
+        } else if (chainId == 31337) {
+            vm.deal(s_deployer, 10000 ether);
+            activeNetworkConfig = getAnvilConfig();
+        } else if (chainId == 11155420) {
             activeNetworkConfig = getOpSepoliaConfig();
-        else if (chainId == 11155111) activeNetworkConfig = getSepoliaConfig();
+        } else if (chainId == 11155111) {
+            activeNetworkConfig = getSepoliaConfig();
+        }
     }
 
-    function getActiveNetworkConfig()
-        public
-        view
-        returns (NetworkConfig memory)
-    {
+    function getActiveNetworkConfig() public view returns (NetworkConfig memory) {
         return activeNetworkConfig;
     }
 
     function getAnvilConfig() public pure returns (NetworkConfig memory) {
-        return
-            NetworkConfig({
-                activationThreshold: 0.01 ether,
-                flatFee: 0.001 ether,
-                maxActivatedOperators: 10,
-                name: "Commit Reveal2",
-                version: "1",
-                offChainSubmissionPeriod: 80,
-                requestOrSubmitOrFailDecisionPeriod: 60,
-                onChainSubmissionPeriod: 120,
-                offChainSubmissionPeriodPerOperator: 40,
-                onChainSubmissionPeriodPerOperator: 40,
-                deployer: LEADERNODE
-            });
+        return NetworkConfig({
+            activationThreshold: 0.01 ether,
+            flatFee: 0.001 ether,
+            maxActivatedOperators: 10,
+            name: "Commit Reveal2",
+            version: "1",
+            offChainSubmissionPeriod: 80,
+            requestOrSubmitOrFailDecisionPeriod: 60,
+            onChainSubmissionPeriod: 120,
+            offChainSubmissionPeriodPerOperator: 40,
+            onChainSubmissionPeriodPerOperator: 40,
+            deployer: LEADERNODE
+        });
     }
 
-    function getThanosSepoliaConfig()
-        public
-        view
-        returns (NetworkConfig memory)
-    {
-        return
-            NetworkConfig({
-                activationThreshold: 0.01 ether,
-                flatFee: 0.001 ether,
-                maxActivatedOperators: 10,
-                name: "Commit Reveal2",
-                version: "1",
-                offChainSubmissionPeriod: 80,
-                requestOrSubmitOrFailDecisionPeriod: 60,
-                onChainSubmissionPeriod: 120,
-                offChainSubmissionPeriodPerOperator: 40,
-                onChainSubmissionPeriodPerOperator: 40,
-                deployer: deployer
-            });
+    function getThanosSepoliaConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({
+            activationThreshold: 0.01 ether,
+            flatFee: 0.001 ether,
+            maxActivatedOperators: 10,
+            name: "Commit Reveal2",
+            version: "1",
+            offChainSubmissionPeriod: 80,
+            requestOrSubmitOrFailDecisionPeriod: 60,
+            onChainSubmissionPeriod: 120,
+            offChainSubmissionPeriodPerOperator: 40,
+            onChainSubmissionPeriodPerOperator: 40,
+            deployer: s_deployer
+        });
     }
 
     function getSepoliaConfig() public view returns (NetworkConfig memory) {
-        return
-            NetworkConfig({
-                activationThreshold: 0.01 ether,
-                flatFee: 0.001 ether,
-                maxActivatedOperators: 10,
-                name: "Commit Reveal2",
-                version: "1",
-                offChainSubmissionPeriod: 80,
-                requestOrSubmitOrFailDecisionPeriod: 60,
-                onChainSubmissionPeriod: 120,
-                offChainSubmissionPeriodPerOperator: 40,
-                onChainSubmissionPeriodPerOperator: 40,
-                deployer: deployer
-            });
+        return NetworkConfig({
+            activationThreshold: 0.01 ether,
+            flatFee: 0.001 ether,
+            maxActivatedOperators: 10,
+            name: "Commit Reveal2",
+            version: "1",
+            offChainSubmissionPeriod: 80,
+            requestOrSubmitOrFailDecisionPeriod: 60,
+            onChainSubmissionPeriod: 120,
+            offChainSubmissionPeriodPerOperator: 40,
+            onChainSubmissionPeriodPerOperator: 40,
+            deployer: s_deployer
+        });
     }
 
     function getOpSepoliaConfig() public view returns (NetworkConfig memory) {
-        return
-            NetworkConfig({
-                activationThreshold: 0.01 ether,
-                flatFee: 0.001 ether,
-                maxActivatedOperators: 10,
-                name: "Commit Reveal2",
-                version: "1",
-                offChainSubmissionPeriod: 80,
-                requestOrSubmitOrFailDecisionPeriod: 60,
-                onChainSubmissionPeriod: 120,
-                offChainSubmissionPeriodPerOperator: 40,
-                onChainSubmissionPeriodPerOperator: 40,
-                deployer: deployer
-            });
+        return NetworkConfig({
+            activationThreshold: 0.01 ether,
+            flatFee: 0.001 ether,
+            maxActivatedOperators: 10,
+            name: "Commit Reveal2",
+            version: "1",
+            offChainSubmissionPeriod: 80,
+            requestOrSubmitOrFailDecisionPeriod: 60,
+            onChainSubmissionPeriod: 120,
+            offChainSubmissionPeriodPerOperator: 40,
+            onChainSubmissionPeriodPerOperator: 40,
+            deployer: s_deployer
+        });
     }
 }

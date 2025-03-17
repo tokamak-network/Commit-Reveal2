@@ -35,6 +35,8 @@ THANOS_SEPOLIA_URL=https://rpc.titan-sepolia.tokamak.network
 THANOS_SEPOLIA_EXPLORER=https://explorer.titan-sepolia.tokamak.network/api
 ```
 
+## Deploy to a real network
+
 You can deploy by setting up an .env file for the network you want to deploy to and referring to the script below.
 The command below will deploy and verify two contracts, CommitReveal2 and ConsumerExample.
 
@@ -43,3 +45,21 @@ make deploy ARGS="--network thanossepolia"
 make deploy ARGS="--network opsepolia"
 make deploy ARGS="--network sepolia"
 ```
+
+## Deploy to a local node
+
+### Start a local node
+
+```
+make anvil
+```
+
+### Deploy
+
+```
+make deploy
+```
+
+DEFAULT_ANVIL_ADDRESS = 0xBcd4042DE499D14e55001CcbB24a551F3b954096
+
+DEFAULT_ANVIL_KEY = 0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897
