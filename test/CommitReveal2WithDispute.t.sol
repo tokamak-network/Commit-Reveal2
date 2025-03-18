@@ -218,7 +218,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         }
         /// *** Finally request to submit the s_secrets
         mine(1);
-        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv);
+        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv, revealOrders);
         mine(1);
 
         // ** 14. submitS(), k 4-9 submit their s_secrets
@@ -380,7 +380,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         }
         mine(1);
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv);
+        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv, revealOrders);
         mine(1);
 
         // ** 14. submitS(), k 6-9 submit their s_secrets
@@ -456,6 +456,12 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** Off-chain: Cvi Submission
 
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
+        s_secrets = new bytes32[](s_anvilDefaultAddresses.length);
+        s_cos = new bytes32[](s_anvilDefaultAddresses.length);
+        s_cvs = new bytes32[](s_anvilDefaultAddresses.length);
+        s_vs = new uint8[](s_anvilDefaultAddresses.length);
+        s_rs = new bytes32[](s_anvilDefaultAddresses.length);
+        s_ss = new bytes32[](s_anvilDefaultAddresses.length);
         for (uint256 i; i < s_anvilDefaultAddresses.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
             (s_vs[i], s_rs[i], s_ss[i]) =
@@ -505,7 +511,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_alreadySubmittedSecretsOffChain = new bytes32[](0);
         mine(1);
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv);
+        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv, revealOrders);
 
         // ** 14. submitS(), k 0-9 submit their s_secrets
         for (uint256 i = 0; i < s_anvilDefaultAddresses.length; i++) {
@@ -528,6 +534,12 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** Off-chain: Cvi Submission
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
+        s_secrets = new bytes32[](s_anvilDefaultAddresses.length);
+        s_cos = new bytes32[](s_anvilDefaultAddresses.length);
+        s_cvs = new bytes32[](s_anvilDefaultAddresses.length);
+        s_vs = new uint8[](s_anvilDefaultAddresses.length);
+        s_rs = new bytes32[](s_anvilDefaultAddresses.length);
+        s_ss = new bytes32[](s_anvilDefaultAddresses.length);
         for (uint256 i; i < s_anvilDefaultAddresses.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
             (s_vs[i], s_rs[i], s_ss[i]) =
@@ -692,7 +704,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_alreadySubmittedSecretsOffChain = new bytes32[](0);
         mine(1);
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv);
+        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv, revealOrders);
 
         // ** 14. submitS(), k 0-9 submit their s_secrets
         for (uint256 i = 0; i < s_anvilDefaultAddresses.length; i++) {
@@ -745,6 +757,12 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // * j. 1 -> 3 -> 4 -> 7, round: 9
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
         // ** Off-chain: Cvi Submission
+        s_secrets = new bytes32[](s_anvilDefaultAddresses.length);
+        s_cos = new bytes32[](s_anvilDefaultAddresses.length);
+        s_cvs = new bytes32[](s_anvilDefaultAddresses.length);
+        s_vs = new uint8[](s_anvilDefaultAddresses.length);
+        s_rs = new bytes32[](s_anvilDefaultAddresses.length);
+        s_ss = new bytes32[](s_anvilDefaultAddresses.length);
         for (uint256 i; i < s_anvilDefaultAddresses.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
             (s_vs[i], s_rs[i], s_ss[i]) =
@@ -847,6 +865,12 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** Off-chain: Cvi Submission
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
         s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
         for (uint256 i; i < s_activatedOperators.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
             (s_vs[i], s_rs[i], s_ss[i]) =
@@ -898,6 +922,12 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** Off-chain: Cvi Submission
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
         s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
         for (uint256 i; i < s_activatedOperators.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
             (s_vs[i], s_rs[i], s_ss[i]) =
@@ -960,6 +990,12 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** Off-chain: Cvi Submission
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
         s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
         for (uint256 i; i < s_activatedOperators.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
             (s_vs[i], s_rs[i], s_ss[i]) =
@@ -1038,50 +1074,462 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
 
-        // // ** 10 operators deposit and activate
-        // for (uint256 i; i < 10; i++) {
-        //     vm.startPrank(s_anvilDefaultAddresses[i]);
-        //     if (s_commitReveal2.s_depositAmount(s_anvilDefaultAddresses[i]) < s_activeNetworkConfig.activationThreshold)
-        //     {
-        //         s_commitReveal2.deposit{
-        //             value: s_activeNetworkConfig.activationThreshold
-        //                 - s_commitReveal2.s_depositAmount(s_anvilDefaultAddresses[i])
-        //         }();
-        //     }
-        //     s_commitReveal2.activate();
-        //     mine(1);
-        //     vm.stopPrank();
-        // }
+        // ** 10 operators deposit and activate
+        for (uint256 i; i < 10; i++) {
+            vm.startPrank(s_anvilDefaultAddresses[i]);
+            if (s_commitReveal2.s_depositAmount(s_anvilDefaultAddresses[i]) < s_activeNetworkConfig.activationThreshold)
+            {
+                s_commitReveal2.deposit{
+                    value: s_activeNetworkConfig.activationThreshold
+                        - s_commitReveal2.s_depositAmount(s_anvilDefaultAddresses[i])
+                }();
+            }
+            s_commitReveal2.activate();
+            mine(1);
+            vm.stopPrank();
+        }
 
-        // // ** Off-chain: Cvi Submission
-        // (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
-        // s_activatedOperators = s_commitReveal2.getActivatedOperators();
-        // for (uint256 i; i < s_activatedOperators.length; i++) {
-        //     (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
-        //     (s_vs[i], s_rs[i], s_ss[i]) =
-        //         vm.sign(s_privateKeys[s_activatedOperators[i]], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
-        // }
+        // ** operator resume
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
+        mine(1);
 
-        // // ** 3. requestToSubmitCv()
-        // // *** The leadernode requests the operators index 0,1,2 to submit their cv
-        // mine(1);
-        // s_tempArray = [0, 1, 2];
-        // s_requestedToSubmitCvIndices = new uint256[](3);
-        // for (uint256 i; i < 3; i++) {
-        //     s_requestedToSubmitCvIndices[i] = s_tempArray[i];
-        // }
-        // vm.startPrank(LEADERNODE);
-        // s_commitReveal2.requestToSubmitCv(s_requestedToSubmitCvIndices);
-        // mine(1);
+        // ** Off-chain: Cvi Submission
+        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
+        s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
+            (s_vs[i], s_rs[i], s_ss[i]) =
+                vm.sign(s_privateKeys[s_activatedOperators[i]], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
+        }
 
-        // // ** 4. submitCv()
-        // // *** The operators index 0, 1, 2 submit their cv
-        // vm.stopPrank();
-        // for (uint256 i; i < 3; i++) {
-        //     vm.startPrank(s_activatedOperators[s_tempArray[i]]);
-        //     s_commitReveal2.submitCv(s_cvs[s_tempArray[i]]);
-        //     mine(1);
-        //     vm.stopPrank();
-        // }
+        // ** 3. requestToSubmitCv()
+        // *** The leadernode requests the operators index 0,1,2 to submit their cv
+        mine(1);
+        s_tempArray = [0, 1, 2];
+        s_requestedToSubmitCvIndices = new uint256[](3);
+        for (uint256 i; i < 3; i++) {
+            s_requestedToSubmitCvIndices[i] = s_tempArray[i];
+        }
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.requestToSubmitCv(s_requestedToSubmitCvIndices);
+        mine(1);
+
+        // ** 4. submitCv()
+        // *** The operators index 0,1,2 submit their cv
+        vm.stopPrank();
+        for (uint256 i; i < 3; i++) {
+            vm.startPrank(s_activatedOperators[s_tempArray[i]]);
+            s_commitReveal2.submitCv(s_cvs[s_tempArray[i]]);
+            mine(1);
+            vm.stopPrank();
+        }
+
+        // ** 6. submitMerkleRoot()
+        vm.startPrank(LEADERNODE);
+        mine(1);
+        s_commitReveal2.submitMerkleRootAfterDispute(_createMerkleRoot(s_cvs));
+        mine(1);
+
+        // ** 9. requestToSubmitCo()
+        // *** Let's request [0,1,2, 3, 4, 5] to submit their Co
+        s_tempArray = [0, 1, 2, 3, 4, 5];
+        s_requestedToSubmitCoIndices = new uint256[](6);
+        // *** The indices who already submitted the Cvi on-chain should be appended at the end.
+        for (uint256 i = 3; i < 6; i++) {
+            s_requestedToSubmitCoIndices[i - 3] = s_tempArray[i];
+        }
+        for (uint256 i = 0; i < 3; i++) {
+            s_requestedToSubmitCoIndices[i + 3] = s_tempArray[i];
+        }
+        // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
+        // *** In this case, 0, 1, 2 submitted the Cvi on-chain (in submitCv() function)
+        s_cvsToSubmit = new bytes32[](6 - 3);
+        s_vsToSubmit = new uint8[](6 - 3);
+        s_rsToSubmit = new bytes32[](6 - 3);
+        s_ssToSubmit = new bytes32[](6 - 3);
+        for (uint256 i = 3; i < 6; i++) {
+            s_cvsToSubmit[i - 3] = s_cvs[s_tempArray[i]];
+            s_vsToSubmit[i - 3] = s_vs[s_tempArray[i]];
+            s_rsToSubmit[i - 3] = s_rs[s_tempArray[i]];
+            s_ssToSubmit[i - 3] = s_ss[s_tempArray[i]];
+        }
+        mine(1);
+        s_commitReveal2.requestToSubmitCo(
+            s_requestedToSubmitCoIndices, s_cvsToSubmit, s_vsToSubmit, s_rsToSubmit, s_ssToSubmit
+        );
+        mine(1);
+
+        // ** 10. submitCo()
+        // *** only index 3,4 submit their Co
+        vm.stopPrank();
+        for (uint256 i = 3; i < 5; i++) {
+            vm.startPrank(s_activatedOperators[s_tempArray[i]]);
+            mine(1);
+            s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
+            mine(1);
+            vm.stopPrank();
+        }
+
+        // ** 11. failToSubmitCo()
+        // *** The operator index 5 fail to submit their Co
+        mine(s_activeNetworkConfig.onChainSubmissionPeriod);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.failToSubmitCo();
+        mine(1);
+        vm.stopPrank();
+        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+
+        // * q. 1 -> 2 -> 15
+        // ** Off-chain: Cvi Submission
+        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
+        s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
+            (s_vs[i], s_rs[i], s_ss[i]) =
+                vm.sign(s_privateKeys[s_activatedOperators[i]], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
+        }
+
+        // ** 2. submitMerkleRoot()
+        mine(1);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
+        mine(1);
+
+        // ** 15. failToRequestSOrGenerateRandomNumber()
+        mine(s_activeNetworkConfig.offChainSubmissionPeriod);
+        mine(s_activeNetworkConfig.offChainSubmissionPeriodPerOperator * s_activatedOperators.length);
+        mine(s_activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.failToRequestSOrGenerateRandomNumber();
+        mine(1);
+        vm.stopPrank();
+        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+
+        // ** resume
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
+        mine(1);
+        vm.stopPrank();
+        console2.log("After resume");
+        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+
+        // * r. 1 -> 2 -> 9 -> 10 -> 15
+        // ** Off-chain: Cvi Submission
+        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
+        s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
+            (s_vs[i], s_rs[i], s_ss[i]) =
+                vm.sign(s_privateKeys[s_activatedOperators[i]], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
+        }
+
+        // ** 2. submitMerkleRoot()
+        mine(1);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
+        mine(1);
+
+        // ** 9. requestToSubmitCo()
+        // *** Let's request [0, 3] to submit their Co
+        s_tempArray = [0, 3];
+        s_requestedToSubmitCoIndices = new uint256[](2);
+        for (uint256 i; i < 2; i++) {
+            s_requestedToSubmitCoIndices[i] = s_tempArray[i];
+        }
+        // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
+        // *** In this case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
+        s_cvsToSubmit = new bytes32[](2);
+        s_vsToSubmit = new uint8[](2);
+        s_rsToSubmit = new bytes32[](2);
+        s_ssToSubmit = new bytes32[](2);
+        for (uint256 i; i < 2; i++) {
+            s_cvsToSubmit[i] = s_cvs[s_tempArray[i]];
+            s_vsToSubmit[i] = s_vs[s_tempArray[i]];
+            s_rsToSubmit[i] = s_rs[s_tempArray[i]];
+            s_ssToSubmit[i] = s_ss[s_tempArray[i]];
+        }
+        mine(1);
+        s_commitReveal2.requestToSubmitCo(
+            s_requestedToSubmitCoIndices, s_cvsToSubmit, s_vsToSubmit, s_rsToSubmit, s_ssToSubmit
+        );
+        mine(1);
+
+        // ** 10. submitCo()
+        // *** index 0, 3 submit their Co
+        vm.stopPrank();
+        for (uint256 i = 0; i < 2; i++) {
+            vm.startPrank(s_activatedOperators[s_tempArray[i]]);
+            mine(1);
+            s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
+            mine(1);
+            vm.stopPrank();
+        }
+
+        // ** 15. failToRequestSOrGenerateRandomNumber()
+        mine(s_activeNetworkConfig.onChainSubmissionPeriod);
+        mine(s_activeNetworkConfig.offChainSubmissionPeriodPerOperator * s_activatedOperators.length);
+        mine(s_activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.failToRequestSOrGenerateRandomNumber();
+        mine(1);
+        vm.stopPrank();
+        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+
+        // ** resume
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
+        mine(1);
+        vm.stopPrank();
+        console2.log("After resume");
+        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+
+        // * s. 1 -> 2 -> 9 -> 10 -> 13 -> 14 -> 16
+        // ** Off-chain: Cvi Submission
+        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
+        s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
+            (s_vs[i], s_rs[i], s_ss[i]) =
+                vm.sign(s_privateKeys[s_activatedOperators[i]], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
+        }
+
+        // ** 2. submitMerkleRoot()
+        mine(1);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
+        mine(1);
+
+        // ** 9. requestToSubmitCo()
+        // *** Let's request [1, 2, 3] to submit their Co
+        s_tempArray = [1, 2, 3];
+        s_requestedToSubmitCoIndices = new uint256[](3);
+        for (uint256 i; i < 3; i++) {
+            s_requestedToSubmitCoIndices[i] = s_tempArray[i];
+        }
+        // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
+        // *** In this case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
+        s_cvsToSubmit = new bytes32[](3);
+        s_vsToSubmit = new uint8[](3);
+        s_rsToSubmit = new bytes32[](3);
+        s_ssToSubmit = new bytes32[](3);
+        for (uint256 i; i < 3; i++) {
+            s_cvsToSubmit[i] = s_cvs[s_tempArray[i]];
+            s_vsToSubmit[i] = s_vs[s_tempArray[i]];
+            s_rsToSubmit[i] = s_rs[s_tempArray[i]];
+            s_ssToSubmit[i] = s_ss[s_tempArray[i]];
+        }
+        mine(1);
+        s_commitReveal2.requestToSubmitCo(
+            s_requestedToSubmitCoIndices, s_cvsToSubmit, s_vsToSubmit, s_rsToSubmit, s_ssToSubmit
+        );
+        mine(1);
+
+        // ** 10. submitCo()
+        // *** index [1, 2, 3] submit their Co
+        vm.stopPrank();
+        for (uint256 i; i < 3; i++) {
+            vm.startPrank(s_activatedOperators[s_tempArray[i]]);
+            mine(1);
+            s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
+            mine(1);
+            vm.stopPrank();
+        }
+
+        // ** 13. requestToSubmitS()
+        // *** - calculate reveal order
+        revealOrders = new uint256[](s_activatedOperators.length);
+        diffs = new uint256[](s_activatedOperators.length);
+        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            revealOrders[i] = i;
+        }
+        Sort.sort(diffs, revealOrders);
+
+        // *** Let's assume only k 0, 1 submitted their s_secrets off-chain
+        // *** [1, 2, 3] submitted their cv on-chain
+        s_alreadySubmittedSecretsOffChain = new bytes32[](2);
+        for (uint256 i = 0; i < 2; i++) {
+            s_alreadySubmittedSecretsOffChain[i] = s_secrets[revealOrders[i]];
+        }
+        // *** [0, 5] didn't submit their cv onchain
+        s_tempArray = [5, 4, 0]; // in descending order
+        s_sigsDidntSubmitCv = new CommitReveal2L1.Signature[](3);
+        for (uint256 i = 0; i < 3; i++) {
+            s_sigsDidntSubmitCv[i].v = s_vs[s_tempArray[i]];
+            s_sigsDidntSubmitCv[i].r = s_rs[s_tempArray[i]];
+            s_sigsDidntSubmitCv[i].s = s_ss[s_tempArray[i]];
+        }
+        mine(1);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv, revealOrders);
+
+        // ** 14. submitS(), k 2 - 3 submit their s_secrets, 4 - 5 fail to submit their s_secrets
+        for (uint256 i = 2; i < 4; i++) {
+            vm.startPrank(s_activatedOperators[revealOrders[i]]);
+            mine(1);
+            s_commitReveal2.submitS(s_secrets[revealOrders[i]]);
+            mine(1);
+            vm.stopPrank();
+        }
+
+        // ** 16. failToSubmitS()
+        mine(s_activeNetworkConfig.offChainSubmissionPeriodPerOperator);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.failToSubmitS();
+        mine(1);
+        vm.stopPrank();
+        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+
+        // * t. 1 -> 2 -> 9 -> 10 -> 13 -> 16
+        // ** Off-chain: Cvi Submission
+        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
+        s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
+            (s_vs[i], s_rs[i], s_ss[i]) =
+                vm.sign(s_privateKeys[s_activatedOperators[i]], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
+        }
+
+        // ** 2. submitMerkleRoot()
+        mine(1);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
+        mine(1);
+
+        // ** 9. requestToSubmitCo()
+        // *** Let's request [0, 1, 2, 3, 4] to submit their Co
+        s_tempArray = [0, 1, 2, 3, 4];
+        s_requestedToSubmitCoIndices = new uint256[](5);
+        for (uint256 i; i < 5; i++) {
+            s_requestedToSubmitCoIndices[i] = s_tempArray[i];
+        }
+        // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
+        // *** In this case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
+        s_cvsToSubmit = new bytes32[](5);
+        s_vsToSubmit = new uint8[](5);
+        s_rsToSubmit = new bytes32[](5);
+        s_ssToSubmit = new bytes32[](5);
+        for (uint256 i; i < 5; i++) {
+            s_cvsToSubmit[i] = s_cvs[s_tempArray[i]];
+            s_vsToSubmit[i] = s_vs[s_tempArray[i]];
+            s_rsToSubmit[i] = s_rs[s_tempArray[i]];
+            s_ssToSubmit[i] = s_ss[s_tempArray[i]];
+        }
+        mine(1);
+        s_commitReveal2.requestToSubmitCo(
+            s_requestedToSubmitCoIndices, s_cvsToSubmit, s_vsToSubmit, s_rsToSubmit, s_ssToSubmit
+        );
+        mine(1);
+
+        // ** 10. submitCo()
+        // *** index [0, 1, 2, 3, 4] submit their Co
+        vm.stopPrank();
+        for (uint256 i; i < 5; i++) {
+            vm.startPrank(s_activatedOperators[s_tempArray[i]]);
+            mine(1);
+            s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
+            mine(1);
+            vm.stopPrank();
+        }
+
+        // ** 13. requestToSubmitS()
+        // *** - calculate reveal order
+        revealOrders = new uint256[](s_activatedOperators.length);
+        diffs = new uint256[](s_activatedOperators.length);
+        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            revealOrders[i] = i;
+        }
+        Sort.sort(diffs, revealOrders);
+
+        // *** Let's assume no one submitted their s_secrets off-chain
+        // *** [0, 1, 2, 3, 4] submitted their cv on-chain
+        s_alreadySubmittedSecretsOffChain = new bytes32[](0);
+        // *** everyone submitted their cv onchain
+        s_sigsDidntSubmitCv = new CommitReveal2L1.Signature[](0);
+        mine(1);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.requestToSubmitS(s_cos, s_alreadySubmittedSecretsOffChain, s_sigsDidntSubmitCv, revealOrders);
+
+        // ** 16. failToSubmitS()
+        mine(s_activeNetworkConfig.offChainSubmissionPeriodPerOperator);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.failToSubmitS();
+        mine(1);
+        vm.stopPrank();
+        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+
+        // * a. 1 -> 2 -> 12
+        // ** Off-chain: Cvi Submission
+        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
+        s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
+            (s_vs[i], s_rs[i], s_ss[i]) =
+                vm.sign(s_privateKeys[s_activatedOperators[i]], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
+        }
+
+        // ** 2. submitMerkleRoot()
+        mine(1);
+        vm.startPrank(LEADERNODE);
+        s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
+        mine(1);
+
+        // *** calculate reveal order
+        revealOrders = new uint256[](s_activatedOperators.length);
+        diffs = new uint256[](s_activatedOperators.length);
+        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            revealOrders[i] = i;
+        }
+        Sort.sort(diffs, revealOrders);
+
+        // ** 12. generateRandomNumber()
+        mine(1);
+        s_commitReveal2.generateRandomNumber(s_secrets, s_vs, s_rs, s_ss, revealOrders);
+        mine(1);
+        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(0);
+        console2.log(s_fulfilled, s_randomNumber);
+        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
     }
 }

@@ -52,7 +52,7 @@ contract CommitReveal2Helper {
 
     function _nextRequestedRound(uint256 word, uint8 bitPos, uint256 round)
         internal
-        view
+        pure
         returns (uint256 next, bool requested)
     {
         unchecked {
