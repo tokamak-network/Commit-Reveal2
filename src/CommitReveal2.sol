@@ -283,7 +283,7 @@ contract CommitReveal2 is EIP712, OptimismL1Fees, CommitReveal2Storage, Operator
         require(s_isInProcess == HALTED, NotHalted());
         require(s_activatedOperators.length > 1, NotEnoughActivatedOperators());
         address owner = owner();
-        s_depositAmount[owner] += msg.value;
+        if (msg.value > 0) s_depositAmount[owner] += msg.value;
         require(s_depositAmount[owner] >= s_activationThreshold, LeaderLowDeposit());
         uint256 nextRequestedRound = s_currentRound;
         bool requested;
@@ -438,11 +438,19 @@ contract CommitReveal2 is EIP712, OptimismL1Fees, CommitReveal2Storage, Operator
         uint256 secretsLength;
     }
 
+    struct RVICV {
+        // to avoid stack too deep error
+        uint256 rv;
+        uint256 i;
+        bytes32 cv;
+    }
+
     // * Phase8: On-chain: Reveal-2 Submission Request
     function requestToSubmitS(
         bytes32[] calldata cos, // all cos
         bytes32[] calldata secrets, // already received off-chain
-        Signature[] calldata signatures // used struct to avoid stack too deep error
+        Signature[] calldata signatures, // used struct to avoid stack too deep error, who didn't submit cv onchain, index descending order
+        uint256[] calldata revealOrders
     ) external onlyOwner {
         TempStackVariables memory tempStackVariables = TempStackVariables({
             startTime: s_requestInfo[s_currentRound].startTime,
@@ -464,25 +472,25 @@ contract CommitReveal2 is EIP712, OptimismL1Fees, CommitReveal2Storage, Operator
                 ),
             TooLate()
         );
-        //uint256 operatorsLength = s_activatedOperators.length;
-        uint256[] memory diffs = new uint256[](tempStackVariables.operatorsLength);
-        uint256[] memory revealOrders = new uint256[](tempStackVariables.operatorsLength);
         s_ss[tempStackVariables.startTime] = new bytes32[](tempStackVariables.operatorsLength);
         bytes32[] storage s_cvsArray = s_cvs[tempStackVariables.startTime];
         if (s_cvsArray.length == 0) {
             s_cvs[tempStackVariables.startTime] = new bytes32[](tempStackVariables.operatorsLength);
         }
         {
-            uint256 rv = uint256(keccak256(abi.encodePacked(cos)));
-            uint256 i;
+            // to avoid stack too deep error
+            RVICV memory rvicv;
+            rvicv.rv = uint256(keccak256(abi.encodePacked(cos)));
+            uint256[] memory diffs = new uint256[](tempStackVariables.operatorsLength);
             do {
                 unchecked {
-                    bytes32 cv = _efficientOneKeccak256(cos[--tempStackVariables.operatorsLength]);
+                    rvicv.cv = _efficientOneKeccak256(cos[--tempStackVariables.operatorsLength]);
+                    diffs[tempStackVariables.operatorsLength] = _diff(rvicv.rv, uint256(rvicv.cv));
                     if (s_cvsArray[tempStackVariables.operatorsLength] > 0) {
-                        require(s_cvsArray[tempStackVariables.operatorsLength] == cv, InvalidCo());
+                        require(s_cvsArray[tempStackVariables.operatorsLength] == rvicv.cv, InvalidCo());
                     } else {
                         require(
-                            signatures[i].s <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
+                            signatures[rvicv.i].s <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
                             InvalidSignatureS()
                         );
                         require(
@@ -490,25 +498,30 @@ contract CommitReveal2 is EIP712, OptimismL1Fees, CommitReveal2Storage, Operator
                                 _hashTypedDataV4(
                                     keccak256(
                                         abi.encode(
-                                            MESSAGE_TYPEHASH, Message({timestamp: tempStackVariables.startTime, cv: cv})
+                                            MESSAGE_TYPEHASH,
+                                            Message({timestamp: tempStackVariables.startTime, cv: rvicv.cv})
                                         )
                                     )
                                 ),
-                                signatures[i].v,
-                                signatures[i].r,
-                                signatures[i++].s
+                                signatures[rvicv.i].v,
+                                signatures[rvicv.i].r,
+                                signatures[rvicv.i++].s
                             )] == tempStackVariables.operatorsLength + 1,
                             InvalidSignature()
                         );
-                        s_cvsArray[tempStackVariables.operatorsLength] = cv;
+                        s_cvsArray[tempStackVariables.operatorsLength] = rvicv.cv;
                     }
-                    diffs[tempStackVariables.operatorsLength] = _diff(rv, uint256(cv));
-                    revealOrders[tempStackVariables.operatorsLength] = tempStackVariables.operatorsLength;
                 }
             } while (tempStackVariables.operatorsLength > 0);
+            // ** verify reveal order
+            uint256 before = diffs[revealOrders[0]];
+            uint256 activatedOperatorLength = cos.length;
+            for (rvicv.i = 1; rvicv.i < activatedOperatorLength; rvicv.i = unchecked_inc(rvicv.i)) {
+                uint256 curr = diffs[revealOrders[rvicv.i]];
+                require(before >= curr, RevealNotInDescendingOrder());
+                before = curr;
+            }
         }
-        // ** calculate reveal order
-        Sort.sort(diffs, revealOrders);
         s_revealOrders = revealOrders;
 
         s_requestedToSubmitSFromIndexK = tempStackVariables.secretsLength;
@@ -527,7 +540,8 @@ contract CommitReveal2 is EIP712, OptimismL1Fees, CommitReveal2Storage, Operator
 
     // * Phase9: On-chain: Reveal-2 Submission
     function submitS(bytes32 s) external {
-        RequestInfo storage requestInfo = s_requestInfo[s_currentRound];
+        uint256 round = s_currentRound;
+        RequestInfo storage requestInfo = s_requestInfo[round];
         uint256 startTime = requestInfo.startTime;
         require(block.timestamp < s_previousSSubmitTimestamp + s_onChainSubmissionPeriodPerOperator, TooLate());
         uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[msg.sender] - 1;
@@ -537,7 +551,6 @@ contract CommitReveal2 is EIP712, OptimismL1Fees, CommitReveal2Storage, Operator
         }
         emit SSubmitted(startTime, s, activatedOperatorIndex);
         s_ss[startTime][activatedOperatorIndex] = s;
-        uint256 round = s_currentRound;
         if (activatedOperatorIndex == s_revealOrders[s_revealOrders.length - 1]) {
             // ** create random number
             uint256 randomNumber = uint256(keccak256(abi.encodePacked(s_ss[startTime])));
@@ -563,9 +576,80 @@ contract CommitReveal2 is EIP712, OptimismL1Fees, CommitReveal2Storage, Operator
         }
     }
 
-    function failToSubmitAllS() external {}
+    function failToSubmitS() external {
+        // ** check if S is requested
+        bytes32[] storage s_ssArray = s_ss[s_requestInfo[s_currentRound].startTime];
+        require(s_ssArray.length > 0, SNotRequested());
+        // ** check if it's time to fail this round
+        require(block.timestamp >= s_previousSSubmitTimestamp + s_onChainSubmissionPeriodPerOperator, TooEarly());
 
-    function failToGenerateRandomNumber() external {}
+        // ** return gas fee
+        uint256 returnGasFee = tx.gasprice * FAILTOSUBMITS_GASUSED;
+        s_depositAmount[msg.sender] += returnGasFee;
+
+        uint256 slashRewardPerOperator = s_slashRewardPerOperator;
+        uint256 activationThreshold = s_activationThreshold;
+        uint256 updatedSlashRewardPerOperator =
+            slashRewardPerOperator + (activationThreshold - returnGasFee) / (s_activatedOperators.length); // 1 for owner
+        // ** update global slash reward
+        s_slashRewardPerOperator = updatedSlashRewardPerOperator;
+
+        // ** s_revealOrders[s_requestedToSubmitSFromIndexK] is the index of the operator who didn't submit S
+        uint256 indexToSlash = s_revealOrders[s_requestedToSubmitSFromIndexK];
+        address operator = s_activatedOperators[indexToSlash];
+        // ** update deposit amount
+        s_depositAmount[operator] = s_depositAmount[operator] - activationThreshold + slashRewardPerOperator
+            - s_slashRewardPerOperatorPaid[operator];
+        s_slashRewardPerOperatorPaid[operator] = updatedSlashRewardPerOperator;
+        // ** deactivate
+        _deactivate(indexToSlash, operator);
+
+        // ** restart or end this round
+        if (s_activatedOperators.length > 1) {
+            s_requestInfo[s_currentRound].startTime = block.timestamp;
+            emit RandomNumberRequested(s_currentRound, block.timestamp, s_activatedOperators);
+        } else {
+            s_isInProcess = HALTED;
+            emit IsInProcess(HALTED);
+        }
+    }
+
+    function failToRequestSOrGenerateRandomNumber() external {
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
+        // ** MerkleRoot Submitted
+        require(s_isSubmittedMerkleRoot[startTime], MerkleRootNotSubmitted());
+        if (s_requestToSubmitCoBitmap[startTime] > 0) {
+            require(
+                block.timestamp
+                    >= s_requestedToSubmitCoTimestamp + s_onChainSubmissionPeriod
+                        + (s_onChainSubmissionPeriodPerOperator * s_activatedOperators.length)
+                        + s_requestOrSubmitOrFailDecisionPeriod,
+                TooEarly()
+            );
+        } else {
+            require(
+                block.timestamp
+                    >= s_merkleRootSubmittedTimestamp + s_offChainSubmissionPeriod
+                        + (s_offChainSubmissionPeriodPerOperator * s_activatedOperators.length)
+                        + s_requestOrSubmitOrFailDecisionPeriod,
+                TooEarly()
+            );
+        }
+        // ** slash the leadernode(owner)'s deposit
+        uint256 activationThreshold = s_activationThreshold;
+        uint256 returnGasFee = tx.gasprice * FAILTOSUBMITCVORSUBMITMERKLEROOT_GASUSED; // + L1Gas
+        address owner = owner();
+        unchecked {
+            s_depositAmount[owner] -= activationThreshold;
+            s_depositAmount[msg.sender] += returnGasFee;
+        }
+        uint256 delta = (activationThreshold - returnGasFee) / s_activatedOperators.length;
+        s_slashRewardPerOperator += delta;
+        s_slashRewardPerOperatorPaid[owner] += delta;
+
+        s_isInProcess = HALTED;
+        emit IsInProcess(HALTED);
+    }
 
     function generateRandomNumber(
         bytes32[] calldata secrets,
