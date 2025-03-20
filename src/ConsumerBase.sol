@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
+
 import {ICommitReveal2} from "./ICommitReveal2.sol";
 
 /**
@@ -28,16 +29,9 @@ abstract contract ConsumerBase {
      * @return requestId The ID of the request
      * @dev Request Randomness to the Coordinator
      */
-    function _requestRandomNumber(
-        uint32 callbackGasLimit
-    ) internal returns (uint256) {
-        uint256 requestFee = i_commitreveal2.estimateRequestPrice(
-            callbackGasLimit,
-            tx.gasprice
-        );
-        uint256 requestId = i_commitreveal2.requestRandomNumber{
-            value: requestFee
-        }(callbackGasLimit);
+    function _requestRandomNumber(uint32 callbackGasLimit) internal returns (uint256) {
+        uint256 requestFee = i_commitreveal2.estimateRequestPrice(callbackGasLimit, tx.gasprice);
+        uint256 requestId = i_commitreveal2.requestRandomNumber{value: requestFee}(callbackGasLimit);
         return requestId;
     }
 
@@ -50,24 +44,15 @@ abstract contract ConsumerBase {
      * @param randomNumber the random number
      * @dev Callback function for the Coordinator to call after the request is fulfilled.  Override this function in your contract
      */
-    function fulfillRandomRandomNumber(
-        uint256 round,
-        uint256 randomNumber
-    ) internal virtual;
+    function fulfillRandomRandomNumber(uint256 round, uint256 randomNumber) internal virtual;
 
     /**
      * @param round The round of the randomness
      * @param randomNumber The random number
      * @dev Callback function for the Coordinator to call after the request is fulfilled. This function is called by the Coordinator
      */
-    function rawFulfillRandomNumber(
-        uint256 round,
-        uint256 randomNumber
-    ) external {
-        require(
-            msg.sender == address(i_commitreveal2),
-            OnlyCoordinatorCanFulfill(msg.sender, address(i_commitreveal2))
-        );
+    function rawFulfillRandomNumber(uint256 round, uint256 randomNumber) external {
+        require(msg.sender == address(i_commitreveal2), OnlyCoordinatorCanFulfill(msg.sender, address(i_commitreveal2)));
         fulfillRandomRandomNumber(round, randomNumber);
     }
 }

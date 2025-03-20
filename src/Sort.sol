@@ -2,10 +2,7 @@
 pragma solidity ^0.8.28;
 
 library Sort {
-    function sort(
-        uint256[] memory array,
-        uint256[] memory index
-    ) internal pure {
+    function sort(uint256[] memory array, uint256[] memory index) internal pure {
         _quickSort(_begin(array), _end(array), _begin(index), _end(index));
         // descending order
     }
@@ -58,12 +55,7 @@ library Sort {
     //     bytes
     // )
 
-    function _quickSort(
-        uint256 begin,
-        uint256 end,
-        uint256 beginIndex,
-        uint256 endIndex
-    ) private pure {
+    function _quickSort(uint256 begin, uint256 end, uint256 beginIndex, uint256 endIndex) private pure {
         unchecked {
             if (end - begin < 0x40) return;
 

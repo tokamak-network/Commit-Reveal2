@@ -6,10 +6,7 @@ interface IOVM_GasPriceOracle {
     event GasPriceUpdated(uint256);
     event L1BaseFeeUpdated(uint256);
     event OverheadUpdated(uint256);
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event ScalarUpdated(uint256);
 
     function DECIMALS() external view returns (uint256);
@@ -28,9 +25,7 @@ interface IOVM_GasPriceOracle {
 
     function getL1Fee(bytes memory _data) external view returns (uint256);
 
-    function getL1FeeUpperBound(
-        uint256 _unsignedTxSize
-    ) external view returns (uint256);
+    function getL1FeeUpperBound(uint256 _unsignedTxSize) external view returns (uint256);
 
     function getL1GasUsed(bytes memory _data) external view returns (uint256);
 
