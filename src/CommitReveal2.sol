@@ -21,11 +21,6 @@ import {console2} from "forge-std/Test.sol";
 ///   - OperatorManager for managing operator deposits and slash mechanics
 /// @custom:company Tokamak Network
 contract CommitReveal2 is EIP712, OptimismL1Fees, CommitReveal2Storage, OperatorManager {
-    /**
-     * @notice Associates the Bitmap library with a storage mapping from `uint248` to `uint256`.
-     * @dev This allows efficient bitwise operations on round states packed into 256-bit words,
-     *      where each `uint248` key corresponds to one “word” holding state for up to 256 rounds.
-     */
     using Bitmap for mapping(uint248 => uint256);
 
     constructor(
