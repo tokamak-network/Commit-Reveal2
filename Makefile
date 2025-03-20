@@ -75,3 +75,9 @@ deploy-consumer-example:
 
 test:
 	@forge test --gas-limit 9999999999999999999 --isolate -vv
+
+fuzz_test:
+	@forge test --mp test/fuzz/CommitReveal2Fuzz.t.sol -vv --isolate
+
+doc:
+	@forge doc --serve --open
