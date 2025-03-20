@@ -174,7 +174,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(0);
         console2.log(s_fulfilled, s_randomNumber);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * b. 1 -> 2 -> 13 -> 14
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
@@ -231,7 +233,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         }
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(1);
         console2.log(s_fulfilled, s_randomNumber);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * c. 1 -> 2 -> 9 -> 10 -> 12, round: 2
         // ** Off-chain: Cvi Submission
@@ -302,7 +306,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(s_commitReveal2.s_currentRound());
         console2.log(s_fulfilled, s_randomNumber);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // *** d. 1 -> 2 -> 9 -> 10 -> 13 -> 14
         // ** Request Three more times
@@ -393,7 +399,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         }
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(3);
         console2.log(s_fulfilled, s_randomNumber);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // ** e,f,g,h
 
@@ -450,7 +458,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(4);
         console2.log(s_fulfilled, s_randomNumber);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * f. 1 -> 3 ->4 -> 6 -> 13 -> 14, round = 5
         // ** Off-chain: Cvi Submission
@@ -523,7 +533,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         }
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(5);
         console2.log(s_fulfilled, s_randomNumber);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * g. 1 -> 3 ->4 -> 6 -> 9 -> 10 -> 12, round = 6
         // ** 1. Request Three more times
@@ -629,7 +641,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(6);
         console2.log(s_fulfilled, s_randomNumber);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * h. 1 -> 3 ->4 -> 6 -> 9 -> 10 -> 13 -> 14
         // ** 3. requestToSubmitCv()
@@ -716,7 +730,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         }
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(7);
         console2.log(s_fulfilled, s_randomNumber);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * i. 1 -> 5, round: 8
         // ** 5.
@@ -732,19 +748,25 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         // *** After the protocol halts, the round can be restarted or the consumer can refund the round.
 
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // *** let's refund the round 8 and start from round 9
         s_consumerExample.refund(8);
         mine(1);
         vm.stopPrank();
         console2.log("after refund");
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         vm.startPrank(LEADERNODE);
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
         console2.log("After resume");
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // With currentRound=8, lastFulfilledRound=7, and requestCount=9, let's call requestRandomNumber 3 more times.
 
@@ -752,7 +774,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_consumerExample.requestRandomNumber{value: s_requestFee}();
         }
         mine(1);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * j. 1 -> 3 -> 4 -> 7, round: 9
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
@@ -801,7 +825,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
 
         console2.log("After 2, 6, 8 failToSubmitCv");
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * k. 1 -> 3 -> 7, round: 9
         // ** 3. requestToSubmitCv()
@@ -821,7 +847,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitCv();
         mine(1);
         vm.stopPrank();
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * l. 1 -> 3 -> 4 -> 8, round 9, operatorNum = 6
         // ** 3. requestToSubmitCv()
@@ -859,7 +887,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
         mine(1);
         vm.stopPrank();
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * m. 1 -> 2 -> 9 -> 11, round: 9, operatorNum = 6
         // ** Off-chain: Cvi Submission
@@ -916,7 +946,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * n. 1 -> 2 -> 9 -> 10 -> 11, operatorNum = 4
         // ** Off-chain: Cvi Submission
@@ -983,7 +1015,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitCo();
         mine(1);
         vm.stopPrank();
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * o. 1 -> 3 -> 4 -> 6 -> 9 -> 11, operatorNum = 3
 
@@ -1057,7 +1091,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * p. 1 -> 3 -> 4 -> 6 -> 9 -> 10 -> 11, operatorNum = 0
         // ** Let's withdraw all
@@ -1072,7 +1108,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // ** 10 operators deposit and activate
         for (uint256 i; i < 10; i++) {
@@ -1184,7 +1222,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitCo();
         mine(1);
         vm.stopPrank();
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * q. 1 -> 2 -> 15
         // ** Off-chain: Cvi Submission
@@ -1216,7 +1256,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToRequestSOrGenerateRandomNumber();
         mine(1);
         vm.stopPrank();
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // ** resume
         vm.startPrank(LEADERNODE);
@@ -1224,7 +1266,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
         console2.log("After resume");
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * r. 1 -> 2 -> 9 -> 10 -> 15
         // ** Off-chain: Cvi Submission
@@ -1292,7 +1336,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToRequestSOrGenerateRandomNumber();
         mine(1);
         vm.stopPrank();
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // ** resume
         vm.startPrank(LEADERNODE);
@@ -1300,7 +1346,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
         console2.log("After resume");
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * s. 1 -> 2 -> 9 -> 10 -> 13 -> 14 -> 16
         // ** Off-chain: Cvi Submission
@@ -1404,7 +1452,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitS();
         mine(1);
         vm.stopPrank();
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * t. 1 -> 2 -> 9 -> 10 -> 13 -> 16
         // ** Off-chain: Cvi Submission
@@ -1490,7 +1540,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitS();
         mine(1);
         vm.stopPrank();
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
 
         // * a. 1 -> 2 -> 12
         // ** Off-chain: Cvi Submission
@@ -1530,6 +1582,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(0);
         console2.log(s_fulfilled, s_randomNumber);
-        consoleDepositsAndSlashRewardAccumulated(s_commitReveal2, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress);
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_anvilDefaultAddresses, LEADERNODE, s_anyAddress
+        );
     }
 }

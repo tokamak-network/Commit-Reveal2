@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
+
 import {ConsumerBase} from "./ConsumerBase.sol";
 
 contract ConsumerExample is ConsumerBase {
@@ -8,10 +9,11 @@ contract ConsumerExample is ConsumerBase {
         uint256 randomNumber;
     }
 
-    mapping(address requester => uint256[] requestIds)
-        public s_requesterRequestIds;
-    mapping(uint256 requestId => RequestStatus)
-        public s_requests; /* requestId --> requestStatus */
+    mapping(address requester => uint256[] requestIds) public s_requesterRequestIds;
+    mapping(uint256 requestId => RequestStatus) public s_requests; /* requestId --> requestStatus */
+
+    // * for testing
+    uint256 public lastRequestId;
 
     // past requests Id.
     uint32 public constant CALLBACK_GAS_LIMIT = 80000;
@@ -23,12 +25,10 @@ contract ConsumerExample is ConsumerBase {
         s_requesterRequestIds[msg.sender].push(requestId);
     }
 
-    function fulfillRandomRandomNumber(
-        uint256 requestId,
-        uint256 randomNumber
-    ) internal override {
+    function fulfillRandomRandomNumber(uint256 requestId, uint256 randomNumber) internal override {
         s_requests[requestId].fulfilled = true;
         s_requests[requestId].randomNumber = randomNumber;
+        lastRequestId = requestId;
     }
 
     function getCommitReveal2Address() external view returns (address) {
@@ -38,11 +38,7 @@ contract ConsumerExample is ConsumerBase {
     function getYourRequests()
         external
         view
-        returns (
-            uint256[] memory requestIds,
-            bool[] memory isFulFilled,
-            uint256[] memory randomNumbers
-        )
+        returns (uint256[] memory requestIds, bool[] memory isFulFilled, uint256[] memory randomNumbers)
     {
         requestIds = s_requesterRequestIds[msg.sender];
         isFulFilled = new bool[](requestIds.length);

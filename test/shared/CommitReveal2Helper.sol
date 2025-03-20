@@ -5,6 +5,7 @@ import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 import {CommitReveal2Storage} from "./../../src/CommitReveal2.sol";
 import {console2} from "forge-std/Test.sol";
 import {Bitmap} from "../../src/libraries/Bitmap.sol";
+import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 
 contract CommitReveal2Helper {
     uint256 private s_nonce;
@@ -67,6 +68,7 @@ contract CommitReveal2Helper {
 
     function consoleDepositsAndSlashRewardAccumulated(
         CommitReveal2 commitReveal2,
+        ConsumerExample consumerExample,
         address[10] memory operators,
         address leaderNode,
         address extraAddress
@@ -83,7 +85,8 @@ contract CommitReveal2Helper {
         uint256 nextRequestedRound = commitReveal2.s_currentRound();
         bool requested;
         uint256 requestCount = commitReveal2.s_requestCount();
-        uint256 lastfulfilledRound = commitReveal2.s_lastfulfilledRound();
+        // uint256 lastfulfilledRound = commitReveal2.s_lastfulfilledRound();
+        uint256 lastfulfilledRound = consumerExample.lastRequestId();
         for (uint256 i; i < 10; i++) {
             uint248 wordPos = uint248(nextRequestedRound >> 8);
             uint8 bitPos;
@@ -94,7 +97,7 @@ contract CommitReveal2Helper {
             (nextRequestedRound, requested) = _nextRequestedRound(word, bitPos, nextRequestedRound);
             if (requested) {
                 if (nextRequestedRound == lastfulfilledRound) {
-                    break;
+                    break; // because it is already updated in s_depositAmount
                 }
                 (,, uint256 cost,) = commitReveal2.s_requestInfo(nextRequestedRound);
                 sum += cost;
