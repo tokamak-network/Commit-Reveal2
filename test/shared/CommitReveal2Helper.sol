@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
-import {CommitReveal2Storage} from "./../../src/CommitReveal2.sol";
+import {CommitReveal2Storage} from "./../../src/CommitReveal2Storage.sol";
 import {console2} from "forge-std/Test.sol";
 import {Bitmap} from "../../src/libraries/Bitmap.sol";
 import {ConsumerExample} from "./../../src/ConsumerExample.sol";

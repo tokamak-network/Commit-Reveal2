@@ -5,7 +5,7 @@ import {CommitReveal2L1} from "./../src/CommitReveal2L1.sol";
 import {BaseTest} from "./shared/BaseTest.t.sol";
 import {console2, Vm} from "forge-std/Test.sol";
 import {NetworkHelperConfig} from "./../script/NetworkHelperConfig.s.sol";
-import {Sort} from "./../src/Sort.sol";
+import {Sort} from "./shared/Sort.sol";
 import {CommitReveal2Helper} from "./shared/CommitReveal2Helper.sol";
 import {ConsumerExample} from "./../src/ConsumerExample.sol";
 import {DeployCommitReveal2} from "./../script/DeployCommitReveal2.s.sol";

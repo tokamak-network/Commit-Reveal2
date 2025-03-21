@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {CreateMerkleRootSolidity, CreateMerkleRootInlineAssembly} from "./../../src/test/CommitReveal2Test.sol";
+import {CreateMerkleRootSolidity, CreateMerkleRootInlineAssembly} from "./../shared/CommitReveal2Test.sol";
 
 import {NetworkHelperConfig} from "./../../script/NetworkHelperConfig.s.sol";
 import {Test, console2} from "forge-std/Test.sol";
