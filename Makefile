@@ -47,17 +47,14 @@ NETWORK_ARGS := --rpc-url 127.0.0.1:8545 --private-key $(DEFAULT_ANVIL_KEY) --br
 
 
 ifeq ($(findstring --network sepolia,$(ARGS)), --network sepolia)
-	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast 
+	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --retries 20 --etherscan-api-key $(ETHERSCAN_API_KEY) -vv
 endif
 ifeq ($(findstring --network opsepolia,$(ARGS)), --network opsepolia)
-	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast
+	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(OP_ETHERSCAN_API_KEY) -vv
 endif
 ifeq ($(findstring --network thanossepolia,$(ARGS)), --network thanossepolia)
 	NETWORK_ARGS := --rpc-url $(THANOS_SEPOLIA_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) -vv
 endif
-
-# --verify --retries 20 --etherscan-api-key $(ETHERSCAN_API_KEY) -vv
-# --verify --etherscan-api-key $(OP_ETHERSCAN_API_KEY) -vv
 
 deploy: deploy-commit-reveal2 deploy-consumer-example
 
