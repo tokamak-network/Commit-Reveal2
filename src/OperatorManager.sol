@@ -70,6 +70,10 @@ contract OperatorManager is Ownable {
         // *** leaderNode doesn't activate
         require(msg.sender != owner(), OwnerCannotActivate());
         require(s_depositAmount[msg.sender] >= s_activationThreshold, LessThanActivationThreshold());
+        _activate();
+    }
+
+    function _activate() private {
         require(s_activatedOperatorIndex1Based[msg.sender] == 0, AlreadyActivated());
         s_activatedOperators.push(msg.sender);
         uint256 activatedOperatorLength = s_activatedOperators.length;
@@ -82,8 +86,10 @@ contract OperatorManager is Ownable {
     }
 
     function depositAndActivate() external payable {
-        deposit();
-        activate();
+        uint256 updatedDepositAmount = s_depositAmount[msg.sender] + msg.value;
+        require(updatedDepositAmount >= s_activationThreshold, LessThanActivationThreshold());
+        s_depositAmount[msg.sender] = updatedDepositAmount;
+        _activate();
     }
 
     function withdraw() external notInProcess {
