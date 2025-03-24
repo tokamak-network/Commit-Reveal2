@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 
-contract CommitReveal2Getter is CommitReveal2 {
+contract CommitReveal2TestSolidity is CommitReveal2 {
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
@@ -33,6 +33,101 @@ contract CommitReveal2Getter is CommitReveal2 {
 
     function getMessageHash(uint256 timestamp, bytes32 cv) external view returns (bytes32) {
         return _hashTypedDataV4(keccak256(abi.encode(MESSAGE_TYPEHASH, Message({timestamp: timestamp, cv: cv}))));
+    }
+
+    function generateRandomNumber() external {
+        // ** check if it is not too late
+        // require(
+        //     (block.timestamp <
+        //         s_merkleRootSubmittedTimestamp +
+        //             s_offChainSubmissionPeriod +
+        //             (s_offChainSubmissionPeriodPerOperator *
+        //                 activatedOperatorsLength) +
+        //             s_requestOrSubmitOrFailDecisionPeriod) ||
+        //         (block.timestamp <
+        //             s_requestedToSubmitCoTimestamp +
+        //                 s_onChainSubmissionPeriod +
+        //                 (s_offChainSubmissionPeriodPerOperator *
+        //                     activatedOperatorsLength) +
+        //                 s_requestOrSubmitOrFailDecisionPeriod),
+        //     TooLate()
+        // );
+
+        // ** initialize cos and cvs arrays memory
+        //bytes32[] memory cos = new bytes32[](activatedOperatorsLength);
+        //bytes32[] memory cvs = new bytes32[](activatedOperatorsLength);
+
+        //for { let i := 0 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
+        //cos[i] = keccak256(abi.encodePacked(secrets[i]));
+        //cvs[i] = keccak256(abi.encodePacked(cos[i]));
+        //}
+
+        // ** verify reveal order
+        /**
+         * uint256 rv = uint256(keccak256(abi.encodePacked(cos)));
+         * for (uint256 i = 1; i < secretsLength; i = _unchecked_inc(i)) {
+         * require(
+         *    diff(rv, cvs[revealOrders[i - 1]]) >
+         *        diff(rv, cvs[revealOrders[i]]),
+         *    RevealNotInAscendingOrder()
+         * );
+         *
+         * uint256 before = diff(rv, cvs[revealOrders[0]]);
+         * for (uint256 i = 1; i < secretsLength; i = _unchecked_inc(i)) {
+         *  uint256 after = diff(rv, cvs[revealOrders[i]]);
+         *  require(before >= after, RevealNotInAscendingOrder());
+         *  before = after;
+         * }
+         *
+         */
+
+        // ** verify signer
+        // uint256 round = s_currentRound;
+        // RequestInfo storage requestInfo = s_requestInfo[round];
+        // uint256 startTimestamp = requestInfo.startTime;
+        // for (uint256 i; i < activatedOperatorsLength; i = _unchecked_inc(i)) {
+        //     // signature malleability prevention
+        //     require(ss[i] <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, InvalidSignatureS());
+        //     require(
+        //         s_activatedOperatorIndex1Based[ecrecover(
+        //             _hashTypedDataV4(
+        //                 keccak256(abi.encode(MESSAGE_TYPEHASH, Message({timestamp: startTimestamp, cv: cvs[i]})))
+        //             ),
+        //             vs[i],
+        //             rs[i],
+        //             ss[i]
+        //         )] > 0,
+        //         InvalidSignature()
+        //     );
+        // }
+
+        // ** create random number
+        // uint256 randomNumber = uint256(keccak256(abi.encodePacked(secrets)));
+        // uint256 nextRound = _unchecked_inc(round);
+        // unchecked {
+        //     if (nextRound == s_requestCount) {
+        //         s_isInProcess = COMPLETED;
+        //         emit IsInProcess(COMPLETED);
+        //     } else {
+        //         s_requestInfo[nextRound].startTime = block.timestamp;
+        //         s_currentRound = nextRound;
+        //     }
+        // }
+        // // reward the last revealer
+        // s_depositAmount[s_activatedOperators[revealOrders[activatedOperatorsLength - 1]]] += requestInfo.cost;
+        // emit RandomNumberGenerated(
+        //     round,
+        //     randomNumber,
+        //     _call(
+        //         requestInfo.consumer,
+        //         abi.encodeWithSelector(ConsumerBase.rawFulfillRandomNumber.selector, round, randomNumber),
+        //         requestInfo.callbackGasLimit
+        //     )
+        // );
+    }
+
+    function diff(uint256 a, uint256 b) private pure returns (uint256) {
+        return a > b ? a - b : b - a;
     }
 }
 

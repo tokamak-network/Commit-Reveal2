@@ -14,6 +14,7 @@ contract DeployConsumerExample is Script {
             (block.chainid == 31337 || block.chainid == 11155111) ? "CommitReveal2L1" : "CommitReveal2";
         address commitReveal2 = DevOpsTools.get_most_recent_deployment(contractName, block.chainid);
         if (commitReveal2 == address(0)) revert CommitReveal2NotDeployed();
+        console2.log("commitReveal2", commitReveal2);
         consumer = deployConsumerExampleUsingConfig(commitReveal2);
     }
 

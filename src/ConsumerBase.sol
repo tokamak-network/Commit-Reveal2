@@ -49,7 +49,7 @@ abstract contract ConsumerBase {
     /**
      * @param round The round of the randomness
      * @param randomNumber The random number
-     * @dev Callback function for the Coordinator to call after the request is fulfilled. This function is called by the Coordinator
+     * @dev Callback function for the Coordinator to call after the request is fulfilled. This function is called by the Coordinator, 0x00fc98b8
      */
     function rawFulfillRandomNumber(uint256 round, uint256 randomNumber) external {
         require(msg.sender == address(i_commitreveal2), OnlyCoordinatorCanFulfill(msg.sender, address(i_commitreveal2)));

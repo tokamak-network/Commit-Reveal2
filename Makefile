@@ -49,6 +49,12 @@ NETWORK_ARGS := --rpc-url 127.0.0.1:8545 --private-key $(DEFAULT_ANVIL_KEY) --br
 ifeq ($(findstring --network sepolia,$(ARGS)), --network sepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --retries 20 --etherscan-api-key $(ETHERSCAN_API_KEY) -vv
 endif
+ifeq ($(findstring --network scriptsepolia,$(ARGS)), --network scriptsepolia)
+	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) -vvv --skip-simulation --broadcast
+endif
+ifeq ($(findstring --network testsepolia,$(ARGS)), --network testsepolia)
+	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) -vvv --slow --skip-simulation
+endif
 ifeq ($(findstring --network opsepolia,$(ARGS)), --network opsepolia)
 	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(OP_ETHERSCAN_API_KEY) -vv
 endif
@@ -63,6 +69,12 @@ deploy-commit-reveal2:
 
 deploy-consumer-example:
 	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
+
+activateAndDeposit:
+	@forge script script/Interactions.s.sol:OperatorsActivateAndDeposit $(NETWORK_ARGS)
+
+successfulPaths:
+	@forge script script/Interactions.s.sol:SuccessfulPaths $(NETWORK_ARGS)
 
 # verify-commitreveal2:
 # 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Commit Reveal2" "1") \
@@ -80,3 +92,4 @@ fuzz_test:
 
 doc:
 	@forge doc --serve --open
+
