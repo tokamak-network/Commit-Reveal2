@@ -13,6 +13,12 @@ contract CommitReveal2Helper {
     bytes32 public s_versionHash;
     address s_commitReveal2Address;
 
+    function setCommitReveal2HelperStates(bytes32 nameHash, bytes32 versionHash, address commitReveal2Address) public {
+        s_nameHash = nameHash;
+        s_versionHash = versionHash;
+        s_commitReveal2Address = commitReveal2Address;
+    }
+
     function _createMerkleRoot(bytes32[] memory leaves) internal pure returns (bytes32) {
         uint256 leavesLen = leaves.length;
         uint256 hashCount = leavesLen - 1;

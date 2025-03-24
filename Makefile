@@ -73,8 +73,13 @@ deploy-consumer-example:
 activateAndDeposit:
 	@forge script script/Interactions.s.sol:OperatorsActivateAndDeposit $(NETWORK_ARGS)
 
-successfulPaths:
+testOneRound: testrequestAndSubmitMerkleRoot testgenerateRand
+
+testrequestAndSubmitMerkleRoot:
 	@forge script script/Interactions.s.sol:SuccessfulPaths $(NETWORK_ARGS)
+
+testgenerateRand:
+	@forge script script/Interactions.s.sol:SuccessfulPaths --sig "generateRandomNumber()" $(NETWORK_ARGS)
 
 # verify-commitreveal2:
 # 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Commit Reveal2" "1") \
