@@ -267,6 +267,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
             } else {
                 s_requestInfo[nextRound].startTime = block.timestamp;
                 s_currentRound = nextRound;
+                emit RandomNumberRequested(nextRound, block.timestamp, s_activatedOperators);
             }
             // ** Reward this last revealer.
             s_depositAmount[s_activatedOperators[activatedOperatorIndex]] += requestInfo.cost;
