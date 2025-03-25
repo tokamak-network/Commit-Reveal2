@@ -67,18 +67,16 @@ contract CommitReveal2Storage {
     error CvNotSubmitted(uint256 index);
 
     // * Events
-
-    event RandomNumberRequested(uint256 round, uint256 timestamp, address[] activatedOperators); // 0x2195ca2caa394fd192f7f17a47139d963938464c7ad99010b12ef0218c2f0838
-    event MerkleRootSubmitted(uint256 timestamp, bytes32 merkleRoot);
+    event Round(uint256 startTime, uint256 state); // 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe
+    event MerkleRootSubmitted(uint256 startTime, bytes32 merkleRoot);
     event RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess); // 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a
 
-    event RequestedToSubmitCv(uint256 timestamp, uint256[] indices);
-    event RequestedToSubmitCo(uint256 timestamp, uint256[] indices);
-    event CvSubmitted(uint256 timestamp, bytes32 cv, uint256 index);
-    event CoSubmitted(uint256 timestamp, bytes32 co, uint256 index);
-    event RequestedToSubmitSFromIndexK(uint256 timestamp, uint256 index);
-    event SSubmitted(uint256 timestamp, bytes32 s, uint256 index);
-    event IsInProcess(uint256 isInProcess); // 0x17e36cf3a793ac6f5c5a4f4902aae8748c5c29bf36f9f66870d1728c40bb562a
+    event RequestedToSubmitCv(uint256 startTime, uint256[] indices);
+    event RequestedToSubmitCo(uint256 startTime, uint256[] indices);
+    event CvSubmitted(uint256 startTime, bytes32 cv, uint256 index);
+    event CoSubmitted(uint256 startTime, bytes32 co, uint256 index);
+    event RequestedToSubmitSFromIndexK(uint256 startTime, uint256 index);
+    event SSubmitted(uint256 startTime, bytes32 s, uint256 index);
 
     // * State Variables
     // ** public

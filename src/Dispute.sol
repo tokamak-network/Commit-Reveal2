@@ -263,11 +263,11 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
             // ** Move to the next round or mark as completed.
             if (nextRound == s_requestCount) {
                 s_isInProcess = COMPLETED;
-                emit IsInProcess(COMPLETED);
+                emit Round(startTime, COMPLETED);
             } else {
                 s_requestInfo[nextRound].startTime = block.timestamp;
                 s_currentRound = nextRound;
-                emit RandomNumberRequested(nextRound, block.timestamp, s_activatedOperators);
+                emit Round(block.timestamp, IN_PROGRESS);
             }
             // ** Reward this last revealer.
             s_depositAmount[s_activatedOperators[activatedOperatorIndex]] += requestInfo.cost;
@@ -287,7 +287,8 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
     function failToSubmitCv() external {
         // ** check if it's time to submit merkle root or to fail this round
         uint256 round = s_currentRound;
-        bytes32[] storage s_cvsArray = s_cvs[s_requestInfo[round].startTime];
+        uint256 startTime = s_requestInfo[round].startTime;
+        bytes32[] storage s_cvsArray = s_cvs[startTime];
         require(s_cvsArray.length > 0, CvNotRequested());
         require(block.timestamp >= s_requestedToSubmitCvTimestamp + s_onChainSubmissionPeriod, TooEarly());
         // ** who didn't submi CV even though requested
@@ -330,10 +331,10 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         // ** restart or end this round
         if (s_activatedOperators.length > 1) {
             s_requestInfo[round].startTime = block.timestamp;
-            emit RandomNumberRequested(round, block.timestamp, s_activatedOperators);
+            emit Round(block.timestamp, IN_PROGRESS);
         } else {
             s_isInProcess = HALTED;
-            emit IsInProcess(HALTED);
+            emit Round(startTime, HALTED);
         }
     }
 
@@ -362,7 +363,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
 
         // Halt the round
         s_isInProcess = HALTED;
-        emit IsInProcess(HALTED);
+        emit Round(startTime, HALTED);
     }
 
     function failToSubmitMerkleRootAfterDispute() external {
@@ -389,7 +390,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         s_slashRewardPerOperatorPaid[ownerToSlash] += delta;
 
         s_isInProcess = HALTED;
-        emit IsInProcess(HALTED);
+        emit Round(startTime, HALTED);
     }
 
     function failToSubmitCo() external {
@@ -439,17 +440,18 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         // Restart round if enough operators remain.
         if (s_activatedOperators.length > 1) {
             s_requestInfo[round].startTime = block.timestamp;
-            emit RandomNumberRequested(round, block.timestamp, s_activatedOperators);
+            emit Round(block.timestamp, IN_PROGRESS);
         } else {
-            // Otherwise halt the round
+            // Otherwise set contract to HALTED.
+            emit Round(startTime, HALTED);
             s_isInProcess = HALTED;
-            emit IsInProcess(HALTED);
         }
     }
 
     function failToSubmitS() external {
         // ** Ensure S was requested
-        bytes32[] storage s_ssArray = s_ss[s_requestInfo[s_currentRound].startTime];
+        uint256 startTime = s_requestInfo[s_currentRound].startTime;
+        bytes32[] storage s_ssArray = s_ss[startTime];
         require(s_ssArray.length > 0, SNotRequested());
         // ** check if it's time to fail this round
         require(block.timestamp >= s_previousSSubmitTimestamp + s_onChainSubmissionPeriodPerOperator, TooEarly());
@@ -478,10 +480,10 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         // ** restart or end this round
         if (s_activatedOperators.length > 1) {
             s_requestInfo[s_currentRound].startTime = block.timestamp;
-            emit RandomNumberRequested(s_currentRound, block.timestamp, s_activatedOperators);
+            emit Round(block.timestamp, IN_PROGRESS);
         } else {
             s_isInProcess = HALTED;
-            emit IsInProcess(HALTED);
+            emit Round(startTime, HALTED);
         }
     }
 
@@ -519,7 +521,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         s_slashRewardPerOperatorPaid[ownerToSlash] += delta;
 
         s_isInProcess = HALTED;
-        emit IsInProcess(HALTED);
+        emit Round(startTime, HALTED);
     }
 
     function _unchecked_inc(uint256 i) internal pure returns (uint256) {

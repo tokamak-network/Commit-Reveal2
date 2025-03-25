@@ -76,7 +76,7 @@ interface CommitReveal2ForDocs {
     event OwnershipHandoverRequested(address indexed pendingOwner);
     event OwnershipTransferred(address indexed oldOwner, address indexed newOwner);
     event RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess);
-    event RandomNumberRequested(uint256 round, uint256 timestamp, address[] activatedOperators);
+    event RandomNumberRequested(uint256 round, uint256 timestamp);
     event RequestedToSubmitCo(uint256 timestamp, uint256[] indices);
     event RequestedToSubmitCv(uint256 timestamp, uint256[] indices);
     event RequestedToSubmitSFromIndexK(uint256 timestamp, uint256 index);
