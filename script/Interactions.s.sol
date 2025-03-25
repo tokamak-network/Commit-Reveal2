@@ -3,6 +3,7 @@ pragma solidity 0.8.28;
 
 import {BaseScript, console2} from "./shared/BaseScript.s.sol";
 import {Sort} from "./../test/shared/Sort.sol";
+import {CommitReveal2} from "./../src/CommitReveal2.sol";
 
 contract OperatorsActivateAndDeposit is BaseScript {
     function run() public {
@@ -21,6 +22,21 @@ contract OperatorsActivateAndDeposit is BaseScript {
                 console2.log("Deposit and activate successful");
                 console2.log("----");
             }
+        }
+    }
+}
+
+contract Withdraw is BaseScript {
+    function run() public {
+        BaseScript.scriptSetUp();
+        s_commitReveal2 = CommitReveal2(address(0xA87c2DE14Fc3F91e9E53854f3707b5e86cF7C3F7));
+        vm.startBroadcast();
+        s_commitReveal2.withdraw();
+        vm.stopBroadcast();
+        for (uint256 i; i < s_numOfOperators; i++) {
+            vm.startBroadcast(s_privateKeys[i]);
+            s_commitReveal2.withdraw();
+            vm.stopBroadcast();
         }
     }
 }
