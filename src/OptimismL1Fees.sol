@@ -7,11 +7,11 @@ import {Ownable} from "@solady/src/auth/Ownable.sol";
 abstract contract OptimismL1Fees is Ownable {
     /// @dev This is the padding size for unsigned RLP-encoded transaction without the signature data
     /// @dev The padding size was estimated based on hypothetical max RLP-encoded transaction size
-    uint256 private constant L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE = 71;
+    uint256 internal constant L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE = 71;
 
     /// @dev OVM_GASPRICEORACLE_ADDR is the address of the OVM_GasPriceOracle precompile on Optimism.
     /// @dev reference: https://community.optimism.io/docs/developers/build/transaction-fees/#estimating-the-l1-data-fee
-    address private constant OVM_GASPRICEORACLE_ADDR = address(0x420000000000000000000000000000000000000F);
+    address internal constant OVM_GASPRICEORACLE_ADDR = 0x420000000000000000000000000000000000000F;
     IOVM_GasPriceOracle private constant OVM_GASPRICEORACLE = IOVM_GasPriceOracle(OVM_GASPRICEORACLE_ADDR);
 
     /// @dev L1 fee coefficient can be applied to reduce possibly inflated gas price

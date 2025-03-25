@@ -2,8 +2,11 @@
 pragma solidity 0.8.28;
 
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
+import {Bitmap} from "./../../src/libraries/Bitmap.sol";
 
 contract CommitReveal2TestSolidity is CommitReveal2 {
+    using Bitmap for mapping(uint248 => uint256);
+
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
@@ -33,6 +36,34 @@ contract CommitReveal2TestSolidity is CommitReveal2 {
 
     function getMessageHash(uint256 timestamp, bytes32 cv) external view returns (bytes32) {
         return _hashTypedDataV4(keccak256(abi.encode(MESSAGE_TYPEHASH, Message({timestamp: timestamp, cv: cv}))));
+    }
+
+    function requestRandomNumber2(uint32 callbackGasLimit) external payable returns (uint256 newRound) {
+        require(callbackGasLimit <= MAX_CALLBACK_GAS_LIMIT, ExceedCallbackGasLimit());
+        uint256 activatedOperatorsLength = s_activatedOperators.length;
+        require(activatedOperatorsLength > 1, NotEnoughActivatedOperators());
+        require(s_depositAmount[owner()] >= s_activationThreshold, LeaderLowDeposit());
+        require(
+            msg.value >= _calculateRequestPrice(callbackGasLimit, tx.gasprice, activatedOperatorsLength),
+            InsufficientAmount()
+        );
+        unchecked {
+            newRound = s_requestCount++;
+        }
+        s_roundBitmap.flipBit(newRound);
+        uint256 startTime;
+        if (s_isInProcess == COMPLETED) {
+            s_currentRound = newRound;
+            s_isInProcess = IN_PROGRESS;
+            startTime = block.timestamp;
+            emit Round(block.timestamp, IN_PROGRESS);
+        }
+        s_requestInfo[newRound] = RequestInfo({
+            consumer: msg.sender,
+            startTime: startTime,
+            cost: msg.value,
+            callbackGasLimit: callbackGasLimit
+        });
     }
 
     function generateRandomNumber() external {

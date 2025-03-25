@@ -45,32 +45,90 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
         return _calculateRequestPrice(callbackGasLimit, gasPrice, numOfOperators);
     }
 
-    function requestRandomNumber(uint32 callbackGasLimit) external payable returns (uint256 newRound) {
-        require(callbackGasLimit <= MAX_CALLBACK_GAS_LIMIT, ExceedCallbackGasLimit());
-        uint256 activatedOperatorsLength = s_activatedOperators.length;
-        require(activatedOperatorsLength > 1, NotEnoughActivatedOperators());
-        require(s_depositAmount[owner()] >= s_activationThreshold, LeaderLowDeposit());
-        require(
-            msg.value >= _calculateRequestPrice(callbackGasLimit, tx.gasprice, activatedOperatorsLength),
-            InsufficientAmount()
-        );
-        unchecked {
-            newRound = s_requestCount++;
+    function requestRandomNumber(uint32 callbackGasLimit) external payable virtual returns (uint256 newRound) {
+        assembly ("memory-safe") {
+            // ** check if the callbackGasLimit is within the limit
+            if gt(callbackGasLimit, MAX_CALLBACK_GAS_LIMIT) {
+                mstore(0, 0x1cf7ab79) // selector for ExceedCallbackGasLimit()
+                revert(0x1c, 0x04)
+            }
+            // ** check if there are enough activated operators
+            let activatedOperatorsLength := sload(s_activatedOperators.slot)
+            if lt(activatedOperatorsLength, 2) {
+                mstore(0, 0x77599fd9) // selector for NotEnoughActivatedOperators()
+                revert(0x1c, 0x04)
+            }
+            // ** check if the leader has enough deposit
+            mstore(0x00, sload(_OWNER_SLOT))
+            mstore(0x20, s_depositAmount.slot)
+            if lt(sload(keccak256(0x00, 0x40)), sload(s_activationThreshold.slot)) {
+                mstore(0, 0xc0013a5a) // selector for LeaderLowDeposit()
+                revert(0x1c, 0x04)
+            }
+            // ** check if the fee amount is enough
+            // submitRoot l2GasUsed = 47216
+            // generateRandomNumber l2GasUsed = 21118.97⋅N + 87117.53
+            // let fmp := mload(0x40) // cache the free memory pointer
+            mstore(0x00, 0xf1c7a58b) // selector for "getL1FeeUpperBound(uint256 _unsignedTxSize) external view returns (uint256)"
+            mstore(0x20, add(MERKLEROOTSUB_CALLDATA_BYTES_SIZE, L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
+            if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x40, 0x20)) {
+                mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
+                revert(0x1c, 0x04)
+            }
+            // l2GasUsed := add(
+            //     mul(gasprice(), add(callbackGasLimit, add(mul(21119, activatedOperatorsLength), 134334))),
+            //     sload(s_flatFee.slot)
+            // )
+            // L1GasFee := div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x40))), 100)
+            mstore(0x20, add(add(292, mul(128, activatedOperatorsLength)), L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
+            if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x20, 0x20)) {
+                mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
+                revert(0x1c, 0x04)
+            }
+            if lt(
+                callvalue(),
+                add(
+                    add(
+                        mul(gasprice(), add(callbackGasLimit, add(mul(21119, activatedOperatorsLength), 134334))),
+                        sload(s_flatFee.slot)
+                    ),
+                    div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x40))), 100)
+                )
+            ) {
+                mstore(0, 0x5945ea56) // selector for InsufficientAmount()
+                revert(0x1c, 0x04)
+            }
+
+            newRound := sload(s_requestCount.slot)
+            sstore(s_requestCount.slot, add(newRound, 1))
+
+            // ** flip the bit
+            // calculate the storage slot corresponding to the round
+            // wordPos = round >> 8
+            mstore(0, shr(8, newRound))
+            mstore(0x20, s_roundBitmap.slot)
+            // the slot of self[wordPos] is keccak256(abi.encode(wordPos, self.slot))
+            let slot := keccak256(0, 0x40)
+            // mask = 1 << bitPos = 1 << (round & 0xff)
+            // self[wordPos] ^= mask
+            sstore(slot, xor(sload(slot), shl(and(newRound, 0xff), 1)))
+            let startTime
+            if eq(sload(s_isInProcess.slot), COMPLETED) {
+                sstore(s_currentRound.slot, newRound)
+                sstore(s_isInProcess.slot, IN_PROGRESS)
+                startTime := timestamp()
+                mstore(0, startTime)
+                mstore(0x20, IN_PROGRESS)
+                log1(0x00, 0x40, 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe) // emit Round(uint256 startTime, uint256 state)
+            }
+            mstore(0x00, newRound)
+            mstore(0x20, s_requestInfo.slot)
+            let requestInfoSlot := keccak256(0x00, 0x40)
+            sstore(requestInfoSlot, caller())
+            sstore(add(requestInfoSlot, 1), startTime)
+            sstore(add(requestInfoSlot, 2), callvalue())
+            sstore(add(requestInfoSlot, 3), callbackGasLimit)
         }
-        s_roundBitmap.flipBit(newRound);
-        uint256 startTime;
-        if (s_isInProcess == COMPLETED) {
-            s_currentRound = newRound;
-            s_isInProcess = IN_PROGRESS;
-            startTime = block.timestamp;
-            emit Round(block.timestamp, startTime);
-        }
-        s_requestInfo[newRound] = RequestInfo({
-            consumer: msg.sender,
-            startTime: startTime,
-            cost: msg.value,
-            callbackGasLimit: callbackGasLimit
-        });
     }
 
     /**
@@ -97,7 +155,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
     {
         // submitRoot l2GasUsed = 47216
         // generateRandomNumber l2GasUsed = 21118.97⋅N + 87117.53
-        return (gasPrice * (callbackGasLimit + (21119 * numOfOperators + 134334))) + s_flatFee
+        return (gasPrice * (callbackGasLimit + (211 * numOfOperators + 1344))) + s_flatFee
             + _getL1CostWeiForcalldataSize2(MERKLEROOTSUB_CALLDATA_BYTES_SIZE, 292 + (128 * numOfOperators));
     }
 

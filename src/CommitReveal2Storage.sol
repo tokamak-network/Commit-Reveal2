@@ -34,14 +34,15 @@ contract CommitReveal2Storage {
 
     error OperatorNotActivated();
     error ExceedCallbackGasLimit();
-    error NotEnoughActivatedOperators();
-    error InsufficientAmount();
+    error NotEnoughActivatedOperators(); // 0x77599fd9
+    error InsufficientAmount(); // 0x5945ea56
     error NotActivatedOperator(); // 0x1b256530
     error MerkleVerificationFailed(); // 0x624dc351
     error InvalidSignatureS(); // 0xbf4bf5b8
     error InvalidSignature();
     error InvalidSignatureLength();
     error TooEarly();
+    error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
     error InvalidCo();
     error InvalidS();
@@ -57,7 +58,7 @@ contract CommitReveal2Storage {
     error MerkleRootNotSubmitted();
     error NotHalted();
     error ZeroLength();
-    error LeaderLowDeposit();
+    error LeaderLowDeposit(); // 0xc0013a5a
     error CoNotRequested();
     error SNotRequested();
     error AlreadySubmittedS();
