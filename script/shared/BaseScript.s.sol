@@ -9,27 +9,12 @@ import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 import {NetworkHelperConfig} from "./../NetworkHelperConfig.s.sol";
 
 contract BaseScript is Script, CommitReveal2Helper {
-    CommitReveal2 public s_commitReveal2;
-    ConsumerExample public s_consumerExample;
-
-    bytes32[] public s_secrets;
-    bytes32[] public s_cos;
-    bytes32[] public s_cvs;
-    uint8[] public s_vs;
-    bytes32[] public s_rs;
-    bytes32[] public s_ss;
-    uint256 public s_rv;
-
     uint256[2] public s_privateKeys;
     address[2] public s_operators;
-    uint256 public s_numOfOperators = 2;
     uint256 s_activationThreshold;
 
-    uint256 public s_startTimestamp;
-
-    NetworkHelperConfig.NetworkConfig public s_activeNetworkConfig;
-
     function scriptSetUp() public {
+        s_numOfOperators = 2;
         // *** Get the most recent deployment of CommitReveal2 ***
         // ** //////////////////////////////////////////////// **
         string memory contractName =
