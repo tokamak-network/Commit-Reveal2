@@ -178,14 +178,17 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
     }
 
     function submitMerkleRoot(bytes32 merkleRoot) external onlyOwner {
-        uint256 startTime = s_requestInfo[s_currentRound].startTime;
-        require(
-            block.timestamp < startTime + s_offChainSubmissionPeriod + s_requestOrSubmitOrFailDecisionPeriod, TooLate()
-        );
-        s_merkleRoot = merkleRoot;
-        s_merkleRootSubmittedTimestamp = block.timestamp;
-        s_isSubmittedMerkleRoot[startTime] = true;
-        emit MerkleRootSubmitted(startTime, merkleRoot);
+        assembly ("memory-safe") {
+            mstore(0x00, sload(s_currentRound.slot))
+            mstore(0x20, s_requestInfo.slot)
+            mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
+            mstore(0x20, s_isSubmittedMerkleRoot.slot)
+            sstore(keccak256(0x00, 0x40), 1)
+            sstore(s_merkleRoot.slot, merkleRoot)
+            sstore(s_merkleRootSubmittedTimestamp.slot, timestamp())
+            mstore(0x20, merkleRoot)
+            log1(0x00, 0x40, 0xb3a8f3e59050d3f97f1bf1b668c8216c654869aa24e3e03cd8891dc68b7db097) // emit MerkleRootSubmitted(uint256 startTime, bytes32 merkleRoot)
+        }
     }
 
     function refund(uint256 round) external notInProcess {
@@ -256,34 +259,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 mstore(0, 0xe0767fa4) // selector for InvalidSecretLength()
                 revert(0x1c, 0x04)
             }
-            // ** check if it is not too late
-            if iszero(
-                or(
-                    lt(
-                        timestamp(),
-                        add(
-                            add(
-                                add(sload(s_merkleRootSubmittedTimestamp.slot), sload(s_offChainSubmissionPeriod.slot)),
-                                mul(sload(s_offChainSubmissionPeriodPerOperator.slot), activatedOperatorsLength)
-                            ),
-                            sload(s_requestOrSubmitOrFailDecisionPeriod.slot)
-                        )
-                    ),
-                    lt(
-                        timestamp(),
-                        add(
-                            add(
-                                add(sload(s_requestedToSubmitCoTimestamp.slot), sload(s_onChainSubmissionPeriod.slot)),
-                                mul(sload(s_offChainSubmissionPeriodPerOperator.slot), activatedOperatorsLength)
-                            ),
-                            sload(s_requestOrSubmitOrFailDecisionPeriod.slot)
-                        )
-                    )
-                )
-            ) {
-                mstore(0, 0xecdd1c29) // selector for TooLate()
-                revert(0x1c, 0x04)
-            }
+
             // ** initialize cos and cvs arrays memory
             let cos := mload(0x40)
             mstore(cos, activatedOperatorsLength)
@@ -309,15 +285,22 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 default { c := sub(b, a) }
             }
             let rv := keccak256(cosDataPtr, activatedOperatorsLengthInBytes)
-            let before := _diff(rv, mload(add(cvsDataPtr, shl(5, calldataload(revealOrders.offset)))))
+            let index := calldataload(revealOrders.offset)
+            let revealBitmap := shl(index, 1)
+            let before := _diff(rv, mload(add(cvsDataPtr, shl(5, index))))
             for { let i := 1 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
-                let after :=
-                    _diff(rv, mload(add(cvsDataPtr, shl(5, calldataload(add(revealOrders.offset, shl(5, i)))))))
+                index := calldataload(add(revealOrders.offset, shl(5, i)))
+                revealBitmap := or(revealBitmap, shl(index, 1))
+                let after := _diff(rv, mload(add(cvsDataPtr, shl(5, index))))
                 if lt(before, after) {
                     mstore(0, 0x24f1948e) // selector for RevealNotInDescendingOrder()
                     revert(0x1c, 0x04)
                 }
                 before := after
+            }
+            if iszero(eq(revealBitmap, sub(shl(activatedOperatorsLength, 1), 1))) {
+                mstore(0, 0xe3ae7cc0) // selector for WrongRevealOrder()
+                revert(0x1c, 0x04)
             }
 
             // ** Create Merkle Root and verify it

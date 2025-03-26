@@ -12,9 +12,6 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
     function requestToSubmitCv(uint256[] calldata indices) external onlyOwner {
         require(indices.length > 0, ZeroLength());
         uint256 startTime = s_requestInfo[s_currentRound].startTime;
-        require(
-            block.timestamp < startTime + s_offChainSubmissionPeriod + s_requestOrSubmitOrFailDecisionPeriod, TooLate()
-        );
         s_cvs[startTime] = new bytes32[](s_activatedOperators.length);
         s_requestedToSubmitCvIndices = indices;
         s_requestedToSubmitCvTimestamp = block.timestamp;
@@ -22,25 +19,17 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
     }
 
     function submitCv(bytes32 cv) external {
-        require(cv != 0x00, ShouldNotBeZero());
-        require(block.timestamp < s_requestedToSubmitCvTimestamp + s_onChainSubmissionPeriod, TooLate());
         uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[msg.sender] - 1;
         uint256 startTime = s_requestInfo[s_currentRound].startTime;
         s_cvs[startTime][activatedOperatorIndex] = cv;
+        assembly ("memory-safe") {
+            mstore(0, startTime)
+            mstore(0x20, s_requestToSubmitCvBitmap.slot)
+            let slot := keccak256(0, 0x40)
+            // set to one
+            sstore(slot, or(sload(slot), shl(activatedOperatorIndex, 1)))
+        }
         emit CvSubmitted(startTime, cv, activatedOperatorIndex);
-    }
-
-    function submitMerkleRootAfterDispute(bytes32 merkleRoot) external onlyOwner {
-        require(
-            block.timestamp
-                < s_requestedToSubmitCvTimestamp + s_onChainSubmissionPeriod + s_requestOrSubmitOrFailDecisionPeriod,
-            TooLate()
-        );
-        s_merkleRoot = merkleRoot;
-        s_merkleRootSubmittedTimestamp = block.timestamp;
-        uint256 startTime = s_requestInfo[s_currentRound].startTime;
-        s_isSubmittedMerkleRoot[startTime] = true;
-        emit MerkleRootSubmitted(startTime, merkleRoot);
     }
 
     function requestToSubmitCo(
@@ -108,6 +97,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
             mstore(0, startTime)
             mstore(0x20, s_requestToSubmitCoBitmap.slot)
             let slot := keccak256(0, 0x40)
+            // set to zero
             sstore(slot, and(sload(slot), not(shl(activatedOperatorIndex, 1))))
         }
         emit CoSubmitted(startTime, co, activatedOperatorIndex);
@@ -146,22 +136,6 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
             operatorsLength: s_activatedOperators.length,
             secretsLength: secrets.length
         });
-        // Deadline checks
-        require(
-            (
-                block.timestamp
-                    < s_merkleRootSubmittedTimestamp + s_offChainSubmissionPeriod
-                        + (s_offChainSubmissionPeriodPerOperator * tempStackVariables.operatorsLength)
-                        + s_requestOrSubmitOrFailDecisionPeriod
-            )
-                || (
-                    block.timestamp
-                        < s_requestedToSubmitCoTimestamp + s_onChainSubmissionPeriod
-                            + (s_offChainSubmissionPeriodPerOperator * tempStackVariables.operatorsLength)
-                            + s_requestOrSubmitOrFailDecisionPeriod
-                ),
-            TooLate()
-        );
         // Initialize arrays for commitments (`cvs`) if not initialized and secrets (`ss`)
         s_ss[tempStackVariables.startTime] = new bytes32[](tempStackVariables.operatorsLength);
         bytes32[] storage s_cvsArray = s_cvs[tempStackVariables.startTime];
@@ -239,8 +213,9 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         RequestInfo storage requestInfo = s_requestInfo[round];
         uint256 startTime = requestInfo.startTime;
 
-        // ** Check per-operator submission deadline.
-        require(block.timestamp < s_previousSSubmitTimestamp + s_onChainSubmissionPeriodPerOperator, TooLate());
+        // ** Ensure S was requested.
+        bytes32[] storage s_ssArray = s_ss[startTime];
+        require(s_ssArray.length > 0, SNotRequested());
 
         // ** Identify the caller’s operator index and validate the secret.
         uint256 activatedOperatorIndex = s_activatedOperatorIndex1Based[msg.sender] - 1;
@@ -253,12 +228,12 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
 
         // ** Record the operator’s final secret on-chain and emit an event.
         emit SSubmitted(startTime, s, activatedOperatorIndex);
-        s_ss[startTime][activatedOperatorIndex] = s;
+        s_ssArray[activatedOperatorIndex] = s;
 
         // ** If this operator is last in the reveal order, finalize the random number process for this round.
         if (activatedOperatorIndex == s_revealOrders[s_revealOrders.length - 1]) {
             // ** create random number
-            uint256 randomNumber = uint256(keccak256(abi.encodePacked(s_ss[startTime])));
+            uint256 randomNumber = uint256(keccak256(abi.encodePacked(s_ssArray)));
             uint256 nextRound = _unchecked_inc(round);
             // ** Move to the next round or mark as completed.
             if (nextRound == s_requestCount) {
@@ -288,22 +263,23 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         // ** check if it's time to submit merkle root or to fail this round
         uint256 round = s_currentRound;
         uint256 startTime = s_requestInfo[round].startTime;
-        bytes32[] storage s_cvsArray = s_cvs[startTime];
-        require(s_cvsArray.length > 0, CvNotRequested());
+        require(s_cvs[startTime].length > 0, CvNotRequested());
         require(block.timestamp >= s_requestedToSubmitCvTimestamp + s_onChainSubmissionPeriod, TooEarly());
         // ** who didn't submi CV even though requested
         uint256 requestedToSubmitCVLength = s_requestedToSubmitCvIndices.length;
         uint256 didntSubmitCVLength; // ** count of operators who didn't submit CV
         address[] memory addressToDeactivates = new address[](requestedToSubmitCVLength);
+        uint256 requestToSubmitCvBitmap = s_requestToSubmitCvBitmap[startTime];
         for (uint256 i; i < requestedToSubmitCVLength; i = _unchecked_inc(i)) {
             uint256 index = s_requestedToSubmitCvIndices[i];
-            if (s_cvsArray[index] == 0) {
+            if (requestToSubmitCvBitmap & 1 << index == 0) {
                 // ** slash deposit and deactivate
                 unchecked {
                     addressToDeactivates[didntSubmitCVLength++] = s_activatedOperators[index];
                 }
             }
         }
+        require(didntSubmitCVLength > 0, AllSubmittedCv());
 
         // ** return gas fee
         uint256 returnGasFee = tx.gasprice * FAILTOSUBMITCV_GASUSED; // + L1Gas
@@ -489,6 +465,10 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
 
     function failToRequestSOrGenerateRandomNumber() external {
         uint256 startTime = s_requestInfo[s_currentRound].startTime;
+        // ** Ensure S was not requested
+        require(s_ss[startTime].length == 0, SRequested());
+        // ** Ensure random number was not generated
+        require(s_isInProcess == IN_PROGRESS, RandomNumGenerated());
         // ** MerkleRoot Submitted
         require(s_isSubmittedMerkleRoot[startTime], MerkleRootNotSubmitted());
         if (s_requestToSubmitCoBitmap[startTime] > 0) {

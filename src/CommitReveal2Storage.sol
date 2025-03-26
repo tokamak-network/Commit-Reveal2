@@ -40,18 +40,22 @@ contract CommitReveal2Storage {
     error MerkleVerificationFailed(); // 0x624dc351
     error InvalidSignatureS(); // 0xbf4bf5b8
     error InvalidSignature();
+    error AllSubmittedCv();
     error InvalidSignatureLength();
     error TooEarly();
     error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
     error InvalidCo();
+    error WrongRevealOrder(); // 0xe3ae7cc0
     error InvalidS();
     error InvalidRevealOrder();
     error InvalidSecretLength(); // 0xe0767fa4
     error ShouldNotBeZero();
     error NotConsumer();
+    error SRequested();
     error InvalidRound();
     error AlreadyRefunded();
+    error RandomNumGenerated();
     error AlreadySubmittedMerkleRoot();
     error AlreadyRequestedToSubmitCv();
     error CvNotRequested();
@@ -191,6 +195,7 @@ contract CommitReveal2Storage {
      */
     mapping(uint256 timestamp => bool) public s_isSubmittedMerkleRoot;
 
+    mapping(uint256 timestamp => uint256) public s_requestToSubmitCvBitmap;
     /**
      * @notice Stores a bitmap indicating which operators must submit `Co` (Reveal-1) for each round,
      *         keyed by that round’s `timestamp`.
