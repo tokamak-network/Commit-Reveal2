@@ -53,7 +53,10 @@ ifeq ($(findstring --network scriptsepolia,$(ARGS)), --network scriptsepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) -vvv --skip-simulation --broadcast
 endif
 ifeq ($(findstring --network testsepolia,$(ARGS)), --network testsepolia)
-	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) -vvv --slow --skip-simulation
+	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) -vvv
+endif
+ifeq ($(findstring --network testmainnet,$(ARGS)), --network testmainnet)
+	NETWORK_ARGS := --rpc-url $(MAINNET_RPC_URL)  --private-key $(PRIVATE_KEY) -vvv
 endif
 ifeq ($(findstring --network opsepolia,$(ARGS)), --network opsepolia)
 	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(OP_ETHERSCAN_API_KEY) -vv
@@ -83,6 +86,12 @@ testgenerateRand:
 
 withdraw:
 	@forge script script/Interactions.s.sol:Withdraw $(NETWORK_ARGS)
+
+deploy-vrf:
+	@forge script script/ChainlinkConsumerTest.s.sol:DeployChainlinkConsumer $(NETWORK_ARGS)
+
+request-vrf:
+	@forge script script/ChainlinkConsumerTest.s.sol:RequestRandomNumber $(NETWORK_ARGS)
 
 # verify-commitreveal2:
 # 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Commit Reveal2" "1") \
