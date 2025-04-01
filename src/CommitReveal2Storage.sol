@@ -148,6 +148,10 @@ contract CommitReveal2Storage {
      */
     mapping(uint256 round => RequestInfo requestInfo) public s_requestInfo;
 
+    function getCurStartTime() public view returns (uint256) {
+        return s_requestInfo[s_currentRound].startTime;
+    }
+
     /**
      * @notice An array of operator indices that must submit `Cv` on-chain for the current round,
      *         as requested by the contract owner. Stored when `requestToSubmitCv()` is called.
