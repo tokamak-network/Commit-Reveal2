@@ -75,11 +75,6 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
             }
-            // l2GasUsed := add(
-            //     mul(gasprice(), add(callbackGasLimit, add(mul(21119, activatedOperatorsLength), 134334))),
-            //     sload(s_flatFee.slot)
-            // )
-            // L1GasFee := div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x40))), 100)
             mstore(0x20, add(add(292, mul(128, activatedOperatorsLength)), L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
             if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x20, 0x20)) {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
@@ -91,14 +86,13 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                     add(
                         mul(gasprice(), add(callbackGasLimit, add(mul(21119, activatedOperatorsLength), 134334))),
                         sload(s_flatFee.slot)
-                    ),
-                    div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x40))), 100)
+                    ), // l2GasFee
+                    div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x40))), 100) // L1GasFee
                 )
             ) {
                 mstore(0, 0x5945ea56) // selector for InsufficientAmount()
                 revert(0x1c, 0x04)
             }
-
             newRound := sload(s_requestCount.slot)
             sstore(s_requestCount.slot, add(newRound, 1))
 
@@ -113,6 +107,8 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             // self[wordPos] ^= mask
             sstore(slot, xor(sload(slot), shl(and(newRound, 0xff), 1)))
             let startTime
+            // ** check if the current round is completed
+            // ** if the current round is completed, start a new round
             if eq(sload(s_isInProcess.slot), COMPLETED) {
                 sstore(s_currentRound.slot, newRound)
                 sstore(s_isInProcess.slot, IN_PROGRESS)
@@ -121,6 +117,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 mstore(0x20, IN_PROGRESS)
                 log1(0x00, 0x40, 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe) // emit Round(uint256 startTime, uint256 state)
             }
+            // *** store the request info
             mstore(0x00, newRound)
             mstore(0x20, s_requestInfo.slot)
             let requestInfoSlot := keccak256(0x00, 0x40)
@@ -183,7 +180,12 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             mstore(0x20, s_requestInfo.slot)
             mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
             mstore(0x20, s_isSubmittedMerkleRoot.slot)
-            sstore(keccak256(0x00, 0x40), 1)
+            let isSubmittedMerkleRootSlot := keccak256(0x00, 0x40)
+            if eq(sload(isSubmittedMerkleRootSlot), 1) {
+                mstore(0, 0xa34402b2) // selector for MerkleRootAlreadySubmitted()
+                revert(0x1c, 0x04)
+            }
+            sstore(isSubmittedMerkleRootSlot, 1)
             sstore(s_merkleRoot.slot, merkleRoot)
             sstore(s_merkleRootSubmittedTimestamp.slot, timestamp())
             mstore(0x20, merkleRoot)
@@ -250,7 +252,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
         bytes32[] calldata rs,
         bytes32[] calldata ss,
         uint256[] calldata revealOrders
-    ) external {
+    ) external virtual {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
@@ -260,22 +262,18 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 revert(0x1c, 0x04)
             }
 
-            // ** initialize cos and cvs arrays memory
-            let cos := mload(0x40)
-            mstore(cos, activatedOperatorsLength)
+            // ** initialize cos and cvs arrays memory, without length data
             let activatedOperatorsLengthInBytes := shl(5, activatedOperatorsLength)
-            let cosDataPtr := add(cos, 0x20)
-            let cvs := add(cosDataPtr, activatedOperatorsLengthInBytes)
-            mstore(cvs, activatedOperatorsLength)
-            mstore(0x40, add(cvs, add(0x20, activatedOperatorsLengthInBytes))) // update the free memory pointer
+            let cos := mload(0x40)
+            let cvs := add(cos, activatedOperatorsLengthInBytes)
+            mstore(0x40, add(cvs, activatedOperatorsLengthInBytes)) // update the free memory pointer
 
-            let cvsDataPtr := add(cvs, 0x20)
             // ** get cos and cvs
-            for { let i } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
-                mstore(0x00, calldataload(add(secrets.offset, shl(5, i))))
-                let cosMemP := add(cosDataPtr, shl(5, i))
+            for { let i } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
+                mstore(0x00, calldataload(add(secrets.offset, i)))
+                let cosMemP := add(cos, i)
                 mstore(cosMemP, keccak256(0x00, 0x20))
-                mstore(add(cvsDataPtr, shl(5, i)), keccak256(cosMemP, 0x20))
+                mstore(add(cvs, i), keccak256(cosMemP, 0x20))
             }
 
             // ** verify reveal order
@@ -284,14 +282,14 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 case true { c := sub(a, b) }
                 default { c := sub(b, a) }
             }
-            let rv := keccak256(cosDataPtr, activatedOperatorsLengthInBytes)
+            let rv := keccak256(cos, activatedOperatorsLengthInBytes)
             let index := calldataload(revealOrders.offset)
             let revealBitmap := shl(index, 1)
-            let before := _diff(rv, mload(add(cvsDataPtr, shl(5, index))))
-            for { let i := 1 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
-                index := calldataload(add(revealOrders.offset, shl(5, i)))
+            let before := _diff(rv, mload(add(cvs, shl(5, index))))
+            for { let i := 0x20 } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
+                index := calldataload(add(revealOrders.offset, i))
                 revealBitmap := or(revealBitmap, shl(index, 1))
-                let after := _diff(rv, mload(add(cvsDataPtr, shl(5, index))))
+                let after := _diff(rv, mload(add(cvs, shl(5, index))))
                 if lt(before, after) {
                     mstore(0, 0x24f1948e) // selector for RevealNotInDescendingOrder()
                     revert(0x1c, 0x04)
@@ -304,34 +302,32 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             }
 
             // ** Create Merkle Root and verify it
-            let hashCount := sub(activatedOperatorsLength, 1)
-            let fmp := mload(0x40)
-            mstore(fmp, hashCount)
-            let hashesDataPtr := add(fmp, 0x20)
+            let hashCountInBytes := sub(activatedOperatorsLengthInBytes, 0x20)
+            let fmp := mload(0x40) // used to store the hashes
             let cvsPosInBytes
             let hashPosInBytes
-            for { let i } lt(i, hashCount) { i := add(i, 1) } {
+            for { let i } lt(i, hashCountInBytes) { i := add(i, 0x20) } {
                 switch lt(cvsPosInBytes, activatedOperatorsLengthInBytes)
                 case 1 {
-                    mstore(0x00, mload(add(cvsDataPtr, cvsPosInBytes)))
+                    mstore(0x00, mload(add(cvs, cvsPosInBytes)))
                     cvsPosInBytes := add(cvsPosInBytes, 0x20)
                 }
                 default {
-                    mstore(0x00, mload(add(hashesDataPtr, hashPosInBytes)))
+                    mstore(0x00, mload(add(fmp, hashPosInBytes)))
                     hashPosInBytes := add(hashPosInBytes, 0x20)
                 }
                 switch lt(cvsPosInBytes, activatedOperatorsLengthInBytes)
                 case 1 {
-                    mstore(0x20, mload(add(cvsDataPtr, cvsPosInBytes)))
+                    mstore(0x20, mload(add(cvs, cvsPosInBytes)))
                     cvsPosInBytes := add(cvsPosInBytes, 0x20)
                 }
                 default {
-                    mstore(0x20, mload(add(hashesDataPtr, hashPosInBytes)))
+                    mstore(0x20, mload(add(fmp, hashPosInBytes)))
                     hashPosInBytes := add(hashPosInBytes, 0x20)
                 }
-                mstore(add(hashesDataPtr, shl(5, i)), keccak256(0x00, 0x40))
+                mstore(add(fmp, i), keccak256(0x00, 0x40))
             }
-            if iszero(eq(mload(add(hashesDataPtr, shl(5, sub(hashCount, 1)))), sload(s_merkleRoot.slot))) {
+            if iszero(eq(mload(add(fmp, sub(hashCountInBytes, 0x20))), sload(s_merkleRoot.slot))) {
                 mstore(0, 0x624dc351) // selector for MerkleVerificationFailed()
                 revert(0x1c, 0x04)
             }
@@ -346,18 +342,18 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             mstore(add(fmp, 0x20), startTime)
             mstore(add(fmp, 0x60), hex"1901") // prefix and version
             mstore(add(fmp, 0x62), domainSeparator)
-            for { let i } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
+            for { let i } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
                 // signature malleability prevention
-                let s := calldataload(add(ss.offset, shl(5, i)))
+                let s := calldataload(add(ss.offset, i))
                 if gt(s, 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
                     mstore(0, 0xbf4bf5b8) // selector for InvalidSignatureS()
                     revert(0x1c, 0x04)
                 }
-                mstore(add(fmp, 0x40), mload(add(cvsDataPtr, shl(5, i)))) // cv
+                mstore(add(fmp, 0x40), mload(add(cvs, i))) // cv
                 mstore(add(fmp, 0x82), keccak256(fmp, 0x60)) // structHash
                 mstore(0x00, keccak256(add(fmp, 0x60), 0x42)) // digest hash
-                mstore(0x20, and(calldataload(add(vs.offset, shl(5, i))), 0xff)) // v, is `and` necessary?
-                mstore(0x40, calldataload(add(rs.offset, shl(5, i)))) // r
+                mstore(0x20, and(calldataload(add(vs.offset, i)), 0xff)) // v, is `and` necessary?
+                mstore(0x40, calldataload(add(rs.offset, i))) // r
                 mstore(0x60, s) // s
                 let operatorAddress := mload(staticcall(gas(), 1, 0x00, 0x80, 0x01, 0x20))
                 // `returndatasize()` will be `0x20` upon success, and `0x00` otherwise.
@@ -394,7 +390,8 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 mstore(0x20, IN_PROGRESS)
                 log1(0x00, 0x40, 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe) // emit Round(uint256 startTime, uint256 state)
             }
-            // ** reward the last revealer
+            // ** reward the flatFee to last revealer
+            // ** reward the leaderNode (requestFee - flatFee) for submitMerkleRoot and generateRandomNumber
             mstore(0x00, s_activatedOperators.slot)
             mstore(
                 0x00,
@@ -406,8 +403,13 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 )
             ) // last revealer address
             mstore(0x20, s_depositAmount.slot)
-            let lastRevealerDepositSlot := keccak256(0x00, 0x40)
-            sstore(lastRevealerDepositSlot, add(sload(lastRevealerDepositSlot), sload(add(currentRequestInfoSlot, 2))))
+            let depositSlot := keccak256(0x00, 0x40) // last revealer
+            let flatFee := sload(s_flatFee.slot)
+            sstore(depositSlot, add(sload(depositSlot), flatFee))
+            // reward sload(add(currentRequestInfoSlot, 2)) - flatFee to the leader
+            mstore(0x00, sload(_OWNER_SLOT))
+            depositSlot := keccak256(0x00, 0x40) // leader
+            sstore(depositSlot, add(sload(depositSlot), sub(sload(add(currentRequestInfoSlot, 2)), flatFee)))
 
             mstore(0x00, 0x00fc98b8) // rawFulfillRandomNumber(uint256,uint256) selector
             mstore(0x20, round)

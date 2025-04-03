@@ -40,12 +40,15 @@ contract CommitReveal2Storage {
     error MerkleVerificationFailed(); // 0x624dc351
     error InvalidSignatureS(); // 0xbf4bf5b8
     error InvalidSignature();
+    error MerkleRootAlreadySubmitted(); // 0xa34402b2
     error AllSubmittedCv();
     error InvalidSignatureLength();
     error TooEarly();
     error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
     error InvalidCo();
+    error InvalidIndex();
+    error DuplicateIndices();
     error WrongRevealOrder(); // 0xe3ae7cc0
     error InvalidS();
     error InvalidRevealOrder();

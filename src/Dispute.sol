@@ -12,9 +12,19 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
     function requestToSubmitCv(uint256[] calldata indices) external onlyOwner {
         require(indices.length > 0, ZeroLength());
         uint256 startTime = s_requestInfo[s_currentRound].startTime;
-        s_cvs[startTime] = new bytes32[](s_activatedOperators.length);
+        uint256 activatedOperatorLength = s_activatedOperators.length;
+        require(s_cvs[startTime].length == 0, AlreadyRequestedToSubmitCv());
+        s_cvs[startTime] = new bytes32[](activatedOperatorLength);
         s_requestedToSubmitCvIndices = indices;
         s_requestedToSubmitCvTimestamp = block.timestamp;
+        uint256 requestToSubmitCvBitmap;
+        for (uint256 i; i < indices.length; i = _unchecked_inc(i)) {
+            uint256 index = indices[i];
+            if (index >= activatedOperatorLength) revert InvalidIndex();
+            if (requestToSubmitCvBitmap ^ (1 << index) == 0) revert DuplicateIndices();
+            requestToSubmitCvBitmap ^= 1 << index;
+        }
+        s_requestToSubmitCvBitmap[startTime] = requestToSubmitCvBitmap;
         emit RequestedToSubmitCv(startTime, indices);
     }
 
@@ -26,18 +36,18 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
             mstore(0, startTime)
             mstore(0x20, s_requestToSubmitCvBitmap.slot)
             let slot := keccak256(0, 0x40)
-            // set to one
-            sstore(slot, or(sload(slot), shl(activatedOperatorIndex, 1)))
+            // set to zero
+            sstore(slot, and(sload(slot), not(shl(activatedOperatorIndex, 1))))
         }
         emit CvSubmitted(startTime, cv, activatedOperatorIndex);
     }
 
     function requestToSubmitCo(
-        uint256[] calldata indices,
-        bytes32[] calldata cvs,
-        uint8[] calldata vs,
-        bytes32[] calldata rs,
-        bytes32[] calldata ss
+        uint256[] calldata indicesFirstCvNotOnChainRestCvOnChain,
+        bytes32[] calldata cvsNotOnChain,
+        uint8[] calldata vForCvsNotOnChain,
+        bytes32[] calldata rForCvsNotOnChain,
+        bytes32[] calldata sForCvsNotOnChain
     ) external onlyOwner {
         uint256 startTime = s_requestInfo[s_currentRound].startTime;
         require(s_isSubmittedMerkleRoot[startTime], MerkleRootNotSubmitted());
@@ -46,7 +56,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
                 < s_merkleRootSubmittedTimestamp + s_offChainSubmissionPeriod + s_requestOrSubmitOrFailDecisionPeriod,
             TooLate()
         );
-        uint256 cvsLength = cvs.length;
+        uint256 cvsLength = cvsNotOnChain.length;
         bytes32[] storage s_cvsArray = s_cvs[startTime];
         if (s_cvsArray.length == 0) {
             s_cvs[startTime] = new bytes32[](s_activatedOperators.length);
@@ -54,35 +64,38 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         uint256 requestToSubmitCoBitmap;
         // Operators who did not previously submit Cv on-chain
         for (uint256 i; i < cvsLength; i = _unchecked_inc(i)) {
-            uint256 index = indices[i];
-            requestToSubmitCoBitmap ^= 1 << index;
-            require(ss[i] <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, InvalidSignatureS());
+            uint256 index = indicesFirstCvNotOnChainRestCvOnChain[i];
+            requestToSubmitCoBitmap ^= 1 << index; // xor
+            require(
+                sForCvsNotOnChain[i] <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
+                InvalidSignatureS()
+            );
             require(
                 index + 1
                     == s_activatedOperatorIndex1Based[ecrecover(
                         _hashTypedDataV4(
-                            keccak256(abi.encode(MESSAGE_TYPEHASH, Message({timestamp: startTime, cv: cvs[i]})))
+                            keccak256(abi.encode(MESSAGE_TYPEHASH, Message({timestamp: startTime, cv: cvsNotOnChain[i]})))
                         ),
-                        vs[i],
-                        rs[i],
-                        ss[i]
+                        vForCvsNotOnChain[i],
+                        rForCvsNotOnChain[i],
+                        sForCvsNotOnChain[i]
                     )],
                 InvalidSignature()
             );
-            s_cvsArray[index] = cvs[i];
+            s_cvsArray[index] = cvsNotOnChain[i];
         }
         // Operators who already submitted Cv on-chain, simply confirm it exists
-        uint256 indicesLength = indices.length;
+        uint256 indicesLength = indicesFirstCvNotOnChainRestCvOnChain.length;
         for (uint256 i = cvsLength; i < indicesLength; i = _unchecked_inc(i)) {
-            uint256 index = indices[i];
+            uint256 index = indicesFirstCvNotOnChainRestCvOnChain[i];
             requestToSubmitCoBitmap ^= 1 << index;
-            require(s_cvsArray[index] > 0, CvNotSubmitted(indices[i]));
+            require(s_cvsArray[index] > 0, CvNotSubmitted(indicesFirstCvNotOnChainRestCvOnChain[i]));
         }
-        s_requestedToSubmitCoIndices = indices;
+        s_requestedToSubmitCoIndices = indicesFirstCvNotOnChainRestCvOnChain;
         s_requestToSubmitCoBitmap[startTime] = requestToSubmitCoBitmap;
         s_requestedToSubmitCoTimestamp = block.timestamp;
         // ** Not Complete
-        emit RequestedToSubmitCo(startTime, indices);
+        emit RequestedToSubmitCo(startTime, indicesFirstCvNotOnChainRestCvOnChain);
     }
 
     function submitCo(bytes32 co) external {
@@ -125,16 +138,16 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
     }
 
     function requestToSubmitS(
-        bytes32[] calldata cos, // all cos
-        bytes32[] calldata secrets, // already received off-chain
-        Signature[] calldata signatures, // used struct to avoid stack too deep error, who didn't submit cv onchain, index descending order
+        bytes32[] calldata allCos, // all cos
+        bytes32[] calldata secretsReceivedOffchain, // already received off-chain
+        Signature[] calldata sigsForCvsNotOnchainDescOrder, // used struct to avoid stack too deep error, who didn't submit cv onchain, index descending order
         uint256[] calldata revealOrders
     ) external onlyOwner {
         // Prepare struct variables to avoid stack too deep error.
         TempStackVariables memory tempStackVariables = TempStackVariables({
             startTime: s_requestInfo[s_currentRound].startTime,
             operatorsLength: s_activatedOperators.length,
-            secretsLength: secrets.length
+            secretsLength: secretsReceivedOffchain.length
         });
         // Initialize arrays for commitments (`cvs`) if not initialized and secrets (`ss`)
         s_ss[tempStackVariables.startTime] = new bytes32[](tempStackVariables.operatorsLength);
@@ -145,18 +158,19 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         {
             // to avoid stack too deep error
             RVICV memory rvicv;
-            rvicv.rv = uint256(keccak256(abi.encodePacked(cos)));
+            rvicv.rv = uint256(keccak256(abi.encodePacked(allCos)));
             uint256[] memory diffs = new uint256[](tempStackVariables.operatorsLength);
             do {
                 unchecked {
-                    rvicv.cv = _efficientOneKeccak256(cos[--tempStackVariables.operatorsLength]);
+                    rvicv.cv = _efficientOneKeccak256(allCos[--tempStackVariables.operatorsLength]);
                     diffs[tempStackVariables.operatorsLength] = _diff(rvicv.rv, uint256(rvicv.cv));
                     if (s_cvsArray[tempStackVariables.operatorsLength] > 0) {
                         require(s_cvsArray[tempStackVariables.operatorsLength] == rvicv.cv, InvalidCo());
                     } else {
                         // If cv was not on-chain, require a signature
                         require(
-                            signatures[rvicv.i].s <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
+                            sigsForCvsNotOnchainDescOrder[rvicv.i].s
+                                <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0,
                             InvalidSignatureS()
                         );
                         require(
@@ -169,9 +183,9 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
                                         )
                                     )
                                 ),
-                                signatures[rvicv.i].v,
-                                signatures[rvicv.i].r,
-                                signatures[rvicv.i++].s
+                                sigsForCvsNotOnchainDescOrder[rvicv.i].v,
+                                sigsForCvsNotOnchainDescOrder[rvicv.i].r,
+                                sigsForCvsNotOnchainDescOrder[rvicv.i++].s
                             )] == tempStackVariables.operatorsLength + 1,
                             InvalidSignature()
                         );
@@ -181,7 +195,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
             } while (tempStackVariables.operatorsLength > 0);
             // Ensure revealOrders is strictly descending by diffs
             uint256 before = diffs[revealOrders[0]];
-            uint256 activatedOperatorLength = cos.length;
+            uint256 activatedOperatorLength = allCos.length;
             for (rvicv.i = 1; rvicv.i < activatedOperatorLength; rvicv.i = _unchecked_inc(rvicv.i)) {
                 uint256 curr = diffs[revealOrders[rvicv.i]];
                 require(before >= curr, RevealNotInDescendingOrder());
@@ -198,7 +212,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         while (tempStackVariables.secretsLength > 0) {
             unchecked {
                 uint256 activatedOperatorIndex = revealOrders[--tempStackVariables.secretsLength];
-                bytes32 secret = secrets[tempStackVariables.secretsLength];
+                bytes32 secret = secretsReceivedOffchain[tempStackVariables.secretsLength];
                 require(s_cvsArray[activatedOperatorIndex] == _efficientTwoKeccak256(secret), InvalidS());
                 s_ssArray[activatedOperatorIndex] = secret;
             }
@@ -272,7 +286,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         uint256 requestToSubmitCvBitmap = s_requestToSubmitCvBitmap[startTime];
         for (uint256 i; i < requestedToSubmitCVLength; i = _unchecked_inc(i)) {
             uint256 index = s_requestedToSubmitCvIndices[i];
-            if (requestToSubmitCvBitmap & 1 << index == 0) {
+            if ((requestToSubmitCvBitmap & 1 << index) > 0) {
                 // ** slash deposit and deactivate
                 unchecked {
                     addressToDeactivates[didntSubmitCVLength++] = s_activatedOperators[index];
