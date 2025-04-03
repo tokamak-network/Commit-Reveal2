@@ -1034,30 +1034,6 @@ function submitMerkleRoot(bytes32 merkleRoot) external;
 | ------------ | --------- | -------------------------------------------------------------------------------------- |
 | `merkleRoot` | `bytes32` | The Merkle root which aggregates all required commitments (e.g. hashed operator data). |
 
-### submitMerkleRootAfterDispute
-
-Submits the Merkle root after a commit phase dispute has occurred.
-
--
-
-1. Restricted to the contract owner.
-2. Must be called before the dispute resolution deadline:
-   `s_requestedToSubmitCvTimestamp + s_onChainSubmissionPeriod + s_requestOrSubmitOrFailDecisionPeriod`.
-   Otherwise, reverts with [TooLate](/src/interfaces/ICommitReveal2ForDocs.sol/interface.CommitReveal2ForDocs.md#toolate).
-3. Records the Merkle root in `s_merkleRoot`, updates the submission timestamp, and flags
-   the round's `startTime` as having a submitted Merkle root.
-4. Emits {MerkleRootSubmitted}.\*
-
-```solidity
-function submitMerkleRootAfterDispute(bytes32 merkleRoot) external;
-```
-
-**Parameters**
-
-| Name         | Type      | Description                                                              |
-| ------------ | --------- | ------------------------------------------------------------------------ |
-| `merkleRoot` | `bytes32` | The Merkle root computed from committed values after dispute resolution. |
-
 ### submitS
 
 Finalizes an operator’s second reveal (S) on-chain for the current round.
