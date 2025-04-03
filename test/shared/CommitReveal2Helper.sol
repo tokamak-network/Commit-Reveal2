@@ -14,12 +14,9 @@ contract CommitReveal2Helper is Test {
     CommitReveal2 public s_commitReveal2;
     ConsumerExample public s_consumerExample;
     NetworkHelperConfig.NetworkConfig public s_activeNetworkConfig;
-    NetworkHelperConfig s_networkHelperConfig;
+    NetworkHelperConfig public s_networkHelperConfig;
 
     uint256 private s_nonce;
-    bytes32 public s_nameHash;
-    bytes32 public s_versionHash;
-    address s_commitReveal2Address;
 
     // ** Variables for Testing
     uint256 public s_requestFee;
@@ -49,12 +46,6 @@ contract CommitReveal2Helper is Test {
     bytes32[] public s_rsToSubmit;
     bytes32[] public s_ssToSubmit;
     uint256[] public s_tempArray;
-
-    function setCommitReveal2HelperStates(bytes32 nameHash, bytes32 versionHash, address commitReveal2Address) public {
-        s_nameHash = nameHash;
-        s_versionHash = versionHash;
-        s_commitReveal2Address = commitReveal2Address;
-    }
 
     function _createMerkleRoot(bytes32[] memory leaves) internal pure returns (bytes32) {
         uint256 leavesLen = leaves.length;
@@ -221,10 +212,10 @@ contract CommitReveal2Helper is Test {
                 keccak256(
                     abi.encode(
                         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-                        s_nameHash,
-                        s_versionHash,
+                        s_activeNetworkConfig.nameHash,
+                        s_activeNetworkConfig.versionHash,
                         block.chainid,
-                        s_commitReveal2Address
+                        address(s_commitReveal2)
                     )
                 ),
                 keccak256(
