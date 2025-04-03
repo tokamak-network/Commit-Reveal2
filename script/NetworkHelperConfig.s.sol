@@ -16,6 +16,8 @@ contract NetworkHelperConfig is Script, BaseTest {
         uint256 maxActivatedOperators;
         string name;
         string version;
+        bytes32 nameHash;
+        bytes32 versionHash;
         uint256 offChainSubmissionPeriod;
         uint256 requestOrSubmitOrFailDecisionPeriod;
         uint256 onChainSubmissionPeriod;
@@ -53,12 +55,16 @@ contract NetworkHelperConfig is Script, BaseTest {
     }
 
     function getAnvilConfig() public pure returns (NetworkConfig memory) {
+        string memory name = "Commit Reveal2";
+        string memory version = "1";
         return NetworkConfig({
             activationThreshold: 0.01 ether,
             flatFee: 0.001 ether,
             maxActivatedOperators: 10,
-            name: "Commit Reveal2",
-            version: "1",
+            name: name,
+            version: version,
+            nameHash: keccak256(bytes(name)),
+            versionHash: keccak256(bytes(version)),
             offChainSubmissionPeriod: 80,
             requestOrSubmitOrFailDecisionPeriod: 60,
             onChainSubmissionPeriod: 120,
@@ -69,12 +75,16 @@ contract NetworkHelperConfig is Script, BaseTest {
     }
 
     function getThanosSepoliaConfig() public view returns (NetworkConfig memory) {
+        string memory name = "Commit Reveal2";
+        string memory version = "1";
         return NetworkConfig({
             activationThreshold: 0.01 ether,
             flatFee: 0.001 ether,
             maxActivatedOperators: 10,
-            name: "Commit Reveal2",
-            version: "1",
+            name: name,
+            version: version,
+            nameHash: keccak256(bytes(name)),
+            versionHash: keccak256(bytes(version)),
             offChainSubmissionPeriod: 80,
             requestOrSubmitOrFailDecisionPeriod: 60,
             onChainSubmissionPeriod: 120,
@@ -85,12 +95,16 @@ contract NetworkHelperConfig is Script, BaseTest {
     }
 
     function getSepoliaConfig() public view returns (NetworkConfig memory) {
+        string memory name = "Commit Reveal2";
+        string memory version = "1";
         return NetworkConfig({
             activationThreshold: 0.01 ether,
             flatFee: 0.001 ether,
             maxActivatedOperators: 10,
-            name: "Commit Reveal2",
-            version: "1",
+            name: name,
+            version: version,
+            nameHash: keccak256(bytes(name)),
+            versionHash: keccak256(bytes(version)),
             offChainSubmissionPeriod: 80,
             requestOrSubmitOrFailDecisionPeriod: 60,
             onChainSubmissionPeriod: 120,
@@ -101,12 +115,16 @@ contract NetworkHelperConfig is Script, BaseTest {
     }
 
     function getOpSepoliaConfig() public view returns (NetworkConfig memory) {
+        string memory name = "Commit Reveal2";
+        string memory version = "1";
         return NetworkConfig({
             activationThreshold: 0.01 ether,
             flatFee: 0.001 ether,
             maxActivatedOperators: 10,
-            name: "Commit Reveal2",
-            version: "1",
+            name: name,
+            version: version,
+            nameHash: keccak256(bytes(name)),
+            versionHash: keccak256(bytes(version)),
             offChainSubmissionPeriod: 80,
             requestOrSubmitOrFailDecisionPeriod: 60,
             onChainSubmissionPeriod: 120,

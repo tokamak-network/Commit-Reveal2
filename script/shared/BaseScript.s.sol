@@ -40,11 +40,6 @@ contract BaseScript is Script, CommitReveal2Helper {
         // ** //////////////////////////////////////////////// **
         NetworkHelperConfig networkHelperConfig = new NetworkHelperConfig();
         s_activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
-        setCommitReveal2HelperStates(
-            keccak256(bytes(s_activeNetworkConfig.name)),
-            keccak256(bytes(s_activeNetworkConfig.version)),
-            address(s_commitReveal2)
-        );
     }
 
     function generateSCoCv() public {
@@ -62,11 +57,6 @@ contract BaseScript is Script, CommitReveal2Helper {
         for (uint256 i; i < s_operators.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
             (s_vs[i], s_rs[i], s_ss[i]) = vm.sign(s_privateKeys[i], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
-
-            console2.logBytes32(_getTypedDataHash(s_startTimestamp, s_cvs[i]));
-            console2.log(uint256(s_vs[i]));
-            console2.log(uint256(s_rs[i]));
-            console2.log(uint256(s_ss[i]));
         }
     }
 }
