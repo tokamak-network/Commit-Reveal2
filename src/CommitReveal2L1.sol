@@ -7,7 +7,6 @@ contract CommitReveal2L1 is CommitReveal2 {
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
-        uint256 maxActivatedOperators,
         string memory name,
         string memory version,
         uint256 offChainSubmissionPeriod,
@@ -20,7 +19,6 @@ contract CommitReveal2L1 is CommitReveal2 {
         CommitReveal2(
             activationThreshold,
             flatFee,
-            maxActivatedOperators,
             name,
             version,
             offChainSubmissionPeriod,

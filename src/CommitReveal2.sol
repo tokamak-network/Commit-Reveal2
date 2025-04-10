@@ -11,7 +11,6 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
-        uint256 maxActivatedOperators,
         string memory name,
         string memory version,
         uint256 offChainSubmissionPeriod,
@@ -24,7 +23,6 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
         s_depositAmount[msg.sender] = msg.value;
         s_activationThreshold = activationThreshold;
         s_flatFee = flatFee;
-        s_maxActivatedOperators = maxActivatedOperators;
         s_offChainSubmissionPeriod = offChainSubmissionPeriod;
         s_requestOrSubmitOrFailDecisionPeriod = requestOrSubmitOrFailDecisionPeriod;
         s_onChainSubmissionPeriod = onChainSubmissionPeriod;
@@ -96,7 +94,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             newRound := sload(s_requestCount.slot)
             sstore(s_requestCount.slot, add(newRound, 1))
 
-            // ** flip the bit
+            // ** set the bit
             // calculate the storage slot corresponding to the round
             // wordPos = round >> 8
             mstore(0, shr(8, newRound))
@@ -104,8 +102,8 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             // the slot of self[wordPos] is keccak256(abi.encode(wordPos, self.slot))
             let slot := keccak256(0, 0x40)
             // mask = 1 << bitPos = 1 << (round & 0xff)
-            // self[wordPos] ^= mask
-            sstore(slot, xor(sload(slot), shl(and(newRound, 0xff), 1)))
+            // self[wordPos] |= mask
+            sstore(slot, or(sload(slot), shl(and(newRound, 0xff), 1)))
             let startTime
             // ** check if the current round is completed
             // ** if the current round is completed, start a new round
@@ -179,15 +177,14 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             mstore(0x00, sload(s_currentRound.slot))
             mstore(0x20, s_requestInfo.slot)
             mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
-            mstore(0x20, s_isSubmittedMerkleRoot.slot)
-            let isSubmittedMerkleRootSlot := keccak256(0x00, 0x40)
-            if eq(sload(isSubmittedMerkleRootSlot), 1) {
+            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
+            let merkleRootSubmittedTimestampSlot := keccak256(0x00, 0x40)
+            if gt(sload(merkleRootSubmittedTimestampSlot), 0) {
                 mstore(0, 0xa34402b2) // selector for MerkleRootAlreadySubmitted()
                 revert(0x1c, 0x04)
             }
-            sstore(isSubmittedMerkleRootSlot, 1)
             sstore(s_merkleRoot.slot, merkleRoot)
-            sstore(s_merkleRootSubmittedTimestamp.slot, timestamp())
+            sstore(merkleRootSubmittedTimestampSlot, timestamp())
             mstore(0x20, merkleRoot)
             log1(0x00, 0x40, 0xb3a8f3e59050d3f97f1bf1b668c8216c654869aa24e3e03cd8891dc68b7db097) // emit MerkleRootSubmitted(uint256 startTime, bytes32 merkleRoot)
         }
@@ -247,17 +244,15 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
     }
 
     function generateRandomNumber(
-        bytes32[] calldata secrets,
-        uint8[] calldata vs,
-        bytes32[] calldata rs,
-        bytes32[] calldata ss,
-        uint256[] calldata revealOrders
+        SecretAndSigRS[] calldata secretSigRSs,
+        uint256, // packedVs
+        uint256 packedRevealOrders
     ) external virtual {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
             // ** check if all secrets are submitted
-            if gt(activatedOperatorsLength, secrets.length) {
+            if gt(activatedOperatorsLength, secretSigRSs.length) {
                 mstore(0, 0xe0767fa4) // selector for InvalidSecretLength()
                 revert(0x1c, 0x04)
             }
@@ -266,13 +261,15 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             let activatedOperatorsLengthInBytes := shl(5, activatedOperatorsLength)
             let cos := mload(0x40)
             let cvs := add(cos, activatedOperatorsLengthInBytes)
-            mstore(0x40, add(cvs, activatedOperatorsLengthInBytes)) // update the free memory pointer
+            let secrets := add(cvs, activatedOperatorsLengthInBytes)
+            mstore(0x40, add(secrets, activatedOperatorsLengthInBytes)) // update the free memory pointer
 
             // ** get cos and cvs
             for { let i } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
-                mstore(0x00, calldataload(add(secrets.offset, i)))
+                let secretMemP := add(secrets, i)
+                mstore(secretMemP, calldataload(add(secretSigRSs.offset, mul(i, 3)))) // secret
                 let cosMemP := add(cos, i)
-                mstore(cosMemP, keccak256(0x00, 0x20))
+                mstore(cosMemP, keccak256(secretMemP, 0x20))
                 mstore(add(cvs, i), keccak256(cosMemP, 0x20))
             }
 
@@ -283,11 +280,12 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 default { c := sub(b, a) }
             }
             let rv := keccak256(cos, activatedOperatorsLengthInBytes)
-            let index := calldataload(revealOrders.offset)
+            let index := and(packedRevealOrders, 0xff) // first reveal index
             let revealBitmap := shl(index, 1)
             let before := _diff(rv, mload(add(cvs, shl(5, index))))
-            for { let i := 0x20 } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
-                index := calldataload(add(revealOrders.offset, i))
+            // revealOrdersOffset = 0x44
+            for { let i := 1 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
+                index := and(calldataload(sub(0x44, i)), 0xff)
                 revealBitmap := or(revealBitmap, shl(index, 1))
                 let after := _diff(rv, mload(add(cvs, shl(5, index))))
                 if lt(before, after) {
@@ -300,7 +298,6 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 mstore(0, 0xe3ae7cc0) // selector for WrongRevealOrder()
                 revert(0x1c, 0x04)
             }
-
             // ** Create Merkle Root and verify it
             let hashCountInBytes := sub(activatedOperatorsLengthInBytes, 0x20)
             let fmp := mload(0x40) // used to store the hashes
@@ -344,7 +341,8 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             mstore(add(fmp, 0x62), domainSeparator)
             for { let i } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
                 // signature malleability prevention
-                let s := calldataload(add(ss.offset, i))
+                let rSOffset := add(secretSigRSs.offset, add(mul(i, 3), 0x20))
+                let s := calldataload(add(rSOffset, 0x20))
                 if gt(s, 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
                     mstore(0, 0xbf4bf5b8) // selector for InvalidSignatureS()
                     revert(0x1c, 0x04)
@@ -352,8 +350,8 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 mstore(add(fmp, 0x40), mload(add(cvs, i))) // cv
                 mstore(add(fmp, 0x82), keccak256(fmp, 0x60)) // structHash
                 mstore(0x00, keccak256(add(fmp, 0x60), 0x42)) // digest hash
-                mstore(0x20, and(calldataload(add(vs.offset, i)), 0xff)) // v, is `and` necessary?
-                mstore(0x40, calldataload(add(rs.offset, i))) // r
+                mstore(0x20, and(calldataload(sub(0x24, shr(5, i))), 0xff)) // v, 0x24: packedVsOffset
+                mstore(0x40, calldataload(rSOffset)) // r
                 mstore(0x60, s) // s
                 let operatorAddress := mload(staticcall(gas(), 1, 0x00, 0x80, 0x01, 0x20))
                 // `returndatasize()` will be `0x20` upon success, and `0x00` otherwise.
@@ -370,8 +368,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             }
 
             // ** create random number
-            calldatacopy(fmp, secrets.offset, activatedOperatorsLengthInBytes) // overwrite the previous value, which is not used anymore
-            let randomNumber := keccak256(fmp, activatedOperatorsLengthInBytes)
+            let randomNumber := keccak256(secrets, activatedOperatorsLengthInBytes)
             let nextRound := add(round, 1)
 
             switch eq(nextRound, sload(s_requestCount.slot))
@@ -398,7 +395,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 sload(
                     add(
                         keccak256(0x00, 0x20), // s_activatedOperators first data slot
-                        calldataload(add(revealOrders.offset, sub(activatedOperatorsLengthInBytes, 0x20))) // last revealer index
+                        and(calldataload(sub(0x44, sub(activatedOperatorsLength, 1))), 0xff) // last revealer index, 0x44: revealOrdersOffset
                     )
                 )
             ) // last revealer address
@@ -431,12 +428,17 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             if iszero(gt(sub(g, div(g, 64)), callbackGasLimit)) { revert(0, 0) }
             // solidity calls check that a contract actually exists at the destination, so we do the same
             let consumer := sload(currentRequestInfoSlot)
-            if iszero(extcodesize(consumer)) { return(0, 0) }
-            // sload(add(currentRequestInfoSlot, 3)) == consumer
-            // call and return whether we succeeded. ignore return data
-            // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
-            mstore(0x60, call(callbackGasLimit, consumer, 0, 0x1c, 0x44, 0, 0))
-            log1(0x20, 0x60, 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a) // emit RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess
+            switch extcodesize(consumer)
+            case 0 {
+                mstore(0x60, 0)
+                log1(0x20, 0x60, 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a) // emit RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess
+            }
+            default {
+                // call and return whether we succeeded. ignore return data
+                // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
+                mstore(0x60, call(callbackGasLimit, consumer, 0, 0x1c, 0x44, 0, 0))
+                log1(0x20, 0x60, 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a) // emit RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess
+            }
         }
     }
 }
