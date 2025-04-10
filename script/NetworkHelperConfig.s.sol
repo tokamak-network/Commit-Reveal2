@@ -13,7 +13,6 @@ contract NetworkHelperConfig is Script, BaseTest {
     struct NetworkConfig {
         uint256 activationThreshold;
         uint256 flatFee;
-        uint256 maxActivatedOperators;
         string name;
         string version;
         bytes32 nameHash;
@@ -60,7 +59,6 @@ contract NetworkHelperConfig is Script, BaseTest {
         return NetworkConfig({
             activationThreshold: 0.01 ether,
             flatFee: 0.001 ether,
-            maxActivatedOperators: 10,
             name: name,
             version: version,
             nameHash: keccak256(bytes(name)),
@@ -80,7 +78,6 @@ contract NetworkHelperConfig is Script, BaseTest {
         return NetworkConfig({
             activationThreshold: 0.01 ether,
             flatFee: 0.001 ether,
-            maxActivatedOperators: 10,
             name: name,
             version: version,
             nameHash: keccak256(bytes(name)),
@@ -100,7 +97,6 @@ contract NetworkHelperConfig is Script, BaseTest {
         return NetworkConfig({
             activationThreshold: 0.01 ether,
             flatFee: 0.001 ether,
-            maxActivatedOperators: 10,
             name: name,
             version: version,
             nameHash: keccak256(bytes(name)),
@@ -120,7 +116,6 @@ contract NetworkHelperConfig is Script, BaseTest {
         return NetworkConfig({
             activationThreshold: 0.01 ether,
             flatFee: 0.001 ether,
-            maxActivatedOperators: 10,
             name: name,
             version: version,
             nameHash: keccak256(bytes(name)),
