@@ -18,7 +18,6 @@ contract CommitReveal2Fuzz is Test {
         createMerkleRootSolidity = new CreateMerkleRootSolidity{value: activeNetworkConfig.activationThreshold}(
             activeNetworkConfig.activationThreshold,
             activeNetworkConfig.flatFee,
-            activeNetworkConfig.maxActivatedOperators,
             activeNetworkConfig.name,
             activeNetworkConfig.version,
             activeNetworkConfig.offChainSubmissionPeriod,
@@ -33,7 +32,6 @@ contract CommitReveal2Fuzz is Test {
         }(
             activeNetworkConfig.activationThreshold,
             activeNetworkConfig.flatFee,
-            activeNetworkConfig.maxActivatedOperators,
             activeNetworkConfig.name,
             activeNetworkConfig.version,
             activeNetworkConfig.offChainSubmissionPeriod,

@@ -10,7 +10,6 @@ contract CommitReveal2TestSolidity is CommitReveal2 {
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
-        uint256 maxActivatedOperators,
         string memory name,
         string memory version,
         uint256 offChainSubmissionPeriod,
@@ -23,7 +22,6 @@ contract CommitReveal2TestSolidity is CommitReveal2 {
         CommitReveal2(
             activationThreshold,
             flatFee,
-            maxActivatedOperators,
             name,
             version,
             offChainSubmissionPeriod,
@@ -166,7 +164,6 @@ contract CreateMerkleRootSolidity is CommitReveal2 {
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
-        uint256 maxActivatedOperators,
         string memory name,
         string memory version,
         uint256 offChainSubmissionPeriod,
@@ -179,7 +176,6 @@ contract CreateMerkleRootSolidity is CommitReveal2 {
         CommitReveal2(
             activationThreshold,
             flatFee,
-            maxActivatedOperators,
             name,
             version,
             offChainSubmissionPeriod,
@@ -214,6 +210,12 @@ contract CreateMerkleRootSolidity is CommitReveal2 {
         return hashes[hashCount - 1];
     }
 
+    function _unchecked_inc(uint256 i) internal pure returns (uint256) {
+        unchecked {
+            return i + 1;
+        }
+    }
+
     function _efficientKeccak256(bytes32 a, bytes32 b) internal pure returns (bytes32 value) {
         assembly ("memory-safe") {
             mstore(0x00, a)
@@ -227,7 +229,6 @@ contract CreateMerkleRootInlineAssembly is CommitReveal2 {
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
-        uint256 maxActivatedOperators,
         string memory name,
         string memory version,
         uint256 offChainSubmissionPeriod,
@@ -240,7 +241,6 @@ contract CreateMerkleRootInlineAssembly is CommitReveal2 {
         CommitReveal2(
             activationThreshold,
             flatFee,
-            maxActivatedOperators,
             name,
             version,
             offChainSubmissionPeriod,

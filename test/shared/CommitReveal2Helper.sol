@@ -21,7 +21,6 @@ contract CommitReveal2Helper is Test {
     // ** Variables for Testing
     uint256 public s_requestFee;
     uint256 public s_startTimestamp;
-
     bytes32[] public s_secrets;
     bytes32[] public s_cos;
     bytes32[] public s_cvs;
@@ -36,16 +35,32 @@ contract CommitReveal2Helper is Test {
     address public s_anyAddress;
     uint256 public s_numOfOperators;
 
+    // ** requestToSubmitS
+    bytes32[] public s_secretsReceivedOffchainInRevealOrder;
+    uint256 public s_packedVsForCvsNotOnChain;
+    CommitReveal2.SigRS[] public s_sigRSsForCvsNotOnChain;
+
+    // ** generate random number
+    CommitReveal2.SecretAndSigRS[] public s_secretSigRSs;
+    uint256 public s_packedVs;
+    uint256 public s_packedRevealOrders;
+
+    // ** requestToSubmitCo
+    CommitReveal2.CvAndSigRS[] public s_cvRSsForCvsNotOnChain;
+    //uint256 public s_packedVsForCvsNotOnChain;
+    uint256 s_indicesLength;
+    uint256 s_indicesFirstCvNotOnChainRestCvOnChain;
+
     // ** Variables for Dispute
-    CommitReveal2.Signature[] public s_sigsDidntSubmitCv;
-    bytes32[] public s_alreadySubmittedSecretsOffChain;
-    uint256[] public s_requestedToSubmitCoIndices;
-    uint256[] public s_requestedToSubmitCvIndices;
-    bytes32[] public s_cvsToSubmit;
-    uint8[] public s_vsToSubmit;
-    bytes32[] public s_rsToSubmit;
-    bytes32[] public s_ssToSubmit;
     uint256[] public s_tempArray;
+    uint256[] public s_tempVs;
+
+    function _packArrayIntoUint256(uint256[] storage arr) internal view returns (uint256 packed) {
+        uint256 len = arr.length;
+        for (uint256 i = 0; i < len; i++) {
+            packed |= (arr[i] << (i * 8));
+        }
+    }
 
     function _createMerkleRoot(bytes32[] memory leaves) internal pure returns (bytes32) {
         uint256 leavesLen = leaves.length;
@@ -94,11 +109,22 @@ contract CommitReveal2Helper is Test {
         s_vs = new uint8[](s_activatedOperators.length);
         s_rs = new bytes32[](s_activatedOperators.length);
         s_ss = new bytes32[](s_activatedOperators.length);
+
+        s_secretSigRSs = new CommitReveal2.SecretAndSigRS[](s_activatedOperators.length);
+        s_packedVs = 0;
+        s_packedRevealOrders = 0;
         // *** Generate S, Co, Cv, Signatures
+
         for (uint256 i; i < s_activatedOperators.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
             (s_vs[i], s_rs[i], s_ss[i]) =
                 vm.sign(privatekeys[s_activatedOperators[i]], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
+            uint256 v = uint256(s_vs[i]);
+            s_packedVs = s_packedVs | (v << (i * 8));
+            s_secretSigRSs[i] = CommitReveal2Storage.SecretAndSigRS({
+                secret: s_secrets[i],
+                rs: CommitReveal2Storage.SigRS({r: s_rs[i], s: s_ss[i]})
+            });
         }
         // *** Set Reveal Orders
         uint256[] memory diffs = new uint256[](s_activatedOperators.length);
@@ -109,7 +135,9 @@ contract CommitReveal2Helper is Test {
             revealOrders[i] = i;
         }
         Sort.sort(diffs, revealOrders);
-        return revealOrders;
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            s_packedRevealOrders = s_packedRevealOrders | (revealOrders[i] << (i * 8));
+        }
     }
 
     function _setRevealOrders(uint256[] memory diffs, uint256[] memory revealOrders) internal pure {}
@@ -189,19 +217,6 @@ contract CommitReveal2Helper is Test {
             console2.log(commitReveal2.s_depositAmount(operators[i]));
         }
         console2.log(commitReveal2.s_depositAmount(leaderNode));
-        console2.log("--------------------");
-    }
-
-    function consoleSlashRewardAccumulated(
-        CommitReveal2 commitReveal2,
-        address[10] memory operators,
-        address leaderNode
-    ) internal view {
-        uint256 globalSlashRewardPerOperator = commitReveal2.s_slashRewardPerOperator();
-        for (uint256 i = 0; i < operators.length; i++) {
-            console2.log(globalSlashRewardPerOperator - commitReveal2.s_slashRewardPerOperatorPaid(operators[i]));
-        }
-        console2.log(globalSlashRewardPerOperator - commitReveal2.s_slashRewardPerOperatorPaid(leaderNode));
         console2.log("--------------------");
     }
 
