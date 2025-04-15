@@ -51,8 +51,12 @@ contract CommitReveal2Helper is Test {
     uint256 s_indicesLength;
     uint256 s_indicesFirstCvNotOnChainRestCvOnChain;
 
+    // ** requestToSubmitCv
+    uint256 public s_packedIndices;
+
     // ** Variables for Dispute
     uint256[] public s_tempArray;
+    uint256[] public s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp;
     uint256[] public s_tempVs;
 
     function _packArrayIntoUint256(uint256[] storage arr) internal view returns (uint256 packed) {
