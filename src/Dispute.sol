@@ -143,6 +143,60 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
         }
     }
 
+    function failToSubmitMerkleRootAfterDispute() external {
+        assembly ("memory-safe") {
+            mstore(0x00, sload(s_currentRound.slot))
+            mstore(0x20, s_requestInfo.slot)
+            mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
+            mstore(0x20, s_requestedToSubmitCvTimestamp.slot)
+            // ** check if it is requested to submit cv
+            let requestedToSubmitCvTimestamp := sload(keccak256(0x00, 0x40))
+            if iszero(requestedToSubmitCvTimestamp) {
+                mstore(0, 0xd3e6c959) // CvNotRequested()
+                revert(0x1c, 0x04)
+            }
+            // ** check time window
+            if lt(
+                timestamp(),
+                add(
+                    add(requestedToSubmitCvTimestamp, sload(s_onChainSubmissionPeriod.slot)),
+                    sload(s_requestOrSubmitOrFailDecisionPeriod.slot)
+                )
+            ) {
+                mstore(0, 0x085de625) // TooEarly()
+                revert(0x1c, 0x04)
+            }
+            // ** MerkleRoot Not Submitted
+            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
+            if gt(sload(keccak256(0x00, 0x40)), 0) {
+                mstore(0, 0x7a69f8d3) // AlreadySubmittedMerkleRoot()
+                revert(0x1c, 0x04)
+            }
+
+            let activationThreshold := sload(s_activationThreshold.slot)
+            let returnGasFee := mul(gasprice(), FAILTOSUBMITMERKLEROOTAFTERDISPUTE_GASUSED)
+            mstore(0x20, sload(_OWNER_SLOT))
+            // ** Distribute remainder among operators
+            let delta := div(shl(8, sub(activationThreshold, returnGasFee)), sload(s_activatedOperators.slot))
+            sstore(s_slashRewardPerOperatorX8.slot, add(sload(s_slashRewardPerOperatorX8.slot), delta))
+            mstore(0x40, s_slashRewardPerOperatorPaidX8.slot)
+            let slashRewardPerOperatorPaidX8Slot := keccak256(0x20, 0x40) // owner
+            sstore(slashRewardPerOperatorPaidX8Slot, add(sload(slashRewardPerOperatorPaidX8Slot), delta))
+            // ** slash the leadernode(owner)'s deposit
+            mstore(0x40, s_depositAmount.slot)
+            let depositSlot := keccak256(0x20, 0x40) // owner
+            sstore(depositSlot, sub(sload(depositSlot), activationThreshold))
+            mstore(0x20, caller())
+            depositSlot := keccak256(0x20, 0x40) // msg.sender
+            sstore(depositSlot, add(sload(depositSlot), returnGasFee))
+
+            // ** Halt the round
+            sstore(s_isInProcess.slot, HALTED)
+            mstore(0x20, HALTED)
+            log1(0x00, 0x40, 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe) // emit Round(uint256 startTime, uint256 state)
+        }
+    }
+
     function failToSubmitCv() external {
         assembly ("memory-safe") {
             mstore(0x00, sload(s_currentRound.slot))
@@ -492,7 +546,7 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
             let zeroBitIfSubmittedCoBitmap := sload(s_zeroBitIfSubmittedCoBitmap.slot)
             mstore(0x20, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x20, 0x20)
-            mstore(0x20, s_requestedToSubmitCoPackedIndices.slot)
+            mstore(0x20, sload(s_requestedToSubmitCoPackedIndices.slot))
             for { let i } lt(i, requestedToSubmitCoLength) { i := add(i, 1) } {
                 let operatorIndex := and(mload(sub(0x20, i)), 0xff)
                 if gt(and(zeroBitIfSubmittedCoBitmap, shl(operatorIndex, 1)), 0) {
@@ -957,11 +1011,11 @@ contract Dispute is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0x53489cf9) // SRequested()
                 revert(0x1c, 0x04)
             }
-            // ** Merkle Root submitted
+            // ** Ensure Merkle Root is submitted
             mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
             let merkleRootSubmittedTimestamp := sload(keccak256(0x00, 0x40))
-            if gt(merkleRootSubmittedTimestamp, 0) {
-                mstore(0, 0x22b9d231) // MerkleRootIsSubmitted()
+            if iszero(merkleRootSubmittedTimestamp) {
+                mstore(0, 0x8e56b845) // MerkleRootNotSubmitted()
                 revert(0x1c, 0x04)
             }
             // ** is in process
