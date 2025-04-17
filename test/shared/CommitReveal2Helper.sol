@@ -37,8 +37,8 @@ contract CommitReveal2Helper is Test {
 
     // ** requestToSubmitS
     bytes32[] public s_secretsReceivedOffchainInRevealOrder;
-    uint256 public s_packedVsForCvsNotOnChain;
-    CommitReveal2.SigRS[] public s_sigRSsForCvsNotOnChain;
+    uint256 public s_packedVsForAllCvsNotOnChain;
+    CommitReveal2.SigRS[] public s_sigRSsForAllCvsNotOnChain;
 
     // ** generate random number
     CommitReveal2.SecretAndSigRS[] public s_secretSigRSs;
@@ -46,8 +46,8 @@ contract CommitReveal2Helper is Test {
     uint256 public s_packedRevealOrders;
 
     // ** requestToSubmitCo
-    CommitReveal2.CvAndSigRS[] public s_cvRSsForCvsNotOnChain;
-    //uint256 public s_packedVsForCvsNotOnChain;
+    CommitReveal2.CvAndSigRS[] public s_cvRSsForCvsNotOnChainAndReqToSubmitCo;
+    //uint256 public s_packedVsForAllCvsNotOnChain;
     uint256 s_indicesLength;
     uint256 s_indicesFirstCvNotOnChainRestCvOnChain;
 
@@ -144,8 +144,6 @@ contract CommitReveal2Helper is Test {
         }
     }
 
-    function _setRevealOrders(uint256[] memory diffs, uint256[] memory revealOrders) internal pure {}
-
     function _diff(uint256 a, uint256 b) internal pure returns (uint256) {
         return a > b ? a - b : b - a;
     }
@@ -210,17 +208,6 @@ contract CommitReveal2Helper is Test {
         console2.log(address(commitReveal2).balance);
         console2.log("difference");
         console2.log(_diff(sum, address(commitReveal2).balance));
-        console2.log("--------------------");
-    }
-
-    function consoleDeposits(CommitReveal2 commitReveal2, address[10] memory operators, address leaderNode)
-        internal
-        view
-    {
-        for (uint256 i = 0; i < operators.length; i++) {
-            console2.log(commitReveal2.s_depositAmount(operators[i]));
-        }
-        console2.log(commitReveal2.s_depositAmount(leaderNode));
         console2.log("--------------------");
     }
 

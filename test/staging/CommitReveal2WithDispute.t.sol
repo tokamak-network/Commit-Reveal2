@@ -125,10 +125,10 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** The signatures are required except the operator who submitted the Cvi on-chain.
         // *** The signatures should be organized in the order of activatedOperator Index
         // **** In b case, no one submitted the Cvi on-chain, all the signatures are required.
-        s_sigRSsForCvsNotOnChain = new CommitReveal2.SigRS[](10);
+        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](10);
         for (uint256 i; i < s_operatorAddresses.length; i++) {
-            s_sigRSsForCvsNotOnChain[i].r = s_rs[i];
-            s_sigRSsForCvsNotOnChain[i].s = s_ss[i];
+            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[i];
+            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[i];
         }
         /// *** We need to send the s_secrets of the k 0, 1, 2, 3 operators
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](4);
@@ -138,7 +138,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         /// *** Finally request to submit the s_secrets
         mine(1);
         s_commitReveal2.requestToSubmitS(
-            s_cos, s_secretsReceivedOffchainInRevealOrder, s_packedVs, s_sigRSsForCvsNotOnChain, s_packedRevealOrders
+            s_cos, s_secretsReceivedOffchainInRevealOrder, s_packedVs, s_sigRSsForAllCvsNotOnChain, s_packedRevealOrders
         );
         mine(1);
 
@@ -171,22 +171,22 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
         // *** In c case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
         s_tempArray = [2, 5, 9];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](3);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](3);
         s_tempVs = new uint256[](3);
         s_indicesLength = s_tempArray.length;
         for (uint256 i; i < 3; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain = _packArrayIntoUint256(s_tempArray);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -233,22 +233,22 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
         // *** In d case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
         s_tempArray = [7, 8, 3];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_tempArray.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain = _packArrayIntoUint256(s_tempArray);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -273,13 +273,13 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** The signatures should be organized in the order of activatedOperator Index
         s_tempArray = [0, 1, 2, 4, 5, 6, 9];
 
-        s_sigRSsForCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForCvsNotOnChain = 0;
+        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
+        s_packedVsForAllCvsNotOnChain = 0;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForCvsNotOnChain = s_packedVsForCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](6);
         for (uint256 i; i < 6; i++) {
@@ -290,8 +290,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.requestToSubmitS(
             s_cos,
             s_secretsReceivedOffchainInRevealOrder,
-            s_packedVsForCvsNotOnChain,
-            s_sigRSsForCvsNotOnChain,
+            s_packedVsForAllCvsNotOnChain,
+            s_sigRSsForAllCvsNotOnChain,
             s_packedRevealOrders
         );
         mine(1);
@@ -392,13 +392,13 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's assume none of the operators submitted their s_secrets off-chain
         // *** index 0, 9 already submitted their cv on-chain
         s_tempArray = [1, 2, 3, 4, 5, 6, 7, 8];
-        s_sigRSsForCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForCvsNotOnChain = 0;
+        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
+        s_packedVsForAllCvsNotOnChain = 0;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForCvsNotOnChain = s_packedVsForCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](0);
         mine(1);
@@ -406,8 +406,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.requestToSubmitS(
             s_cos,
             s_secretsReceivedOffchainInRevealOrder,
-            s_packedVsForCvsNotOnChain,
-            s_sigRSsForCvsNotOnChain,
+            s_packedVsForAllCvsNotOnChain,
+            s_sigRSsForAllCvsNotOnChain,
             s_packedRevealOrders
         );
         mine(1);
@@ -470,22 +470,22 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
         // *** In g case, some(0,9) submitted the Cvi on-chain (in submitCv() function), the s_cvs and signatures of the operators who are requested to submit their Co are required.
         s_tempArray = [1, 2, 3, 4, 5, 6, 7, 8, 0, 9];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_tempArray.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain = _packArrayIntoUint256(s_tempArray);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -550,23 +550,23 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** In h case, everyone submitted the Cvi on-chain (in submitCv() function), no s_cvs and signatures are required.
         s_tempArray = new uint256[](0); // cvs not on-chain
         s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain =
             _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -587,13 +587,13 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's assume none of the operators submitted their s_secrets off-chain
         // *** everyone submitted their cv on-chain
         s_tempArray = new uint256[](0); // secrets received off-chain
-        s_sigRSsForCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForCvsNotOnChain = 0;
+        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
+        s_packedVsForAllCvsNotOnChain = 0;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForCvsNotOnChain = s_packedVsForCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](0);
         mine(1);
@@ -601,8 +601,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.requestToSubmitS(
             s_cos,
             s_secretsReceivedOffchainInRevealOrder,
-            s_packedVsForCvsNotOnChain,
-            s_sigRSsForCvsNotOnChain,
+            s_packedVsForAllCvsNotOnChain,
+            s_sigRSsForAllCvsNotOnChain,
             s_packedRevealOrders
         );
         mine(1);
@@ -789,23 +789,23 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** In m case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
         s_tempArray = [2, 3];
         s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [2, 3];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain =
             _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -837,23 +837,23 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's request all the operators to submit their Co
         s_tempArray = [0, 1, 2, 3];
         s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 1, 2, 3];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain =
             _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -919,23 +919,23 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's request all the operators to submit their Co
         s_tempArray = [0, 1, 2];
         s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 1, 2];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain =
             _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -1025,23 +1025,23 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** 0,1,2 submitted their cv on-chain
         s_tempArray = [3, 4, 5]; // cvs not on chain
         s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [3, 4, 5, 0, 1, 2];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain =
             _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -1115,23 +1115,23 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's request [0, 3] to submit their Co
         s_tempArray = [0, 3];
         s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 3];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain =
             _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -1184,23 +1184,23 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's request [1, 2, 3] to submit their Co
         s_tempArray = [1, 2, 3];
         s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [1, 2, 3];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain =
             _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -1221,13 +1221,13 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's assume only k 0, 1 submitted their s_secrets off-chain
         // *** [1, 2, 3] submitted their cv on-chain
         s_tempArray = [0, 4, 5]; // s_cvs not on chain
-        s_sigRSsForCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForCvsNotOnChain = 0;
+        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
+        s_packedVsForAllCvsNotOnChain = 0;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForCvsNotOnChain = s_packedVsForCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](2);
         for (uint256 i; i < 2; i++) {
@@ -1238,8 +1238,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.requestToSubmitS(
             s_cos,
             s_secretsReceivedOffchainInRevealOrder,
-            s_packedVsForCvsNotOnChain,
-            s_sigRSsForCvsNotOnChain,
+            s_packedVsForAllCvsNotOnChain,
+            s_sigRSsForAllCvsNotOnChain,
             s_packedRevealOrders
         );
         mine(1);
@@ -1277,23 +1277,23 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's request [0, 1, 2, 3, 4] to submit their Co
         s_tempArray = [0, 1, 2, 3, 4];
         s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 1, 2, 3, 4];
-        s_cvRSsForCvsNotOnChain = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
+        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
         s_tempVs = new uint256[](s_tempArray.length);
         s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChain[i] = CommitReveal2Storage.CvAndSigRS({
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
             });
             s_tempVs[i] = s_vs[s_tempArray[i]];
         }
-        s_packedVsForCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
+        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
         s_indicesFirstCvNotOnChainRestCvOnChain =
             _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
         mine(1);
         s_commitReveal2.requestToSubmitCo(
-            s_cvRSsForCvsNotOnChain,
-            s_packedVsForCvsNotOnChain,
+            s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+            s_packedVsForAllCvsNotOnChain,
             s_indicesLength,
             s_indicesFirstCvNotOnChainRestCvOnChain
         );
@@ -1314,13 +1314,13 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's assume no one submitted their s_secrets off-chain
         // *** [0, 1, 2, 3, 4] submitted their cv on-chain
         s_tempArray = new uint256[](0);
-        s_sigRSsForCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForCvsNotOnChain = 0;
+        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
+        s_packedVsForAllCvsNotOnChain = 0;
         for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForCvsNotOnChain = s_packedVsForCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](0);
         mine(1);
@@ -1328,8 +1328,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.requestToSubmitS(
             s_cos,
             s_secretsReceivedOffchainInRevealOrder,
-            s_packedVsForCvsNotOnChain,
-            s_sigRSsForCvsNotOnChain,
+            s_packedVsForAllCvsNotOnChain,
+            s_sigRSsForAllCvsNotOnChain,
             s_packedRevealOrders
         );
         mine(1);

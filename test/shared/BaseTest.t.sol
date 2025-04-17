@@ -34,19 +34,4 @@ contract BaseTest is Test {
         vm.warp(block.timestamp + second);
         vm.roll(block.number + 1);
     }
-
-    // function getRandomAddresses(
-    //     uint256 from,
-    //     uint256 to
-    // ) internal returns (address[] memory) {
-    //     uint256 length = to - from;
-    //     address[] memory addresses = new address[](length);
-    //     for (uint256 i = 0; i < length; ++i) {
-    //         addresses[i] = address(
-    //             uint160(uint256(keccak256(abi.encodePacked(i + from))))
-    //         );
-    //         vm.deal(addresses[i], 10000 ether);
-    //     }
-    //     return addresses;
-    // }
 }
