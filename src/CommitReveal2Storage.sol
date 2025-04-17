@@ -46,18 +46,15 @@ contract CommitReveal2Storage {
     }
 
     // * Errors
-
-    error OperatorNotActivated();
-    error ExceedCallbackGasLimit();
+    error ExceedCallbackGasLimit(); // 0x1cf7ab79
     error NotEnoughActivatedOperators(); // 0x77599fd9
     error InsufficientAmount(); // 0x5945ea56
     error NotActivatedOperator(); // 0x1b256530
     error MerkleVerificationFailed(); // 0x624dc351
     error InvalidSignatureS(); // 0xbf4bf5b8
-    error InvalidSignature();
+    error InvalidSignature(); // 0x8baa579f
     error MerkleRootAlreadySubmitted(); // 0xa34402b2
     error AllSubmittedCv(); // 0x7d39a81b
-    error InvalidSignatureLength();
     error TooEarly(); // 0x085de625
     error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
@@ -71,10 +68,10 @@ contract CommitReveal2Storage {
     error AllCvsNotSubmitted(); // 0xad029eb9
     error InvalidSecretLength(); // 0xe0767fa4
     error ShouldNotBeZero();
-    error NotConsumer();
+    error NotConsumer(); // 0x8c7dc13d
     error SRequested();
-    error InvalidRound();
-    error AlreadyRefunded();
+    error InvalidRound(); // 0xa2b52a54
+    error AlreadyRefunded(); // 0xa85e6f1a
     error RandomNumGenerated();
     error AlreadySubmittedMerkleRoot();
     error AlreadyRequestedToSubmitS(); // 0x0d934196
@@ -82,7 +79,7 @@ contract CommitReveal2Storage {
     error AlreadyRequestedToSubmitCo(); // 0x13efcda2
     error CvNotRequested(); // 0xd3e6c959
     error MerkleRootNotSubmitted(); // 0x8e56b845
-    error NotHalted();
+    error NotHalted(); // 0x78b19eb2
     error MerkleRootIsSubmitted(); // 0x22b9d231
     error AllCosNotSubmitted(); // 0x15467973
     error AllSubmittedCo();
@@ -98,7 +95,7 @@ contract CommitReveal2Storage {
     error CvNotEqualHashCo(); // 0x67b3c693
 
     // * Events
-    event Round(uint256 startTime, uint256 state); // 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe
+    event Status(uint256 curStartTime, uint256 curState); // 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762
     event MerkleRootSubmitted(uint256 startTime, bytes32 merkleRoot);
     event RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess); // 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a
 
@@ -107,7 +104,7 @@ contract CommitReveal2Storage {
     event RequestedToSubmitCo(uint256 startTime, uint256 packedIndices); // 0xa3be0347f45bfc2dee4a4ba1d73c735d156d2c7f4c8134c13f48659942996846
     event CvSubmitted(uint256 startTime, bytes32 cv, uint256 index);
     event CoSubmitted(uint256 startTime, bytes32 co, uint256 index); // 0x881e94fac6a4a0f5fbeeb59a652c0f4179a070b4e73db759ec4ef38e080eb4a8
-    event RequestedToSubmitSFromIndexK(uint256 startTime, uint256 index); // 0x6f5c0fbf1eb0f90db5f97e1e5b4c0bc94060698d6f59c07e07695ddea198b778
+    event RequestedToSubmitSFromIndexK(uint256 startTime, uint256 indexK); // 0x6f5c0fbf1eb0f90db5f97e1e5b4c0bc94060698d6f59c07e07695ddea198b778
     event SSubmitted(uint256 startTime, bytes32 s, uint256 index); // 0x1f2f0bf333e80ee899084dda13e87c0b04096ba331a8d993487a116d166947ec
 
     // * State Variables
@@ -256,4 +253,8 @@ contract CommitReveal2Storage {
 
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
+
+    function getCurStartTime() public view returns (uint256) {
+        return s_requestInfo[s_currentRound].startTime;
+    }
 }
