@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {Dispute, ConsumerBase} from "./Dispute.sol";
+import {FailLogics} from "./FailLogics.sol";
+import {ConsumerBase} from "./ConsumerBase.sol";
 import {OptimismL1Fees} from "./OptimismL1Fees.sol";
 import {Bitmap} from "./libraries/Bitmap.sol";
 
-contract CommitReveal2 is Dispute, OptimismL1Fees {
+contract CommitReveal2 is FailLogics, OptimismL1Fees {
     using Bitmap for mapping(uint248 => uint256);
 
     constructor(
@@ -18,7 +19,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator
-    ) payable Dispute(name, version) {
+    ) payable FailLogics(name, version) {
         require(msg.value >= activationThreshold);
         s_depositAmount[msg.sender] = msg.value;
         s_activationThreshold = activationThreshold;
@@ -29,6 +30,29 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
         s_offChainSubmissionPeriodPerOperator = offChainSubmissionPeriodPerOperator;
         s_onChainSubmissionPeriodPerOperator = onChainSubmissionPeriodPerOperator;
         s_isInProcess = COMPLETED;
+    }
+
+    function setFees(uint256 activationThreshold, uint256 flatFee) external onlyOwner {
+        assembly ("memory-safe") {
+            sstore(s_activationThreshold.slot, activationThreshold)
+            sstore(s_flatFee.slot, flatFee)
+        }
+    }
+
+    function setPeriods(
+        uint256 offChainSubmissionPeriod,
+        uint256 requestOrSubmitOrFailDecisionPeriod,
+        uint256 onChainSubmissionPeriod,
+        uint256 offChainSubmissionPeriodPerOperator,
+        uint256 onChainSubmissionPeriodPerOperator
+    ) external onlyOwner {
+        assembly ("memory-safe") {
+            sstore(s_offChainSubmissionPeriod.slot, offChainSubmissionPeriod)
+            sstore(s_requestOrSubmitOrFailDecisionPeriod.slot, requestOrSubmitOrFailDecisionPeriod)
+            sstore(s_onChainSubmissionPeriod.slot, onChainSubmissionPeriod)
+            sstore(s_offChainSubmissionPeriodPerOperator.slot, offChainSubmissionPeriodPerOperator)
+            sstore(s_onChainSubmissionPeriodPerOperator.slot, onChainSubmissionPeriodPerOperator)
+        }
     }
 
     function estimateRequestPrice(uint256 callbackGasLimit, uint256 gasPrice) external view returns (uint256) {
@@ -113,7 +137,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 startTime := timestamp()
                 mstore(0, startTime)
                 mstore(0x20, IN_PROGRESS)
-                log1(0x00, 0x40, 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe) // emit Round(uint256 startTime, uint256 state)
+                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }
             // *** store the request info
             mstore(0x00, newRound)
@@ -191,17 +215,44 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
     }
 
     function refund(uint256 round) external notInProcess {
-        require(round < s_requestCount, InvalidRound());
-        require(round >= s_currentRound, InvalidRound());
-        RequestInfo storage requestInfo = s_requestInfo[round];
-        require(requestInfo.consumer == msg.sender, NotConsumer());
-        s_roundBitmap.flipBit(round); // 1 -> 0
-
-        // ** refund
-        uint256 cost = requestInfo.cost;
-        require(cost > 0, AlreadyRefunded());
-        requestInfo.cost = 0;
         assembly ("memory-safe") {
+            // ** check if the round is valid
+            if iszero(lt(round, sload(s_requestCount.slot))) {
+                mstore(0, 0xa2b52a54) // selector for InvalidRound()
+                revert(0x1c, 0x04)
+            }
+            if lt(round, sload(s_currentRound.slot)) {
+                mstore(0, 0xa2b52a54) // selector for InvalidRound()
+                revert(0x1c, 0x04)
+            }
+            mstore(0x00, round)
+            mstore(0x20, s_requestInfo.slot)
+            let consumerSlot := keccak256(0x00, 0x40)
+            // ** check if the caller is the consumer
+            if iszero(eq(sload(consumerSlot), caller())) {
+                mstore(0, 0x8c7dc13d) // selector for NotConsumer()
+                revert(0x1c, 0x04)
+            }
+
+            // ** flip the roundBitmap 1 -> 0
+            // calculate the storage slot corresponding to the round
+            // wordPos = round >> 8
+            mstore(0x00, shr(8, round))
+            mstore(0x20, s_roundBitmap.slot)
+            // the slot of self[wordPos] is keccak256(abi.encode(wordPos, self.slot))
+            let slot := keccak256(0, 0x40)
+            // mask = 1 << bitPos = 1 << (round & 0xff)
+            // self[wordPos] ^= mask
+            sstore(slot, xor(sload(slot), shl(and(round, 0xff), 1)))
+
+            // ** refund
+            slot := add(consumerSlot, 2) // cost
+            let cost := sload(slot)
+            if iszero(cost) {
+                mstore(0, 0xa85e6f1a) // selector for AlreadyRefunded()
+                revert(0x1c, 0x04)
+            }
+            sstore(slot, 0)
             // Transfer the ETH and check if it succeeded or not.
             if iszero(call(gas(), caller(), cost, 0x00, 0x00, 0x00, 0x00)) {
                 mstore(0x00, 0xb12d13eb) // `ETHTransferFailed()`.
@@ -211,36 +262,61 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
     }
 
     function resume() external payable onlyOwner {
-        require(s_isInProcess == HALTED, NotHalted());
-        require(s_activatedOperators.length > 1, NotEnoughActivatedOperators());
-        address owner = owner();
-        if (msg.value > 0) s_depositAmount[owner] += msg.value;
-        require(s_depositAmount[owner] >= s_activationThreshold, LeaderLowDeposit());
-        uint256 nextRequestedRound = s_currentRound;
+        uint256 nextRequestedRound;
         bool requested;
-        uint256 requestCountMinusOne = s_requestCount - 1;
+        uint256 requestCountMinusOne;
+        assembly ("memory-safe") {
+            if iszero(eq(sload(s_isInProcess.slot), HALTED)) {
+                mstore(0, 0x78b19eb2) // selector for NotHalted()
+                revert(0x1c, 0x04)
+            }
+            if lt(sload(s_activatedOperators.slot), 2) {
+                mstore(0, 0x77599fd9) // selector for NotEnoughActivatedOperators()
+                revert(0x1c, 0x04)
+            }
+            mstore(0x00, sload(_OWNER_SLOT))
+            mstore(0x20, s_depositAmount.slot)
+            let ownerDepositSlot := keccak256(0x00, 0x40)
+            let ownderDepositAmount := sload(ownerDepositSlot)
+            if gt(callvalue(), 0) {
+                ownderDepositAmount := add(ownderDepositAmount, callvalue())
+                sstore(ownerDepositSlot, ownderDepositAmount)
+            }
+            if lt(ownderDepositAmount, sload(s_activationThreshold.slot)) {
+                mstore(0, 0xc0013a5a) // selector for LeaderLowDeposit()
+                revert(0x1c, 0x04)
+            }
+            nextRequestedRound := sload(s_currentRound.slot)
+            requestCountMinusOne := sub(sload(s_requestCount.slot), 1)
+        }
         for (uint256 i; i < 10; i++) {
             (nextRequestedRound, requested) = s_roundBitmap.nextRequestedRound(nextRequestedRound);
-            if (requested) {
-                // Start this requested round
-                s_currentRound = nextRequestedRound;
-                s_requestInfo[nextRequestedRound].startTime = block.timestamp;
-                s_isInProcess = IN_PROGRESS;
-                emit Round(block.timestamp, IN_PROGRESS);
-                return;
-            }
-            unchecked {
+            assembly ("memory-safe") {
+                if requested {
+                    // Start this requested round
+                    mstore(0x00, nextRequestedRound)
+                    mstore(0x20, s_requestInfo.slot)
+                    sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
+                    sstore(s_currentRound.slot, nextRequestedRound)
+                    sstore(s_isInProcess.slot, IN_PROGRESS)
+                    mstore(0x00, timestamp())
+                    mstore(0x20, IN_PROGRESS)
+                    log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                    return(0, 0)
+                }
                 // If we reach or pass the last round without finding any requested round,
                 // mark as COMPLETED and set the current round to the last possible index.
-                if (nextRequestedRound++ >= requestCountMinusOne) {
-                    // && requested = false
-                    s_isInProcess = COMPLETED; // q I don't think this is necessary
-                    s_currentRound = requestCountMinusOne;
-                    return;
+                if iszero(lt(nextRequestedRound, requestCountMinusOne)) {
+                    sstore(s_isInProcess.slot, COMPLETED) // q I don't think this is necessary
+                    sstore(s_currentRound.slot, requestCountMinusOne)
+                    return(0, 0)
                 }
+                nextRequestedRound := add(nextRequestedRound, 1)
             }
         }
-        s_currentRound = nextRequestedRound;
+        assembly ("memory-safe") {
+            sstore(s_currentRound.slot, nextRequestedRound)
+        }
     }
 
     function generateRandomNumber(
@@ -376,7 +452,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 sstore(s_isInProcess.slot, COMPLETED)
                 mstore(0x00, startTime)
                 mstore(0x20, COMPLETED)
-                log1(0x00, 0x40, 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe) // emit Round(uint256 startTime, uint256 state)
+                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }
             default {
                 mstore(0x00, nextRound) // round
@@ -385,7 +461,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
                 sstore(s_currentRound.slot, nextRound)
                 mstore(0x00, timestamp())
                 mstore(0x20, IN_PROGRESS)
-                log1(0x00, 0x40, 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe) // emit Round(uint256 startTime, uint256 state)
+                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }
             // ** reward the flatFee to last revealer
             // ** reward the leaderNode (requestFee - flatFee) for submitMerkleRoot and generateRandomNumber
@@ -431,7 +507,7 @@ contract CommitReveal2 is Dispute, OptimismL1Fees {
             switch extcodesize(consumer)
             case 0 {
                 mstore(0x60, 0)
-                log1(0x20, 0x60, 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a) // emit RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess
+                log1(0x20, 0x60, 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a) // emit RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess)
             }
             default {
                 // call and return whether we succeeded. ignore return data
