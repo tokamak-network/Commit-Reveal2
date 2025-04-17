@@ -3,33 +3,18 @@ pragma solidity 0.8.28;
 
 import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
 import {Script, console2} from "forge-std/Script.sol";
-import {CommitReveal2Helper} from "./../../test/shared/CommitReveal2Helper.sol";
+import {CommitReveal2Helper, CommitReveal2Storage} from "./../../test/shared/CommitReveal2Helper.sol";
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 import {NetworkHelperConfig} from "./../NetworkHelperConfig.s.sol";
 
 contract BaseScript is Script, CommitReveal2Helper {
-    CommitReveal2 public s_commitReveal2;
-    ConsumerExample public s_consumerExample;
-
-    bytes32[] public s_secrets;
-    bytes32[] public s_cos;
-    bytes32[] public s_cvs;
-    uint8[] public s_vs;
-    bytes32[] public s_rs;
-    bytes32[] public s_ss;
-    uint256 public s_rv;
-
     uint256[2] public s_privateKeys;
     address[2] public s_operators;
-    uint256 public s_numOfOperators = 2;
     uint256 s_activationThreshold;
 
-    uint256 public s_startTimestamp;
-
-    NetworkHelperConfig.NetworkConfig public s_activeNetworkConfig;
-
     function scriptSetUp() public {
+        s_numOfOperators = 2;
         // *** Get the most recent deployment of CommitReveal2 ***
         // ** //////////////////////////////////////////////// **
         string memory contractName =
@@ -55,18 +40,13 @@ contract BaseScript is Script, CommitReveal2Helper {
         // ** //////////////////////////////////////////////// **
         NetworkHelperConfig networkHelperConfig = new NetworkHelperConfig();
         s_activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
-        setCommitReveal2HelperStates(
-            keccak256(bytes(s_activeNetworkConfig.name)),
-            keccak256(bytes(s_activeNetworkConfig.version)),
-            address(s_commitReveal2)
-        );
     }
 
     function generateSCoCv() public {
         // ** Off-chain: Cvi Submission
         // ** //////////////////////////////////////////////// **
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
-        console2.log("startTimestamp", s_startTimestamp);
+
         s_secrets = new bytes32[](s_operators.length);
         s_cos = new bytes32[](s_operators.length);
         s_cvs = new bytes32[](s_operators.length);
@@ -74,14 +54,20 @@ contract BaseScript is Script, CommitReveal2Helper {
         s_rs = new bytes32[](s_operators.length);
         s_ss = new bytes32[](s_operators.length);
 
+        s_secretSigRSs = new CommitReveal2.SecretAndSigRS[](s_operators.length);
+        s_packedVs = 0;
+        s_packedRevealOrders = 0;
+
         for (uint256 i; i < s_operators.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
             (s_vs[i], s_rs[i], s_ss[i]) = vm.sign(s_privateKeys[i], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
 
-            console2.logBytes32(_getTypedDataHash(s_startTimestamp, s_cvs[i]));
-            console2.log(uint256(s_vs[i]));
-            console2.log(uint256(s_rs[i]));
-            console2.log(uint256(s_ss[i]));
+            uint256 v = uint256(s_vs[i]);
+            s_packedVs = s_packedVs | (v << (i * 8));
+            s_secretSigRSs[i] = CommitReveal2Storage.SecretAndSigRS({
+                secret: s_secrets[i],
+                rs: CommitReveal2Storage.SigRS({r: s_rs[i], s: s_ss[i]})
+            });
         }
     }
 }

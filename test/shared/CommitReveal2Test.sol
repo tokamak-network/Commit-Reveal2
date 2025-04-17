@@ -4,169 +4,10 @@ pragma solidity 0.8.28;
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 import {Bitmap} from "./../../src/libraries/Bitmap.sol";
 
-contract CommitReveal2TestSolidity is CommitReveal2 {
-    using Bitmap for mapping(uint248 => uint256);
-
-    constructor(
-        uint256 activationThreshold,
-        uint256 flatFee,
-        uint256 maxActivatedOperators,
-        string memory name,
-        string memory version,
-        uint256 offChainSubmissionPeriod,
-        uint256 requestOrSubmitOrFailDecisionPeriod,
-        uint256 onChainSubmissionPeriod,
-        uint256 offChainSubmissionPeriodPerOperator,
-        uint256 onChainSubmissionPeriodPerOperator
-    )
-        payable
-        CommitReveal2(
-            activationThreshold,
-            flatFee,
-            maxActivatedOperators,
-            name,
-            version,
-            offChainSubmissionPeriod,
-            requestOrSubmitOrFailDecisionPeriod,
-            onChainSubmissionPeriod,
-            offChainSubmissionPeriodPerOperator,
-            onChainSubmissionPeriodPerOperator
-        )
-    {}
-
-    function getMessageHash(uint256 timestamp, bytes32 cv) external view returns (bytes32) {
-        return _hashTypedDataV4(keccak256(abi.encode(MESSAGE_TYPEHASH, Message({timestamp: timestamp, cv: cv}))));
-    }
-
-    function requestRandomNumber2(uint32 callbackGasLimit) external payable returns (uint256 newRound) {
-        require(callbackGasLimit <= MAX_CALLBACK_GAS_LIMIT, ExceedCallbackGasLimit());
-        uint256 activatedOperatorsLength = s_activatedOperators.length;
-        require(activatedOperatorsLength > 1, NotEnoughActivatedOperators());
-        require(s_depositAmount[owner()] >= s_activationThreshold, LeaderLowDeposit());
-        require(
-            msg.value >= _calculateRequestPrice(callbackGasLimit, tx.gasprice, activatedOperatorsLength),
-            InsufficientAmount()
-        );
-        unchecked {
-            newRound = s_requestCount++;
-        }
-        s_roundBitmap.flipBit(newRound);
-        uint256 startTime;
-        if (s_isInProcess == COMPLETED) {
-            s_currentRound = newRound;
-            s_isInProcess = IN_PROGRESS;
-            startTime = block.timestamp;
-            emit Round(block.timestamp, IN_PROGRESS);
-        }
-        s_requestInfo[newRound] = RequestInfo({
-            consumer: msg.sender,
-            startTime: startTime,
-            cost: msg.value,
-            callbackGasLimit: callbackGasLimit
-        });
-    }
-
-    function generateRandomNumber() external {
-        // ** check if it is not too late
-        // require(
-        //     (block.timestamp <
-        //         s_merkleRootSubmittedTimestamp +
-        //             s_offChainSubmissionPeriod +
-        //             (s_offChainSubmissionPeriodPerOperator *
-        //                 activatedOperatorsLength) +
-        //             s_requestOrSubmitOrFailDecisionPeriod) ||
-        //         (block.timestamp <
-        //             s_requestedToSubmitCoTimestamp +
-        //                 s_onChainSubmissionPeriod +
-        //                 (s_offChainSubmissionPeriodPerOperator *
-        //                     activatedOperatorsLength) +
-        //                 s_requestOrSubmitOrFailDecisionPeriod),
-        //     TooLate()
-        // );
-
-        // ** initialize cos and cvs arrays memory
-        //bytes32[] memory cos = new bytes32[](activatedOperatorsLength);
-        //bytes32[] memory cvs = new bytes32[](activatedOperatorsLength);
-
-        //for { let i := 0 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
-        //cos[i] = keccak256(abi.encodePacked(secrets[i]));
-        //cvs[i] = keccak256(abi.encodePacked(cos[i]));
-        //}
-
-        // ** verify reveal order
-        /**
-         * uint256 rv = uint256(keccak256(abi.encodePacked(cos)));
-         * for (uint256 i = 1; i < secretsLength; i = _unchecked_inc(i)) {
-         * require(
-         *    diff(rv, cvs[revealOrders[i - 1]]) >
-         *        diff(rv, cvs[revealOrders[i]]),
-         *    RevealNotInAscendingOrder()
-         * );
-         *
-         * uint256 before = diff(rv, cvs[revealOrders[0]]);
-         * for (uint256 i = 1; i < secretsLength; i = _unchecked_inc(i)) {
-         *  uint256 after = diff(rv, cvs[revealOrders[i]]);
-         *  require(before >= after, RevealNotInAscendingOrder());
-         *  before = after;
-         * }
-         *
-         */
-
-        // ** verify signer
-        // uint256 round = s_currentRound;
-        // RequestInfo storage requestInfo = s_requestInfo[round];
-        // uint256 startTimestamp = requestInfo.startTime;
-        // for (uint256 i; i < activatedOperatorsLength; i = _unchecked_inc(i)) {
-        //     // signature malleability prevention
-        //     require(ss[i] <= 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0, InvalidSignatureS());
-        //     require(
-        //         s_activatedOperatorIndex1Based[ecrecover(
-        //             _hashTypedDataV4(
-        //                 keccak256(abi.encode(MESSAGE_TYPEHASH, Message({timestamp: startTimestamp, cv: cvs[i]})))
-        //             ),
-        //             vs[i],
-        //             rs[i],
-        //             ss[i]
-        //         )] > 0,
-        //         InvalidSignature()
-        //     );
-        // }
-
-        // ** create random number
-        // uint256 randomNumber = uint256(keccak256(abi.encodePacked(secrets)));
-        // uint256 nextRound = _unchecked_inc(round);
-        // unchecked {
-        //     if (nextRound == s_requestCount) {
-        //         s_isInProcess = COMPLETED;
-        //         emit IsInProcess(COMPLETED);
-        //     } else {
-        //         s_requestInfo[nextRound].startTime = block.timestamp;
-        //         s_currentRound = nextRound;
-        //     }
-        // }
-        // // reward the last revealer
-        // s_depositAmount[s_activatedOperators[revealOrders[activatedOperatorsLength - 1]]] += requestInfo.cost;
-        // emit RandomNumberGenerated(
-        //     round,
-        //     randomNumber,
-        //     _call(
-        //         requestInfo.consumer,
-        //         abi.encodeWithSelector(ConsumerBase.rawFulfillRandomNumber.selector, round, randomNumber),
-        //         requestInfo.callbackGasLimit
-        //     )
-        // );
-    }
-
-    function diff(uint256 a, uint256 b) private pure returns (uint256) {
-        return a > b ? a - b : b - a;
-    }
-}
-
 contract CreateMerkleRootSolidity is CommitReveal2 {
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
-        uint256 maxActivatedOperators,
         string memory name,
         string memory version,
         uint256 offChainSubmissionPeriod,
@@ -179,7 +20,6 @@ contract CreateMerkleRootSolidity is CommitReveal2 {
         CommitReveal2(
             activationThreshold,
             flatFee,
-            maxActivatedOperators,
             name,
             version,
             offChainSubmissionPeriod,
@@ -214,6 +54,12 @@ contract CreateMerkleRootSolidity is CommitReveal2 {
         return hashes[hashCount - 1];
     }
 
+    function _unchecked_inc(uint256 i) internal pure returns (uint256) {
+        unchecked {
+            return i + 1;
+        }
+    }
+
     function _efficientKeccak256(bytes32 a, bytes32 b) internal pure returns (bytes32 value) {
         assembly ("memory-safe") {
             mstore(0x00, a)
@@ -227,7 +73,6 @@ contract CreateMerkleRootInlineAssembly is CommitReveal2 {
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
-        uint256 maxActivatedOperators,
         string memory name,
         string memory version,
         uint256 offChainSubmissionPeriod,
@@ -240,7 +85,6 @@ contract CreateMerkleRootInlineAssembly is CommitReveal2 {
         CommitReveal2(
             activationThreshold,
             flatFee,
-            maxActivatedOperators,
             name,
             version,
             offChainSubmissionPeriod,

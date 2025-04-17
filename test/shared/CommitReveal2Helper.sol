@@ -3,20 +3,67 @@ pragma solidity ^0.8.28;
 
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 import {CommitReveal2Storage} from "./../../src/CommitReveal2Storage.sol";
-import {console2} from "forge-std/Test.sol";
+import {NetworkHelperConfig} from "./../../script/NetworkHelperConfig.s.sol";
+import {console2, Test} from "forge-std/Test.sol";
 import {Bitmap} from "../../src/libraries/Bitmap.sol";
 import {ConsumerExample} from "./../../src/ConsumerExample.sol";
+import {Sort} from "./Sort.sol";
 
-contract CommitReveal2Helper {
+contract CommitReveal2Helper is Test {
+    // ** Contracts
+    CommitReveal2 public s_commitReveal2;
+    ConsumerExample public s_consumerExample;
+    NetworkHelperConfig.NetworkConfig public s_activeNetworkConfig;
+    NetworkHelperConfig public s_networkHelperConfig;
+
     uint256 private s_nonce;
-    bytes32 public s_nameHash;
-    bytes32 public s_versionHash;
-    address s_commitReveal2Address;
 
-    function setCommitReveal2HelperStates(bytes32 nameHash, bytes32 versionHash, address commitReveal2Address) public {
-        s_nameHash = nameHash;
-        s_versionHash = versionHash;
-        s_commitReveal2Address = commitReveal2Address;
+    // ** Variables for Testing
+    uint256 public s_requestFee;
+    uint256 public s_startTimestamp;
+    bytes32[] public s_secrets;
+    bytes32[] public s_cos;
+    bytes32[] public s_cvs;
+    uint8[] public s_vs;
+    bytes32[] public s_rs;
+    bytes32[] public s_ss;
+    uint256 public s_rv;
+    bool public s_fulfilled;
+    uint256 public s_randomNumber;
+    address[] public s_activatedOperators;
+    uint256[] public s_depositAmounts;
+    address public s_anyAddress;
+    uint256 public s_numOfOperators;
+
+    // ** requestToSubmitS
+    bytes32[] public s_secretsReceivedOffchainInRevealOrder;
+    uint256 public s_packedVsForAllCvsNotOnChain;
+    CommitReveal2.SigRS[] public s_sigRSsForAllCvsNotOnChain;
+
+    // ** generate random number
+    CommitReveal2.SecretAndSigRS[] public s_secretSigRSs;
+    uint256 public s_packedVs;
+    uint256 public s_packedRevealOrders;
+
+    // ** requestToSubmitCo
+    CommitReveal2.CvAndSigRS[] public s_cvRSsForCvsNotOnChainAndReqToSubmitCo;
+    //uint256 public s_packedVsForAllCvsNotOnChain;
+    uint256 s_indicesLength;
+    uint256 s_indicesFirstCvNotOnChainRestCvOnChain;
+
+    // ** requestToSubmitCv
+    uint256 public s_packedIndices;
+
+    // ** Variables for Dispute
+    uint256[] public s_tempArray;
+    uint256[] public s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp;
+    uint256[] public s_tempVs;
+
+    function _packArrayIntoUint256(uint256[] storage arr) internal view returns (uint256 packed) {
+        uint256 len = arr.length;
+        for (uint256 i = 0; i < len; i++) {
+            packed |= (arr[i] << (i * 8));
+        }
     }
 
     function _createMerkleRoot(bytes32[] memory leaves) internal pure returns (bytes32) {
@@ -53,6 +100,50 @@ contract CommitReveal2Helper {
         cv = keccak256(abi.encodePacked(co));
     }
 
+    function _setSCoCvRevealOrders(mapping(address => uint256) storage privatekeys)
+        internal
+        returns (uint256[] memory revealOrders)
+    {
+        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
+        s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        // *** Allocate Storage Arrays
+        s_secrets = new bytes32[](s_activatedOperators.length);
+        s_cos = new bytes32[](s_activatedOperators.length);
+        s_cvs = new bytes32[](s_activatedOperators.length);
+        s_vs = new uint8[](s_activatedOperators.length);
+        s_rs = new bytes32[](s_activatedOperators.length);
+        s_ss = new bytes32[](s_activatedOperators.length);
+
+        s_secretSigRSs = new CommitReveal2.SecretAndSigRS[](s_activatedOperators.length);
+        s_packedVs = 0;
+        s_packedRevealOrders = 0;
+        // *** Generate S, Co, Cv, Signatures
+
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
+            (s_vs[i], s_rs[i], s_ss[i]) =
+                vm.sign(privatekeys[s_activatedOperators[i]], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
+            uint256 v = uint256(s_vs[i]);
+            s_packedVs = s_packedVs | (v << (i * 8));
+            s_secretSigRSs[i] = CommitReveal2Storage.SecretAndSigRS({
+                secret: s_secrets[i],
+                rs: CommitReveal2Storage.SigRS({r: s_rs[i], s: s_ss[i]})
+            });
+        }
+        // *** Set Reveal Orders
+        uint256[] memory diffs = new uint256[](s_activatedOperators.length);
+        revealOrders = new uint256[](s_activatedOperators.length);
+        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            revealOrders[i] = i;
+        }
+        Sort.sort(diffs, revealOrders);
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            s_packedRevealOrders = s_packedRevealOrders | (revealOrders[i] << (i * 8));
+        }
+    }
+
     function _diff(uint256 a, uint256 b) internal pure returns (uint256) {
         return a > b ? a - b : b - a;
     }
@@ -75,7 +166,7 @@ contract CommitReveal2Helper {
     function consoleDepositsAndSlashRewardAccumulated(
         CommitReveal2 commitReveal2,
         ConsumerExample consumerExample,
-        address[10] memory operators,
+        address[] memory operators,
         address leaderNode,
         address extraAddress
     ) internal view {
@@ -112,36 +203,11 @@ contract CommitReveal2Helper {
                 break;
             }
         }
-
         console2.log("get all depositPlusSlashReward and contract balance and compare");
         console2.log(sum);
         console2.log(address(commitReveal2).balance);
         console2.log("difference");
         console2.log(_diff(sum, address(commitReveal2).balance));
-        console2.log("--------------------");
-    }
-
-    function consoleDeposits(CommitReveal2 commitReveal2, address[10] memory operators, address leaderNode)
-        internal
-        view
-    {
-        for (uint256 i = 0; i < operators.length; i++) {
-            console2.log(commitReveal2.s_depositAmount(operators[i]));
-        }
-        console2.log(commitReveal2.s_depositAmount(leaderNode));
-        console2.log("--------------------");
-    }
-
-    function consoleSlashRewardAccumulated(
-        CommitReveal2 commitReveal2,
-        address[10] memory operators,
-        address leaderNode
-    ) internal view {
-        uint256 globalSlashRewardPerOperator = commitReveal2.s_slashRewardPerOperator();
-        for (uint256 i = 0; i < operators.length; i++) {
-            console2.log(globalSlashRewardPerOperator - commitReveal2.s_slashRewardPerOperatorPaid(operators[i]));
-        }
-        console2.log(globalSlashRewardPerOperator - commitReveal2.s_slashRewardPerOperatorPaid(leaderNode));
         console2.log("--------------------");
     }
 
@@ -152,10 +218,10 @@ contract CommitReveal2Helper {
                 keccak256(
                     abi.encode(
                         keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-                        s_nameHash,
-                        s_versionHash,
+                        s_activeNetworkConfig.nameHash,
+                        s_activeNetworkConfig.versionHash,
                         block.chainid,
-                        s_commitReveal2Address
+                        address(s_commitReveal2)
                     )
                 ),
                 keccak256(

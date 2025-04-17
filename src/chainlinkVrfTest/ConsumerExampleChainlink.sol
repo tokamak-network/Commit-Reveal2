@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {ConsumerBase} from "./ConsumerBase.sol";
+import {VRFV2PlusWrapperConsumerBase} from "./VRFV2PlusWrapperConsumerBase.sol";
+import {VRFV2PlusClient} from "./libraries/VRFV2PlusClient.sol";
 
-contract ConsumerExample is ConsumerBase {
+contract ConsumerExampleChainlink is VRFV2PlusWrapperConsumerBase {
     struct RequestStatus {
         bool fulfilled; // whether the request has been successfully fulfilled
         uint256 randomNumber;
@@ -18,20 +19,17 @@ contract ConsumerExample is ConsumerBase {
     // past requests Id.
     uint32 public constant CALLBACK_GAS_LIMIT = 80000;
 
-    constructor(address coordinator) ConsumerBase(coordinator) {}
+    constructor(address wrapper) VRFV2PlusWrapperConsumerBase(wrapper) {}
 
     function requestRandomNumber() external payable {
-        uint256 requestId = _requestRandomNumber(CALLBACK_GAS_LIMIT);
+        bytes memory extraArgs = VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: true}));
+        (uint256 requestId,) = requestRandomnessPayInNative(CALLBACK_GAS_LIMIT, 3, 1, extraArgs);
         s_requesterRequestIds[msg.sender].push(requestId);
     }
 
-    function fulfillRandomRandomNumber(uint256 requestId, uint256 randomNumber) internal override {
-        s_requests[requestId] = RequestStatus(true, randomNumber);
-        lastRequestId = requestId;
-    }
-
-    function getCommitReveal2Address() external view returns (address) {
-        return address(i_commitreveal2);
+    function fulfillRandomWords(uint256 _requestId, uint256[] memory _randomWords) internal override {
+        s_requests[_requestId] = RequestStatus(true, _randomWords[0]);
+        lastRequestId = _requestId;
     }
 
     function getYourRequests()

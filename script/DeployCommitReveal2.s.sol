@@ -18,7 +18,6 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                 new CommitReveal2L1{value: activeNetworkConfig.activationThreshold}(
                     activeNetworkConfig.activationThreshold,
                     activeNetworkConfig.flatFee,
-                    activeNetworkConfig.maxActivatedOperators,
                     activeNetworkConfig.name,
                     activeNetworkConfig.version,
                     activeNetworkConfig.offChainSubmissionPeriod,
@@ -33,7 +32,6 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                 new CommitReveal2{value: activeNetworkConfig.activationThreshold}(
                     activeNetworkConfig.activationThreshold,
                     activeNetworkConfig.flatFee,
-                    activeNetworkConfig.maxActivatedOperators,
                     activeNetworkConfig.name,
                     activeNetworkConfig.version,
                     activeNetworkConfig.offChainSubmissionPeriod,

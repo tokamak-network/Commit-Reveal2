@@ -76,11 +76,10 @@ contract SuccessfulPaths is BaseScript {
             revealOrders[i] = i;
         }
         Sort.sort(diffs, revealOrders);
-        console2.log(s_startTimestamp, s_commitReveal2.s_isSubmittedMerkleRoot(s_startTimestamp));
         // ** 12. generateRandomNumber();
         // ** //////////////////////////////////////////////// **
         vm.startBroadcast();
-        s_commitReveal2.generateRandomNumber(s_secrets, s_vs, s_rs, s_ss, revealOrders);
+        s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
         vm.stopBroadcast();
     }
 }

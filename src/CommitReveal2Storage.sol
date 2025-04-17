@@ -30,54 +30,82 @@ contract CommitReveal2Storage {
         uint256 callbackGasLimit;
     }
 
-    // * Errors
+    struct SigRS {
+        bytes32 r;
+        bytes32 s;
+    }
 
-    error OperatorNotActivated();
-    error ExceedCallbackGasLimit();
+    struct SecretAndSigRS {
+        bytes32 secret;
+        SigRS rs;
+    }
+
+    struct CvAndSigRS {
+        bytes32 cv;
+        SigRS rs;
+    }
+
+    // * Errors
+    error ExceedCallbackGasLimit(); // 0x1cf7ab79
     error NotEnoughActivatedOperators(); // 0x77599fd9
     error InsufficientAmount(); // 0x5945ea56
     error NotActivatedOperator(); // 0x1b256530
     error MerkleVerificationFailed(); // 0x624dc351
     error InvalidSignatureS(); // 0xbf4bf5b8
-    error InvalidSignature();
-    error InvalidSignatureLength();
-    error TooEarly();
+    error InvalidSignature(); // 0x8baa579f
+    error MerkleRootAlreadySubmitted(); // 0xa34402b2
+    error AllSubmittedCv(); // 0x7d39a81b
+    error TooEarly(); // 0x085de625
     error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
     error InvalidCo();
+    error LengthExceedsMax(); // 0x12466af8
+    error SignatureAndIndexDoNotMatch(); // 0x980c4296
+    error InvalidIndex(); // 0x63df8171
+    error DuplicateIndices(); // 0x7a69f8d3
+    error WrongRevealOrder(); // 0xe3ae7cc0
     error InvalidS();
-    error InvalidRevealOrder();
+    error AllCvsNotSubmitted(); // 0xad029eb9
     error InvalidSecretLength(); // 0xe0767fa4
     error ShouldNotBeZero();
-    error NotConsumer();
-    error InvalidRound();
-    error AlreadyRefunded();
+    error NotConsumer(); // 0x8c7dc13d
+    error SRequested();
+    error InvalidRound(); // 0xa2b52a54
+    error AlreadyRefunded(); // 0xa85e6f1a
+    error RandomNumGenerated();
     error AlreadySubmittedMerkleRoot();
-    error AlreadyRequestedToSubmitCv();
-    error CvNotRequested();
-    error MerkleRootNotSubmitted();
-    error NotHalted();
-    error ZeroLength();
+    error AlreadyRequestedToSubmitS(); // 0x0d934196
+    error AlreadyRequestedToSubmitCv(); // 0x899a05f2
+    error AlreadyRequestedToSubmitCo(); // 0x13efcda2
+    error CvNotRequested(); // 0xd3e6c959
+    error MerkleRootNotSubmitted(); // 0x8e56b845
+    error NotHalted(); // 0x78b19eb2
+    error MerkleRootIsSubmitted(); // 0x22b9d231
+    error AllCosNotSubmitted(); // 0x15467973
+    error AllSubmittedCo();
+    error ZeroLength(); // 0xbf557497
     error LeaderLowDeposit(); // 0xc0013a5a
-    error CoNotRequested();
-    error SNotRequested();
+    error CoNotRequested(); // 0x11974969
+    error SNotRequested(); // 0x2d37f8d3
     error AlreadySubmittedS();
+    error CvNotEqualDoubleHashS(); // 0x5bcc2334
     error ETHTransferFailed(); // 0xb12d13eb
     error RevealNotInDescendingOrder(); // 0x24f1948e
-
-    error CvNotSubmitted(uint256 index);
+    error CvNotSubmitted(); // 0x03798920
+    error CvNotEqualHashCo(); // 0x67b3c693
 
     // * Events
-    event Round(uint256 startTime, uint256 state); // 0xe2af5431d45f111f112df909784bcdd0cf9a409671adeaf0964cc234a98297fe
+    event Status(uint256 curStartTime, uint256 curState); // 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762
     event MerkleRootSubmitted(uint256 startTime, bytes32 merkleRoot);
     event RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess); // 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a
 
-    event RequestedToSubmitCv(uint256 startTime, uint256[] indices);
-    event RequestedToSubmitCo(uint256 startTime, uint256[] indices);
+    //event RequestedToSubmitCv(uint256 startTime, uint256[] indices);
+    event RequestedToSubmitCv(uint256 startTime, uint256 packedIndices); // 0x18d0e75c02ebf9429b0b69ace609256eb9c9e12d5c9301a2d4a04fd7599b5cfc
+    event RequestedToSubmitCo(uint256 startTime, uint256 packedIndices); // 0xa3be0347f45bfc2dee4a4ba1d73c735d156d2c7f4c8134c13f48659942996846
     event CvSubmitted(uint256 startTime, bytes32 cv, uint256 index);
-    event CoSubmitted(uint256 startTime, bytes32 co, uint256 index);
-    event RequestedToSubmitSFromIndexK(uint256 startTime, uint256 index);
-    event SSubmitted(uint256 startTime, bytes32 s, uint256 index);
+    event CoSubmitted(uint256 startTime, bytes32 co, uint256 index); // 0x881e94fac6a4a0f5fbeeb59a652c0f4179a070b4e73db759ec4ef38e080eb4a8
+    event RequestedToSubmitSFromIndexK(uint256 startTime, uint256 indexK); // 0x6f5c0fbf1eb0f90db5f97e1e5b4c0bc94060698d6f59c07e07695ddea198b778
+    event SSubmitted(uint256 startTime, bytes32 s, uint256 index); // 0x1f2f0bf333e80ee899084dda13e87c0b04096ba331a8d993487a116d166947ec
 
     // * State Variables
     // ** public
@@ -112,32 +140,38 @@ contract CommitReveal2Storage {
      *   - Used to validate operator commitments in the chain of trust for reveal phases.
      *   - Updated by the leader node via `submitMerkleRoot()`.
      */
+    mapping(uint256 startTime => uint256) public s_requestedToSubmitCvTimestamp;
+    uint256 public s_requestedToSubmitCvLength;
+    uint256 public s_requestedToSubmitCvPackedIndices;
+    uint256 public s_zeroBitIfSubmittedCvBitmap;
+    bytes32[32] public s_cvs;
+
+    mapping(uint256 startTime => uint256) public s_merkleRootSubmittedTimestamp;
     bytes32 public s_merkleRoot;
 
+    mapping(uint256 startTime => uint256) public s_requestedToSubmitCoTimestamp;
+    uint256 public s_requestedToSubmitCoLength;
+    uint256 public s_requestedToSubmitCoPackedIndices;
+    uint256 public s_zeroBitIfSubmittedCoBitmap;
+
+    mapping(uint256 startTime => uint256) public s_previousSSubmitTimestamp;
     /**
-     * @notice Tracks when the contract owner requested on-chain commit submissions (`Cv`).
+     * @notice Tracks the reveal order index in `secrets` when `requestToSubmitS()` is called
      * @dev
-     *   - Relevant to the deadline for calling `submitCv()` or failing the round (`failToSubmitCv()`).
+     *   - Used in `submitS()` to verify if the current operator is next in line.
      */
-    uint256 public s_requestedToSubmitCvTimestamp;
+    uint256 public s_requestedToSubmitSFromIndexK;
     /**
-     * @notice The time when the Merkle root was submitted on-chain.
-     * @dev
-     *   - Used to compute deadlines for subsequent phases, like “request or submit or fail” decisions.
+     * @notice For each round (`timestamp`), stores an array of final secrets (`S`):
+     *         - `s_ss[timestamp][i]` is the revealed secret of operator `i`, if submitted on-chain.
      */
-    uint256 public s_merkleRootSubmittedTimestamp;
+    bytes32[32] public s_secrets;
     /**
-     * @notice Tracks when the contract owner requested on-chain “Co” submissions (Reveal-1).
+     * @notice The array of operator indices in strictly descending difference order (rv and Cvi).
      * @dev
-     *   - Relevant to the deadline for calling `submitCo()` or failing the round (`failToSubmitCo()`).
+     *   - Used in the final reveal phases to enforce the order of `S` submissions.
      */
-    uint256 public s_requestedToSubmitCoTimestamp;
-    /**
-     * @notice The timestamp of the last S-submission request (Reveal-2) phase.
-     * @dev
-     *   - Used to enforce per-operator submission windows in `submitS()` or `failToSubmitS()`.
-     */
-    uint256 public s_previousSSubmitTimestamp;
+    uint256 public s_packedRevealOrders;
 
     /**
      * @notice Maps each round (identified by its index) to its corresponding {RequestInfo}.
@@ -153,31 +187,6 @@ contract CommitReveal2Storage {
     }
 
     /**
-     * @notice An array of operator indices that must submit `Cv` on-chain for the current round,
-     *         as requested by the contract owner. Stored when `requestToSubmitCv()` is called.
-     */
-    uint256[] public s_requestedToSubmitCvIndices;
-    /**
-     * @notice An array of operator indices that must submit `Co` (Reveal-1) on-chain for the current round,
-     *         as requested by the contract owner. Populated by `requestToSubmitCo()`.
-     */
-    uint256[] public s_requestedToSubmitCoIndices;
-
-    /**
-     * @notice Tracks the reveal order index in `secrets` when `requestToSubmitS()` is called
-     * @dev
-     *   - Used in `submitS()` to verify if the current operator is next in line.
-     */
-    uint256 public s_requestedToSubmitSFromIndexK;
-
-    /**
-     * @notice The array of operator indices in strictly descending difference order (rv and Cvi).
-     * @dev
-     *   - Used in the final reveal phases to enforce the order of `S` submissions.
-     */
-    uint256[] public s_revealOrders;
-
-    /**
      * @notice A packed bitmap mapping each round index to its “requested” status.
      * @dev
      *   - Each `uint248` key represents a 256-bit word in storage, where each bit indicates
@@ -185,36 +194,6 @@ contract CommitReveal2Storage {
      *   - Managed with the `Bitmap` library (e.g., `flipBit()`).
      */
     mapping(uint248 wordPos => uint256) public s_roundBitmap;
-
-    /**
-     * @notice Tracks whether a Merkle root was submitted for the round identified by `timestamp`.
-     * @dev
-     *   - If `true`, indicates the leader node has called `submitMerkleRoot()` (or a similar function)
-     *     for that round.
-     *   - Used in verifying subsequent reveal phases can proceed.
-     */
-    mapping(uint256 timestamp => bool) public s_isSubmittedMerkleRoot;
-
-    /**
-     * @notice Stores a bitmap indicating which operators must submit `Co` (Reveal-1) for each round,
-     *         keyed by that round’s `timestamp`.
-     * @dev
-     *   - If a bit is set, that operator has not yet submitted Co on-chain.
-     *   - Cleared when an operator calls `submitCo()` successfully.
-     */
-    mapping(uint256 timestamp => uint256) public s_requestToSubmitCoBitmap;
-
-    /**
-     * @notice For each round (`timestamp`), stores an array of `Cv` commitments:
-     *         - `s_cvs[timestamp][i]` is the hashed commitment (`Cv`) for operator `i`.
-     */
-    mapping(uint256 timestamp => bytes32[]) public s_cvs;
-
-    /**
-     * @notice For each round (`timestamp`), stores an array of final secrets (`S`):
-     *         - `s_ss[timestamp][i]` is the revealed secret of operator `i`, if submitted on-chain.
-     */
-    mapping(uint256 timestamp => bytes32[]) public s_ss;
 
     // ** internal
 
@@ -278,4 +257,8 @@ contract CommitReveal2Storage {
 
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
+
+    function getCurStartTime() public view returns (uint256) {
+        return s_requestInfo[s_currentRound].startTime;
+    }
 }
