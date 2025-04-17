@@ -182,10 +182,6 @@ contract CommitReveal2Storage {
      */
     mapping(uint256 round => RequestInfo requestInfo) public s_requestInfo;
 
-    function getCurStartTime() public view returns (uint256) {
-        return s_requestInfo[s_currentRound].startTime;
-    }
-
     /**
      * @notice A packed bitmap mapping each round index to its “requested” status.
      * @dev
