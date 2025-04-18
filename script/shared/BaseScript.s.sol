@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
+import {Sort} from "../../test/shared/Sort.sol";
+
 import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
 import {Script, console2} from "forge-std/Script.sol";
 import {CommitReveal2Helper, CommitReveal2Storage} from "./../../test/shared/CommitReveal2Helper.sol";
@@ -68,6 +70,19 @@ contract BaseScript is Script, CommitReveal2Helper {
                 secret: s_secrets[i],
                 rs: CommitReveal2Storage.SigRS({r: s_rs[i], s: s_ss[i]})
             });
+        }
+
+        // *** Set Reveal Orders
+        uint256[] memory diffs = new uint256[](s_operators.length);
+        uint256[] memory revealOrders = new uint256[](s_operators.length);
+        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        for (uint256 i; i < s_operators.length; i++) {
+            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            revealOrders[i] = i;
+        }
+        Sort.sort(diffs, revealOrders);
+        for (uint256 i; i < s_operators.length; i++) {
+            s_packedRevealOrders = s_packedRevealOrders | (revealOrders[i] << (i * 8));
         }
     }
 }
