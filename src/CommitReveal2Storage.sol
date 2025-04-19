@@ -236,7 +236,11 @@ contract CommitReveal2Storage {
 
     // uint256 internal constant MERKLEROOTSUB_RANDOMNUMGENERATE_GASUSED = 100000;
     uint256 internal constant MERKLEROOTSUB_CALLDATA_BYTES_SIZE = 36;
-    // uint256 internal constant RANDOMNUMGENERATE_CALLDATA_BYTES_SIZE = 278;
+    uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_A = 96;
+    uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_B = 132;
+    uint256 internal constant GASUSED_MERKLEROOTSUB_GENRANDNUM_A = 3932;
+    uint256 internal constant GASUSED_MERKLEROOTSUB_GENRANDNUM_B = 131509;
+
     uint256 internal constant MAX_CALLBACK_GAS_LIMIT = 2500000;
     uint256 internal constant GAS_FOR_CALL_EXACT_CHECK = 5_000;
 

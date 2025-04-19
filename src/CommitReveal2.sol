@@ -97,7 +97,16 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
             }
-            mstore(0x20, add(add(132, mul(96, activatedOperatorsLength)), L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
+            mstore(
+                0x20,
+                add(
+                    add(
+                        mul(GENRANDNUM_CALLDATA_BYTES_SIZE_A, activatedOperatorsLength),
+                        GENRANDNUM_CALLDATA_BYTES_SIZE_B
+                    ),
+                    L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE
+                )
+            )
             if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x20, 0x20)) {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
@@ -106,7 +115,16 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 callvalue(),
                 add(
                     add(
-                        mul(gasprice(), add(callbackGasLimit, add(mul(3932, activatedOperatorsLength), 131509))),
+                        mul(
+                            gasprice(),
+                            add(
+                                callbackGasLimit,
+                                add(
+                                    mul(GASUSED_MERKLEROOTSUB_GENRANDNUM_A, activatedOperatorsLength),
+                                    GASUSED_MERKLEROOTSUB_GENRANDNUM_B
+                                )
+                            )
+                        ),
                         sload(s_flatFee.slot)
                     ), // l2GasFee
                     div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x40))), 100) // L1GasFee
@@ -174,8 +192,17 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
     {
         // submitRoot l2GasUsed = 47216
         // generateRandomNumber l2GasUsed = 21118.97⋅N + 87117.53
-        return (gasPrice * (callbackGasLimit + (211 * numOfOperators + 1344))) + s_flatFee
-            + _getL1CostWeiForcalldataSize2(MERKLEROOTSUB_CALLDATA_BYTES_SIZE, 292 + (128 * numOfOperators));
+        return (
+            gasPrice
+                * (
+                    callbackGasLimit
+                        + (GASUSED_MERKLEROOTSUB_GENRANDNUM_A * numOfOperators + GASUSED_MERKLEROOTSUB_GENRANDNUM_B)
+                )
+        ) + s_flatFee
+            + _getL1CostWeiForcalldataSize2(
+                MERKLEROOTSUB_CALLDATA_BYTES_SIZE,
+                (GENRANDNUM_CALLDATA_BYTES_SIZE_A * numOfOperators) + GENRANDNUM_CALLDATA_BYTES_SIZE_B
+            );
     }
 
     /**

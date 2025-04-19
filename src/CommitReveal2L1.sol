@@ -35,7 +35,13 @@ contract CommitReveal2L1 is CommitReveal2 {
         override
         returns (uint256)
     {
-        return (gasPrice * (callbackGasLimit + (211 * numOfOperators + 1344))) + s_flatFee;
+        return (
+            gasPrice
+                * (
+                    callbackGasLimit
+                        + (GASUSED_MERKLEROOTSUB_GENRANDNUM_A * numOfOperators + GASUSED_MERKLEROOTSUB_GENRANDNUM_B)
+                )
+        ) + s_flatFee;
     }
 
     function requestRandomNumber(uint32 callbackGasLimit) external payable override returns (uint256 newRound) {
@@ -63,7 +69,16 @@ contract CommitReveal2L1 is CommitReveal2 {
             if lt(
                 callvalue(),
                 add(
-                    mul(gasprice(), add(callbackGasLimit, add(mul(3932, activatedOperatorsLength), 131509))),
+                    mul(
+                        gasprice(),
+                        add(
+                            callbackGasLimit,
+                            add(
+                                mul(GASUSED_MERKLEROOTSUB_GENRANDNUM_A, activatedOperatorsLength),
+                                GASUSED_MERKLEROOTSUB_GENRANDNUM_B
+                            )
+                        )
+                    ),
                     sload(s_flatFee.slot)
                 )
             ) {
