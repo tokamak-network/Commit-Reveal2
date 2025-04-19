@@ -88,16 +88,16 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 revert(0x1c, 0x04)
             }
             // ** check if the fee amount is enough
-            // submitRoot l2GasUsed = 47216
-            // generateRandomNumber l2GasUsed = 21118.97⋅N + 87117.53
-            // let fmp := mload(0x40) // cache the free memory pointer
+            // l2GasUsed(SubmitMerkleRoot+GenerateRandomNumber):3931.70 × numOfOperators + 131,508.96
+            // l1GasFee: l1GasFee(submitMerkleRoot callDataSize) + l1GasFee(generateRandomNumber calDataSize)
+            // = l1GasFee(36) + l1GasFee(132 + (96 * numOfOperators))
             mstore(0x00, 0xf1c7a58b) // selector for "getL1FeeUpperBound(uint256 _unsignedTxSize) external view returns (uint256)"
             mstore(0x20, add(MERKLEROOTSUB_CALLDATA_BYTES_SIZE, L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
             if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x40, 0x20)) {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
             }
-            mstore(0x20, add(add(292, mul(128, activatedOperatorsLength)), L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
+            mstore(0x20, add(add(132, mul(96, activatedOperatorsLength)), L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
             if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x20, 0x20)) {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
@@ -106,7 +106,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 callvalue(),
                 add(
                     add(
-                        mul(gasprice(), add(callbackGasLimit, add(mul(21119, activatedOperatorsLength), 134334))),
+                        mul(gasprice(), add(callbackGasLimit, add(mul(3932, activatedOperatorsLength), 131509))),
                         sload(s_flatFee.slot)
                     ), // l2GasFee
                     div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x40))), 100) // L1GasFee

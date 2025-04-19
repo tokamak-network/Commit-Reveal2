@@ -59,13 +59,11 @@ contract CommitReveal2L1 is CommitReveal2 {
                 revert(0x1c, 0x04)
             }
             // ** check if the fee amount is enough
-            // submitRoot l2GasUsed = 47216
-            // generateRandomNumber l2GasUsed = 21118.97⋅N + 87117.53
-            // let fmp := mload(0x40) // cache the free memory pointer
+            // GasUsed(SubmitMerkleRoot+GenerateRandomNumber):3931.70 × numOfOperators + 131,508.96
             if lt(
                 callvalue(),
                 add(
-                    mul(gasprice(), add(callbackGasLimit, add(mul(211, activatedOperatorsLength), 1344))),
+                    mul(gasprice(), add(callbackGasLimit, add(mul(3932, activatedOperatorsLength), 131509))),
                     sload(s_flatFee.slot)
                 )
             ) {
@@ -76,7 +74,7 @@ contract CommitReveal2L1 is CommitReveal2 {
             newRound := sload(s_requestCount.slot)
             sstore(s_requestCount.slot, add(newRound, 1))
 
-            // ** flip the bit
+            // ** set the bit
             // calculate the storage slot corresponding to the round
             // wordPos = round >> 8
             mstore(0, shr(8, newRound))
@@ -84,9 +82,11 @@ contract CommitReveal2L1 is CommitReveal2 {
             // the slot of self[wordPos] is keccak256(abi.encode(wordPos, self.slot))
             let slot := keccak256(0, 0x40)
             // mask = 1 << bitPos = 1 << (round & 0xff)
-            // self[wordPos] ^= mask
-            sstore(slot, xor(sload(slot), shl(and(newRound, 0xff), 1)))
+            // self[wordPos] |= mask
+            sstore(slot, or(sload(slot), shl(and(newRound, 0xff), 1)))
             let startTime
+            // ** check if the current round is completed
+            // ** if the current round is completed, start a new round
             if eq(sload(s_isInProcess.slot), COMPLETED) {
                 sstore(s_currentRound.slot, newRound)
                 sstore(s_isInProcess.slot, IN_PROGRESS)
@@ -95,6 +95,7 @@ contract CommitReveal2L1 is CommitReveal2 {
                 mstore(0x20, IN_PROGRESS)
                 log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }
+            // *** store the request info
             mstore(0x00, newRound)
             mstore(0x20, s_requestInfo.slot)
             let requestInfoSlot := keccak256(0x00, 0x40)

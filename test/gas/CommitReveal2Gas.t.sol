@@ -151,7 +151,7 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
             console2.log(
                 "generateRandomNumber Calldata Size:",
                 abi.encodeWithSelector(
-                    s_commitReveal2.generateRandomNumber.selector, s_secrets, s_vs, s_rs, s_ss, revealOrders
+                    s_commitReveal2.generateRandomNumber.selector, s_secretSigRSs, s_packedVs, s_packedRevealOrders
                 ).length
             );
             console2.log("--------------------");
@@ -163,7 +163,11 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         console2.log("=======================");
     }
 
-    function test_optimisticCaseGas() public {
+    function test_disputeFunctionsForReturnGas() public {
+        setOperatorAdresses(32);
+    }
+
+    function test_optimisticCaseGasChart() public {
         setOperatorAdresses(10);
         for (s_numOfOperators = 2; s_numOfOperators < 10; s_numOfOperators++) {
             // ** Deploy CommitReveal2
