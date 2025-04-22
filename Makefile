@@ -52,6 +52,12 @@ endif
 ifeq ($(findstring --network scriptsepolia,$(ARGS)), --network scriptsepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) -vvv --skip-simulation --broadcast
 endif
+ifeq ($(findstring --network scriptopsepolia,$(ARGS)), --network scriptopsepolia)
+	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) -vvv --skip-simulation --broadcast --disable-block-gas-limit
+endif
+ifeq ($(findstring --network scriptthanossepolia,$(ARGS)), --network scriptthanossepolia)
+	NETWORK_ARGS := --rpc-url $(THANOS_SEPOLIA_URL) --private-key $(PRIVATE_KEY) -vvv --skip-simulation --broadcast --disable-block-gas-limit -g 300
+endif
 ifeq ($(findstring --network testsepolia,$(ARGS)), --network testsepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) -vvv
 endif
@@ -59,7 +65,7 @@ ifeq ($(findstring --network testmainnet,$(ARGS)), --network testmainnet)
 	NETWORK_ARGS := --rpc-url $(MAINNET_RPC_URL)  --private-key $(PRIVATE_KEY) -vvv
 endif
 ifeq ($(findstring --network opsepolia,$(ARGS)), --network opsepolia)
-	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(OP_ETHERSCAN_API_KEY) -vv
+	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(OP_ETHERSCAN_API_KEY) -vv --retries 20
 endif
 ifeq ($(findstring --network thanossepolia,$(ARGS)), --network thanossepolia)
 	NETWORK_ARGS := --rpc-url $(THANOS_SEPOLIA_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) -vv

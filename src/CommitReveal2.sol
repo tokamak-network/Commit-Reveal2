@@ -67,7 +67,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
         return _calculateRequestPrice(callbackGasLimit, gasPrice, numOfOperators);
     }
 
-    function requestRandomNumber(uint32 callbackGasLimit) external payable virtual returns (uint256 newRound) {
+    function requestRandomNumber(uint32 callbackGasLimit) external payable virtual returns (uint256) {
         assembly ("memory-safe") {
             // ** check if the callbackGasLimit is within the limit
             if gt(callbackGasLimit, MAX_CALLBACK_GAS_LIMIT) {
@@ -133,7 +133,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 mstore(0, 0x5945ea56) // selector for InsufficientAmount()
                 revert(0x1c, 0x04)
             }
-            newRound := sload(s_requestCount.slot)
+            let newRound := sload(s_requestCount.slot)
             sstore(s_requestCount.slot, add(newRound, 1))
 
             // ** set the bit
@@ -165,6 +165,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             sstore(add(requestInfoSlot, 1), startTime)
             sstore(add(requestInfoSlot, 2), callvalue())
             sstore(add(requestInfoSlot, 3), callbackGasLimit)
+            return(0x00, 0x20)
         }
     }
 
