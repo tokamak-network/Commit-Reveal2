@@ -11,9 +11,24 @@ import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 import {NetworkHelperConfig} from "./../NetworkHelperConfig.s.sol";
 
 contract BaseScript is Script, CommitReveal2Helper {
-    uint256[2] public s_privateKeys;
+    uint256[2] public s_privateKeysForRealNetwork;
     address[2] public s_operators;
     uint256 s_activationThreshold;
+
+    function anvilSetUp() public {
+        // *** Get the most recent deployment of CommitReveal2 ***
+        // ** //////////////////////////////////////////////// **
+        string memory contractName =
+            (block.chainid == 31337 || block.chainid == 11155111) ? "CommitReveal2L1" : "CommitReveal2";
+        s_commitReveal2 = CommitReveal2(DevOpsTools.get_most_recent_deployment(contractName, block.chainid));
+        console2.log("commitReveal2", address(s_commitReveal2));
+
+        // *** Get most recent deployment of ConsumerExample **
+        // ** //////////////////////////////////////////////// **
+        s_consumerExample =
+            ConsumerExample(payable(DevOpsTools.get_most_recent_deployment("ConsumerExample", block.chainid)));
+        console2.log("consumerExample", address(s_consumerExample));
+    }
 
     function scriptSetUp() public {
         s_numOfOperators = 2;
@@ -33,8 +48,8 @@ contract BaseScript is Script, CommitReveal2Helper {
         // *** Get accounts ***
         // ** //////////////////////////////////////////////// **
         string[2] memory keys = ["PRIVATE_KEY2", "PRIVATE_KEY3"];
-        s_privateKeys = [uint256(vm.envBytes32(keys[0])), uint256(vm.envBytes32(keys[1]))];
-        s_operators = [vm.addr(s_privateKeys[0]), vm.addr(s_privateKeys[1])];
+        s_privateKeysForRealNetwork = [uint256(vm.envBytes32(keys[0])), uint256(vm.envBytes32(keys[1]))];
+        s_operators = [vm.addr(s_privateKeysForRealNetwork[0]), vm.addr(s_privateKeysForRealNetwork[1])];
         s_activationThreshold = s_commitReveal2.s_activationThreshold();
         console2.log("activationThreshold %e", s_activationThreshold);
 
@@ -62,7 +77,8 @@ contract BaseScript is Script, CommitReveal2Helper {
 
         for (uint256 i; i < s_operators.length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
-            (s_vs[i], s_rs[i], s_ss[i]) = vm.sign(s_privateKeys[i], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
+            (s_vs[i], s_rs[i], s_ss[i]) =
+                vm.sign(s_privateKeysForRealNetwork[i], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
 
             uint256 v = uint256(s_vs[i]);
             s_packedVs = s_packedVs | (v << (i * 8));

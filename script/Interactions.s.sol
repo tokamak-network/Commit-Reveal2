@@ -9,6 +9,13 @@ contract OperatorsActivateAndDeposit is BaseScript {
     function run() public {
         BaseScript.scriptSetUp();
         for (uint256 i; i < s_numOfOperators; i++) {
+            if (block.chainid == 31337) {
+                vm.startBroadcast(0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897);
+                (bool success,) = s_operators[i].call{value: 1000 ether}("");
+                vm.stopBroadcast();
+                require(success, "Failed to send Ether");
+            } //vm.deal(s_operators[i], 10000 ether);
+
             console2.log("operator ", i);
             console2.log("balance %e", s_operators[i].balance);
             uint256 depositAmount = s_commitReveal2.s_depositAmount(s_operators[i]);
@@ -16,7 +23,7 @@ contract OperatorsActivateAndDeposit is BaseScript {
             require(s_operators[i].balance >= requiredDeposit, "Insufficient balance");
             if (depositAmount < s_activationThreshold) {
                 console2.log("depositing %e...", requiredDeposit);
-                vm.startBroadcast(s_privateKeys[i]);
+                vm.startBroadcast(s_privateKeysForRealNetwork[i]);
                 s_commitReveal2.depositAndActivate{value: requiredDeposit}();
                 vm.stopBroadcast();
                 console2.log("Deposit and activate successful");
@@ -34,10 +41,23 @@ contract Withdraw is BaseScript {
         s_commitReveal2.withdraw();
         vm.stopBroadcast();
         for (uint256 i; i < s_numOfOperators; i++) {
-            vm.startBroadcast(s_privateKeys[i]);
+            vm.startBroadcast(s_privateKeysForRealNetwork[i]);
             s_commitReveal2.withdraw();
             vm.stopBroadcast();
         }
+    }
+}
+
+contract RequestRandomNumber is BaseScript {
+    function run() public {
+        BaseScript.anvilSetUp();
+        uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_consumerExample.CALLBACK_GAS_LIMIT(), tx.gasprice);
+        console2.log("current gas fee:", tx.gasprice);
+        console2.log("requestFee %e", requestFee);
+
+        vm.startBroadcast();
+        s_consumerExample.requestRandomNumber{value: requestFee}();
+        vm.stopBroadcast();
     }
 }
 

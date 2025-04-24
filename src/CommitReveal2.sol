@@ -360,7 +360,6 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 mstore(0, 0xe0767fa4) // selector for InvalidSecretLength()
                 revert(0x1c, 0x04)
             }
-
             // ** initialize cos and cvs arrays memory, without length data
             let activatedOperatorsLengthInBytes := shl(5, activatedOperatorsLength)
             let cos := mload(0x40)
@@ -376,7 +375,6 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 mstore(cosMemP, keccak256(secretMemP, 0x20))
                 mstore(add(cvs, i), keccak256(cosMemP, 0x20))
             }
-
             // ** verify reveal order
             function _diff(a, b) -> c {
                 switch gt(a, b)
@@ -477,12 +475,14 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
 
             switch eq(nextRound, sload(s_requestCount.slot))
             case 1 {
+                // there is no next round
                 sstore(s_isInProcess.slot, COMPLETED)
                 mstore(0x00, startTime)
                 mstore(0x20, COMPLETED)
                 log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }
             default {
+                // there is a next round
                 mstore(0x00, nextRound) // round
                 mstore(0x20, s_requestInfo.slot)
                 sstore(add(keccak256(0x00, 0x40), 1), timestamp())
