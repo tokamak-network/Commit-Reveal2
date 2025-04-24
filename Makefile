@@ -45,6 +45,8 @@ anvil :; anvil -m 'test test test test test test test test test test test junk' 
 
 NETWORK_ARGS := --rpc-url 127.0.0.1:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast -vv
 
+NO_SIMULATION := --rpc-url 127.0.0.1:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast -vv --skip-simulation
+
 
 ifeq ($(findstring --network sepolia,$(ARGS)), --network sepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --retries 20 --etherscan-api-key $(ETHERSCAN_API_KEY) -vv
@@ -80,9 +82,12 @@ deploy-consumer-example:
 	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
 
 activateAndDeposit:
-	@forge script script/Interactions.s.sol:OperatorsActivateAndDeposit $(NETWORK_ARGS)
+	@forge script script/Interactions.s.sol:OperatorsActivateAndDeposit $(NO_SIMULATION)
 
 testOneRound: testrequestAndSubmitMerkleRoot testgenerateRand
+
+requestRandomNumber:
+	@forge script script/Interactions.s.sol:RequestRandomNumber $(NETWORK_ARGS)
 
 testrequestAndSubmitMerkleRoot:
 	@forge script script/Interactions.s.sol:SuccessfulPaths $(NETWORK_ARGS)
