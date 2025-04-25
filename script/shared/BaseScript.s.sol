@@ -21,13 +21,11 @@ contract BaseScript is Script, CommitReveal2Helper {
         string memory contractName =
             (block.chainid == 31337 || block.chainid == 11155111) ? "CommitReveal2L1" : "CommitReveal2";
         s_commitReveal2 = CommitReveal2(DevOpsTools.get_most_recent_deployment(contractName, block.chainid));
-        console2.log("commitReveal2", address(s_commitReveal2));
 
         // *** Get most recent deployment of ConsumerExample **
         // ** //////////////////////////////////////////////// **
         s_consumerExample =
             ConsumerExample(payable(DevOpsTools.get_most_recent_deployment("ConsumerExample", block.chainid)));
-        console2.log("consumerExample", address(s_consumerExample));
     }
 
     function scriptSetUp() public {

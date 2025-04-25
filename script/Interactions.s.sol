@@ -4,6 +4,7 @@ pragma solidity 0.8.28;
 import {BaseScript, console2} from "./shared/BaseScript.s.sol";
 import {Sort} from "./../test/shared/Sort.sol";
 import {CommitReveal2} from "./../src/CommitReveal2.sol";
+import {ConsumerExample} from "./../src/ConsumerExample.sol";
 
 contract OperatorsActivateAndDeposit is BaseScript {
     function run() public {
@@ -49,8 +50,23 @@ contract Withdraw is BaseScript {
 }
 
 contract RequestRandomNumber is BaseScript {
-    function run() public {
-        BaseScript.anvilSetUp();
+    function run(address commitReveal2, address consumer) public {
+        if (commitReveal2 == address(0)) {
+            BaseScript.anvilSetUp();
+            if (consumer != address(0)) {
+                s_consumerExample = ConsumerExample(payable(consumer));
+            }
+        } else {
+            if (consumer == address(0)) {
+                BaseScript.anvilSetUp();
+                s_commitReveal2 = CommitReveal2(commitReveal2);
+            } else {
+                s_commitReveal2 = CommitReveal2(commitReveal2);
+                s_consumerExample = ConsumerExample(payable(consumer));
+            }
+        }
+        console2.log("commitReveal2", address(s_commitReveal2));
+        console2.log("consumerExample", address(s_consumerExample));
         uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_consumerExample.CALLBACK_GAS_LIMIT(), tx.gasprice);
         console2.log("current gas fee:", tx.gasprice);
         console2.log("requestFee %e", requestFee);
