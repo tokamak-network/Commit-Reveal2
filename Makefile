@@ -86,12 +86,10 @@ activateAndDeposit:
 
 testOneRound: testrequestAndSubmitMerkleRoot testgenerateRand
 
-CR2 := 0x0000000000000000000000000000000000000000
 CE := 0x0000000000000000000000000000000000000000
 
-
 requestRandomNumber:
-	@forge script script/Interactions.s.sol:RequestRandomNumber $(NETWORK_ARGS) $(CR2) $(CE) --sig "run(address,address)"
+	@forge script script/Interactions.s.sol:RequestRandomNumber $(NETWORK_ARGS) $(CE) --sig "run(address)"
 
 requestRandomNumber:
 

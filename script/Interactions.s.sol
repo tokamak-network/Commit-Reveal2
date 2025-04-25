@@ -50,20 +50,12 @@ contract Withdraw is BaseScript {
 }
 
 contract RequestRandomNumber is BaseScript {
-    function run(address commitReveal2, address consumer) public {
-        if (commitReveal2 == address(0)) {
-            BaseScript.anvilSetUp();
-            if (consumer != address(0)) {
-                s_consumerExample = ConsumerExample(payable(consumer));
-            }
+    function run(address consumer) public {
+        if (consumer != address(0)) {
+            s_consumerExample = ConsumerExample(payable(consumer));
+            s_commitReveal2 = CommitReveal2(s_consumerExample.getCommitReveal2Address());
         } else {
-            if (consumer == address(0)) {
-                BaseScript.anvilSetUp();
-                s_commitReveal2 = CommitReveal2(commitReveal2);
-            } else {
-                s_commitReveal2 = CommitReveal2(commitReveal2);
-                s_consumerExample = ConsumerExample(payable(consumer));
-            }
+            BaseScript.anvilSetUp();
         }
         console2.log("commitReveal2", address(s_commitReveal2));
         console2.log("consumerExample", address(s_consumerExample));
