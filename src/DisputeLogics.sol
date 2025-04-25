@@ -407,7 +407,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 before := after
             }
             if iszero(eq(revealBitmap, sub(shl(activatedOperatorsLength, 1), 1))) {
-                mstore(0, 0xe3ae7cc0) // selector for WrongRevealOrder()
+                mstore(0, 0x06efcba4) // selector for RevealOrderHasDuplicates()
                 revert(0x1c, 0x04)
             }
             // skip updating zeroBitIfSubmittedCvBitmap because it is not used anymore

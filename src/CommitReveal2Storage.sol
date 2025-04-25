@@ -64,6 +64,7 @@ contract CommitReveal2Storage {
     error InvalidIndex(); // 0x63df8171
     error DuplicateIndices(); // 0x7a69f8d3
     error WrongRevealOrder(); // 0xe3ae7cc0
+    error RevealOrderHasDuplicates(); // 0x06efcba4
     error InvalidS();
     error AllCvsNotSubmitted(); // 0xad029eb9
     error InvalidSecretLength(); // 0xe0767fa4
