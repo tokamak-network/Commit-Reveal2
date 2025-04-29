@@ -34,6 +34,23 @@ contract OperatorsActivateAndDeposit is BaseScript {
     }
 }
 
+contract AnvilActivateAndDeposit is BaseScript {
+    function run() public {
+        BaseScript.scriptSetUp();
+        vm.startBroadcast(0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d);
+        s_commitReveal2.depositAndActivate{value: s_activationThreshold}();
+        vm.stopBroadcast();
+        vm.startBroadcast(0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a);
+        s_commitReveal2.depositAndActivate{value: s_activationThreshold}();
+        vm.stopBroadcast();
+        vm.startBroadcast(0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6);
+        s_commitReveal2.depositAndActivate{value: s_activationThreshold}();
+        vm.stopBroadcast();
+        console2.log("Deposit and activate successful");
+        console2.log("----");
+    }
+}
+
 contract Withdraw is BaseScript {
     function run() public {
         BaseScript.scriptSetUp();
@@ -109,5 +126,6 @@ contract SuccessfulPaths is BaseScript {
         vm.startBroadcast();
         s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
         vm.stopBroadcast();
+        console2.log("random number generated successfully");
     }
 }

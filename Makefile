@@ -75,14 +75,22 @@ endif
 
 deploy: deploy-commit-reveal2 deploy-consumer-example
 
+anvil-deploy: anvil-deploy-commit-reveal2 deploy-consumer-example
+
 deploy-commit-reveal2:
 	@forge script script/DeployCommitReveal2.s.sol:DeployCommitReveal2 $(NETWORK_ARGS)
+
+anvil-deploy-commit-reveal2:
+	@forge script script/DeployCommitReveal2.s.sol:AnvilDeployCommitReveal2 $(NETWORK_ARGS) --skip-simulation
 
 deploy-consumer-example:
 	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
 
 activateAndDeposit:
 	@forge script script/Interactions.s.sol:OperatorsActivateAndDeposit $(NO_SIMULATION)
+
+anvilActivateAndDeposit:
+	@forge script script/Interactions.s.sol:AnvilActivateAndDeposit $(NETWORK_ARGS)
 
 testOneRound: testrequestAndSubmitMerkleRoot testgenerateRand
 

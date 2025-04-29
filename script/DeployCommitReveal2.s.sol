@@ -45,3 +45,25 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
         vm.stopBroadcast();
     }
 }
+
+contract AnvilDeployCommitReveal2 is Script, CommitReveal2Helper {
+    function run() public returns (address commitReveal2, NetworkHelperConfig networkHelperConfig) {
+        networkHelperConfig = new NetworkHelperConfig();
+        NetworkHelperConfig.NetworkConfig memory activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
+        vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
+        commitReveal2 = address(
+            new CommitReveal2L1{value: activeNetworkConfig.activationThreshold}(
+                activeNetworkConfig.activationThreshold,
+                activeNetworkConfig.flatFee,
+                activeNetworkConfig.name,
+                activeNetworkConfig.version,
+                activeNetworkConfig.offChainSubmissionPeriod,
+                activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
+                activeNetworkConfig.onChainSubmissionPeriod,
+                activeNetworkConfig.offChainSubmissionPeriodPerOperator,
+                activeNetworkConfig.onChainSubmissionPeriodPerOperator
+            )
+        );
+        vm.stopBroadcast();
+    }
+}
