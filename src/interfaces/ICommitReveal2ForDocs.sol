@@ -100,10 +100,10 @@ interface CommitReveal2 {
      * @notice Requests on-chain submission of “C_oi” values (Reveal-1) from a subset of operators
      *         after the Merkle root has been submitted.
      * @dev onlyOwner(leaderNode) function. emit RequestedToSubmitCo(uint256 startTime, uint256 packedIndices);
-     * @param cvRSsForCvsNotOnChainAndReqToSubmitCo The [(C_vi, (r,s)_i), ...], i is the index of the operator who are required to submit their C_o onchain and their C_v is not on-chain. (The C_vi could have been submitted in SubmitCv function)
-     * @param packedVsForCvsNotOnChainAndReqToSubmitCo, The packed 'v'_i, i is the index of the operator who are required to submit their C_o onchain and their C_v is not on-chain. (The C_vi could have been submitted in SubmitCv function), e.g. [28, 27, 27] -> 0x00000000000000000000000000000000000000000000000000000000001b1b1c
+     * @param cvRSsForCvsNotOnChainAndReqToSubmitCo The [(C_vi, (r,s)_i), ...], i is the index of the operator who are required to submit their C_o onchain and their C_v is not on-chain. (The C_vi could have been submitted in SubmitCv function. There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.)
+     * @param packedVsForCvsNotOnChainAndReqToSubmitCo, The packed 'v'_i, i is the index of the operator who are required to submit their C_o onchain and their C_v is not on-chain. (The C_vi could have been submitted in SubmitCv function. There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.), e.g. [28, 27, 27] -> 0x00000000000000000000000000000000000000000000000000000000001b1b1c
      * @param indicesLength The length of the packedIndicesFirstCvNotOnChainRestCvOnChain. e.g. [3, 4, 5, 0, 1, 2] -> 6
-     * @param packedIndicesFirstCvNotOnChainRestCvOnChain The packed indices of the operator who are required to submit their C_o onchain. e.g. ([0, 1, 2, 3, 4, 5] needs to submit their C_oi. [3, 4, 5] operators' C_vi are not on chain and [0, 1, 2] operators' C_vi are on-chain possibly in SubmitCv function.) -> [3, 4, 5, 0, 1, 2] -> 0x0000000000000000000000000000000000000000000000000000020100050403
+     * @param packedIndicesFirstCvNotOnChainRestCvOnChain The packed indices of the operator who are required to submit their C_o onchain. e.g. ([0, 1, 2, 3, 4, 5] needs to submit their C_oi. [3, 4, 5] operators' C_vi are not on chain and [0, 1, 2] operators' C_vi are on-chain possibly in SubmitCv function. There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.) -> [3, 4, 5, 0, 1, 2] -> 0x0000000000000000000000000000000000000000000000000000020100050403
      */
     function requestToSubmitCo(
         CommitReveal2Storage.CvAndSigRS[] memory cvRSsForCvsNotOnChainAndReqToSubmitCo,
@@ -118,8 +118,8 @@ interface CommitReveal2 {
      * @dev onlyOwner(leaderNode) function, emit RequestedToSubmitSFromIndexK(uint256 startTime, uint256 indexK)
      * @param allCos All C_oi must be submitted even if some operators submitted their Co in SubmitCo function, because the calldata is cheaper than `sstore` and `sload`.
      * @param secretsReceivedOffchainInRevealOrder The secrets that are received off-chain in revealOrders. [secret_k, ...], when k is the revealOrder[i]
-     * @param packedVsForAllCvsNotOnChain The packed 'v's of the signatures for all operators' whose C_vi are not on-chain. The C_vi could have been submitted in SubmitCv, RequestToSubmitCo ... functions. e.g. [28, 27, 27] -> 0x00000000000000000000000000000000000000000000000000000000001b1b1c
-     * @param sigRSsForAllCvsNotOnChain The [(r,s)_i, ...] for all operators' whose C_vi are not on-chain. The C_vi could have been submitted in SubmitCv, RequestToSubmitCo ... functions.
+     * @param packedVsForAllCvsNotOnChain The packed 'v's of the signatures for all operators' whose C_vi are not on-chain. The C_vi could have been submitted in SubmitCv(There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.), RequestToSubmitCo ... functions. e.g. [28, 27, 27] -> 0x00000000000000000000000000000000000000000000000000000000001b1b1c
+     * @param sigRSsForAllCvsNotOnChain The [(r,s)_i, ...] for all operators' whose C_vi are not on-chain. The C_vi could have been submitted in SubmitCv(There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.), RequestToSubmitCo ... functions.
      * @param packedRevealOrders The specified index ordering for (R_v > C_vi ? Rv - C_vi : C_vi - Rv) in decending, when Rv = keccak256(C_o0, ..., C_on). eg. [2, 1, 3] -> 0x0000000000000000000000000000000000000000000000000000000000030102
      */
     function requestToSubmitS(
