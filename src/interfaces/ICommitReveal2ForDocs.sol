@@ -92,9 +92,9 @@ interface CommitReveal2 {
      * The function validates all indices are within bounds and sorted in ascending order (from right to left).
      * Upon request, the request timestamp is stored, re-requests are prevented, and internal tracking is initialized.
      *
-     * @param packedIndices A packed uint256 containing the indices of the operators required to submit `Cv` on-chain.
+     * @param packedIndicesAscendingFromLSB A packed uint256 containing the indices of the operators required to submit `Cv` on-chain.
      */
-    function requestToSubmitCv(uint256 packedIndices) external;
+    function requestToSubmitCv(uint256 packedIndicesAscendingFromLSB) external;
 
     /**
      * @notice Requests on-chain submission of “C_oi” values (Reveal-1) from a subset of operators

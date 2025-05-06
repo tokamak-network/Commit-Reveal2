@@ -9,7 +9,7 @@ import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
     constructor(string memory name, string memory version) EIP712(name, version) {}
 
-    function requestToSubmitCv(uint256 packedIndices) external onlyOwner {
+    function requestToSubmitCv(uint256 packedIndicesAscendingFromLSB) external onlyOwner {
         assembly ("memory-safe") {
             mstore(0x00, sload(s_currentRound.slot))
             mstore(0x20, s_requestInfo.slot)
@@ -26,12 +26,12 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             let maxIndex := sub(sload(s_activatedOperators.slot), 1) // max index
-            let previousIndex := and(packedIndices, 0xff)
+            let previousIndex := and(packedIndicesAscendingFromLSB, 0xff)
             if gt(previousIndex, maxIndex) {
                 mstore(0, 0x63df8171) // InvalidIndex()
                 revert(0x1c, 0x04)
             }
-            mstore(0x20, packedIndices)
+            mstore(0x20, packedIndicesAscendingFromLSB)
             let i := 1
             for {} true { i := add(i, 1) } {
                 let currentIndex := and(mload(sub(0x20, i)), 0xff)
@@ -43,7 +43,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             }
             sstore(requestedToSubmitCvTimestampSlot, timestamp())
             sstore(s_requestedToSubmitCvLength.slot, i)
-            sstore(s_requestedToSubmitCvPackedIndices.slot, packedIndices)
+            sstore(s_requestedToSubmitCvPackedIndices.slot, packedIndicesAscendingFromLSB)
             sstore(s_zeroBitIfSubmittedCvBitmap.slot, 0xffffffff) // set all bits to 1
             log1(0x00, 0x40, 0x18d0e75c02ebf9429b0b69ace609256eb9c9e12d5c9301a2d4a04fd7599b5cfc) // emit RequestedToSubmitCv(uint256 startTime, uint256 packedIndices)
         }
