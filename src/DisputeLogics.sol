@@ -9,16 +9,8 @@ import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
     constructor(string memory name, string memory version) EIP712(name, version) {}
 
-    function requestToSubmitCv(uint256 length, uint256 packedIndices) external onlyOwner {
+    function requestToSubmitCv(uint256 packedIndices) external onlyOwner {
         assembly ("memory-safe") {
-            if iszero(length) {
-                mstore(0, 0xbf557497) // ZeroLength()
-                revert(0x1c, 0x04)
-            }
-            if gt(length, MAX_ACTIVATED_OPERATORS) {
-                mstore(0, 0x12466af8) // LengthExceedsMax()
-                revert(0x1c, 0x04)
-            }
             mstore(0x00, sload(s_currentRound.slot))
             mstore(0x20, s_requestInfo.slot)
             mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
@@ -34,27 +26,25 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             let maxIndex := sub(sload(s_activatedOperators.slot), 1) // max index
-            let checkDuplicate
-            for { let i } lt(i, length) { i := add(i, 1) } {
-                let index := and(calldataload(sub(0x24, i)), 0xff)
-                if gt(index, maxIndex) {
-                    // if greater than max index
+            let previousIndex := and(packedIndices, 0xff)
+            if gt(previousIndex, maxIndex) {
+                mstore(0, 0x63df8171) // InvalidIndex()
+                revert(0x1c, 0x04)
+            }
+            mstore(0x20, packedIndices)
+            let i := 1
+            for {} true { i := add(i, 1) } {
+                let currentIndex := and(mload(sub(0x20, i)), 0xff)
+                if gt(currentIndex, maxIndex) {
                     mstore(0, 0x63df8171) // InvalidIndex()
                     revert(0x1c, 0x04)
                 }
-                let mask := shl(index, 1)
-                if gt(and(checkDuplicate, mask), 0) {
-                    // if already set
-                    mstore(0, 0x7a69f8d3) // DuplicateIndices()
-                    revert(0x1c, 0x04)
-                }
-                checkDuplicate := or(checkDuplicate, mask)
+                if iszero(gt(currentIndex, previousIndex)) { break }
             }
             sstore(requestedToSubmitCvTimestampSlot, timestamp())
-            sstore(s_requestedToSubmitCvLength.slot, length)
+            sstore(s_requestedToSubmitCvLength.slot, i)
             sstore(s_requestedToSubmitCvPackedIndices.slot, packedIndices)
             sstore(s_zeroBitIfSubmittedCvBitmap.slot, 0xffffffff) // set all bits to 1
-            mstore(0x20, packedIndices)
             log1(0x00, 0x40, 0x18d0e75c02ebf9429b0b69ace609256eb9c9e12d5c9301a2d4a04fd7599b5cfc) // emit RequestedToSubmitCv(uint256 startTime, uint256 packedIndices)
         }
     }

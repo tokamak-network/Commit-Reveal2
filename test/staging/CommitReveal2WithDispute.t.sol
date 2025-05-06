@@ -326,7 +326,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_packedIndices = s_packedIndices | (s_tempArray[i] << (i * 8));
         }
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitCv(s_indicesLength, s_packedIndices);
+        s_commitReveal2.requestToSubmitCv(s_packedIndices);
         mine(1);
 
         // ** 4. submitCv()
@@ -369,7 +369,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_packedIndices = s_packedIndices | (s_tempArray[i] << (i * 8));
         }
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitCv(s_indicesLength, s_packedIndices);
+        s_commitReveal2.requestToSubmitCv(s_packedIndices);
         mine(1);
 
         // ** 4. submitCv()
@@ -445,7 +445,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_packedIndices = s_packedIndices | (s_tempArray[i] << (i * 8));
         }
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitCv(s_indicesLength, s_packedIndices);
+        s_commitReveal2.requestToSubmitCv(s_packedIndices);
         mine(1);
 
         // ** 4. submitCv()
@@ -523,7 +523,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_packedIndices = s_packedIndices | (s_tempArray[i] << (i * 8));
         }
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitCv(s_indicesLength, s_packedIndices);
+        s_commitReveal2.requestToSubmitCv(s_packedIndices);
         mine(1);
 
         // ** 4. submitCv()
@@ -679,7 +679,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_packedIndices = s_packedIndices | (s_tempArray[i] << (i * 8));
         }
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitCv(s_indicesLength, s_packedIndices);
+        s_commitReveal2.requestToSubmitCv(s_packedIndices);
         mine(1);
 
         // ** 4. submitCv()
@@ -717,7 +717,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_packedIndices = s_packedIndices | (s_tempArray[i] << (i * 8));
         }
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitCv(s_indicesLength, s_packedIndices);
+        s_commitReveal2.requestToSubmitCv(s_packedIndices);
         mine(1);
 
         // ** No one submits their cv
@@ -743,7 +743,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_packedIndices = s_packedIndices | (s_tempArray[i] << (i * 8));
         }
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitCv(s_indicesLength, s_packedIndices);
+        s_commitReveal2.requestToSubmitCv(s_packedIndices);
         mine(1);
 
         // ** 4. submitCv()
@@ -896,7 +896,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_packedIndices = s_packedIndices | (s_tempArray[i] << (i * 8));
         }
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitCv(s_indicesLength, s_packedIndices);
+        s_commitReveal2.requestToSubmitCv(s_packedIndices);
         mine(1);
 
         // ** 4. submitCv()
@@ -1001,7 +1001,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_packedIndices = s_packedIndices | (s_tempArray[i] << (i * 8));
         }
         vm.startPrank(LEADERNODE);
-        s_commitReveal2.requestToSubmitCv(s_indicesLength, s_packedIndices);
+        s_commitReveal2.requestToSubmitCv(s_packedIndices);
         mine(1);
 
         // ** 4. submitCv()

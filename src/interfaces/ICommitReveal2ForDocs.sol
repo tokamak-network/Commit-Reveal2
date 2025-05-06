@@ -78,12 +78,23 @@ interface CommitReveal2 {
 
     // ** CommitReveal2 Dispute
     /**
-     * @notice Requests on-chain submissions of commitments (`Cv`) from a subset of operators.
-     * @dev onlyOwner(leaderNode) function, emit RequestedToSubmitCv(uint256 startTime, uint256 packedIndices)
-     * @param length The length of the indices. eg. [1, 2, 3] -> 3
-     * @param packedIndices The packed indices of the activated operators who are required to submit `C_vi`. eg. [1, 2, 3] -> 0x0000000000000000000000000000000000000000000000000000000000030201
+     * @notice Requests on-chain submissions of commitments (`Cv`) from a subset of activated operators.
+     * @dev Only callable by the leader node (owner). Emits RequestedToSubmitCv(uint256 startTime, uint256 packedIndices).
+     *
+     * `packedIndices` encodes operator indices from least-significant byte (rightmost) to most-significant (left).
+     * Each byte represents a 0-based index in the activated operator list and must be in strictly ascending order.
+     * For example:
+     * - [1, 4, 7] → 0x...0000070401
+     * - [0]       → 0x...00000000
+     *
+     * Submitting 0x...00 indicates a request for operator at index 0 to submit their `Cvi`.
+     *
+     * The function validates all indices are within bounds and sorted in ascending order (from right to left).
+     * Upon request, the request timestamp is stored, re-requests are prevented, and internal tracking is initialized.
+     *
+     * @param packedIndices A packed uint256 containing the indices of the operators required to submit `Cv` on-chain.
      */
-    function requestToSubmitCv(uint256 length, uint256 packedIndices) external;
+    function requestToSubmitCv(uint256 packedIndices) external;
 
     /**
      * @notice Requests on-chain submission of “C_oi” values (Reveal-1) from a subset of operators
