@@ -123,14 +123,14 @@ contract CommitReveal2Storage {
      * @notice The index of the round currently being processed, if `s_isInProcess` is IN_PROGRESS.
      * @dev
      *   - Increments when a new round starts.
-     *   - Used to track which request is “active” for on-chain commit/reveal phases.
+     *   - Used to track which request is "active" for on-chain commit/reveal phases.
      */
     uint256 public s_currentRound;
 
     /**
      * @notice The total number of requests ever made (incremented each time `requestRandomNumber()` is called).
      * @dev
-     *   - Each request is identified by a “round” index in [0..s_requestCount-1].
+     *   - Each request is identified by a "round" index in [0..s_requestCount-1].
      *   - Used to ensure newly created round indices are unique and sequential.
      */
     uint256 public s_requestCount;
@@ -184,7 +184,7 @@ contract CommitReveal2Storage {
     mapping(uint256 round => RequestInfo requestInfo) public s_requestInfo;
 
     /**
-     * @notice A packed bitmap mapping each round index to its “requested” status.
+     * @notice A packed bitmap mapping each round index to its "requested" status.
      * @dev
      *   - Each `uint248` key represents a 256-bit word in storage, where each bit indicates
      *     whether a round is requested (1) or not (0).
@@ -261,5 +261,13 @@ contract CommitReveal2Storage {
 
     function getCurStartTime() public view returns (uint256) {
         return s_requestInfo[s_currentRound].startTime;
+    }
+
+    function getZeroBitIfSubmittedCvOnChainBitmap() public view returns (uint256) {
+        uint256 requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[s_currentRound];
+        if (requestedToSubmitCvTimestamp == 0) {
+            return 0xffffffff;
+        }
+        return s_zeroBitIfSubmittedCvBitmap;
     }
 }

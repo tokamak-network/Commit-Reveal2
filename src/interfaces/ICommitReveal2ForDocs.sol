@@ -244,6 +244,21 @@ interface CommitReveal2 {
     function depositAndActivate() external payable;
     function withdraw() external;
 
+    /**
+     * @notice Returns the start time of the current round.
+     * @dev Reads from the `startTime` field in the request info mapping using the current round index.
+     * @return The UNIX timestamp representing the start time of the current round.
+     */
+    function getCurStartTime() external view returns (uint256);
+
+    /**
+     * @notice Returns the bitmap tracking which operators have submitted their `Cv` values on-chain.
+     * @dev If no `requestToSubmitXX()` has been made in the current round, returns 0xffffffff (all bits set).
+     *      Otherwise, returns the current value of `s_zeroBitIfSubmittedCvBitmap`, which tracks Cv submission status.
+     * @return A uint256 bitmap representing submission status of requested `Cv` values.
+     */
+    function getZeroBitIfSubmittedCvOnChainBitmap() external view returns (uint256);
+
     // ** Ownable contract
     function cancelOwnershipHandover() external payable;
     function completeOwnershipHandover(address pendingOwner) external payable;
