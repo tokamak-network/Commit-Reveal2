@@ -99,8 +99,6 @@ CE := 0x0000000000000000000000000000000000000000
 requestRandomNumber:
 	@forge script script/Interactions.s.sol:RequestRandomNumber $(NETWORK_ARGS) $(CE) --sig "run(address)"
 
-requestRandomNumber:
-
 testrequestAndSubmitMerkleRoot:
 	@forge script script/Interactions.s.sol:SuccessfulPaths $(NETWORK_ARGS)
 
