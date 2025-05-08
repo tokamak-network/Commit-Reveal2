@@ -74,7 +74,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             ) // set to zero
 
             mstore(0x20, cv)
-            log1(0x00, 0x40, 0x689880904ca6a1080ab52c3fd53043e57fddaa2af740366f4fd4275e91512438) // emit CvSubmitted(uint256 startTime, bytes32 cv, uint256 index)
+            mstore(0x40, activatedOperatorIndex)
+            log1(0x00, 0x60, 0x689880904ca6a1080ab52c3fd53043e57fddaa2af740366f4fd4275e91512438) // emit CvSubmitted(uint256 startTime, bytes32 cv, uint256 index)
         }
     }
 
@@ -272,7 +273,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 and(sload(s_zeroBitIfSubmittedCoBitmap.slot), not(shl(activatedOperatorIndex, 1)))
             ) // set to zero bit
             // ** event
-            log1(0x00, 0x40, 0x881e94fac6a4a0f5fbeeb59a652c0f4179a070b4e73db759ec4ef38e080eb4a8) // emit CoSubmitted(uint256 startTime, bytes32 co, uint256 index)
+            mstore(0x40, activatedOperatorIndex)
+            log1(0x00, 0x60, 0x881e94fac6a4a0f5fbeeb59a652c0f4179a070b4e73db759ec4ef38e080eb4a8) // emit CoSubmitted(uint256 startTime, bytes32 co, uint256 index)
         }
     }
 
