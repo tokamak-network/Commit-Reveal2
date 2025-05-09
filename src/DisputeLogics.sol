@@ -553,7 +553,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
         SigRS[] calldata sigRSsForAllCvsNotOnChain,
         uint256, // packedVsForAllCvsNotOnChain
         uint256 packedRevealOrders
-    ) external virtual {
+    ) external {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             // ** check if some cvs are on-chain
