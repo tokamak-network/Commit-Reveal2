@@ -21,7 +21,7 @@ contract FailLogics is DisputeLogics {
             // ** MerkleRoot Not Submitted
             mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
             if gt(sload(keccak256(0x00, 0x40)), 0) {
-                mstore(0, 0x7a69f8d3) // AlreadySubmittedMerkleRoot()
+                mstore(0, 0x1c044d8b) // AlreadySubmittedMerkleRoot()
                 revert(0x1c, 0x04)
             }
             // ** check time window
@@ -87,7 +87,7 @@ contract FailLogics is DisputeLogics {
             // ** MerkleRoot Not Submitted
             mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
             if gt(sload(keccak256(0x00, 0x40)), 0) {
-                mstore(0, 0x7a69f8d3) // AlreadySubmittedMerkleRoot()
+                mstore(0, 0x1c044d8b) // AlreadySubmittedMerkleRoot()
                 revert(0x1c, 0x04)
             }
 
@@ -136,7 +136,7 @@ contract FailLogics is DisputeLogics {
             // ** MerkleRoot Not Submitted
             mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
             if gt(sload(keccak256(0x00, 0x40)), 0) {
-                mstore(0, 0x7a69f8d3) // AlreadySubmittedMerkleRoot()
+                mstore(0, 0x1c044d8b) // AlreadySubmittedMerkleRoot()
                 revert(0x1c, 0x04)
             }
 
@@ -226,8 +226,9 @@ contract FailLogics is DisputeLogics {
             // ** restart or end this round
             switch gt(sload(s_activatedOperators.slot), 1)
             case 1 {
-                sstore(startTimeSlot, timestamp())
-                mstore(0x00, timestamp())
+                let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
+                sstore(startTimeSlot, nextTimestamp)
+                mstore(0x00, nextTimestamp)
                 mstore(0x20, IN_PROGRESS)
                 log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }
@@ -344,8 +345,9 @@ contract FailLogics is DisputeLogics {
             // ** restart or end this round
             switch gt(sload(s_activatedOperators.slot), 1)
             case 1 {
-                sstore(startTimeSlot, timestamp())
-                mstore(0x00, timestamp())
+                let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
+                sstore(startTimeSlot, nextTimestamp)
+                mstore(0x00, nextTimestamp)
                 mstore(0x20, IN_PROGRESS)
                 log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }
@@ -437,8 +439,9 @@ contract FailLogics is DisputeLogics {
             // ** restart or end this round
             switch gt(sload(s_activatedOperators.slot), 1)
             case 1 {
-                sstore(startTimeSlot, timestamp())
-                mstore(0x00, timestamp())
+                let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
+                sstore(startTimeSlot, nextTimestamp)
+                mstore(0x00, nextTimestamp)
                 mstore(0x20, IN_PROGRESS)
                 log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }

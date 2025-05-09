@@ -56,25 +56,24 @@ contract CommitReveal2Storage {
     error MerkleRootAlreadySubmitted(); // 0xa34402b2
     error AllSubmittedCv(); // 0x7d39a81b
     error TooEarly(); // 0x085de625
+    error OnChainCvNotEqualDoubleHashS(); // 0xa39ecadf
     error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
-    error InvalidCo();
+    error NoCvsOnChain(); // 0x96fbee7b
     error LengthExceedsMax(); // 0x12466af8
     error SignatureAndIndexDoNotMatch(); // 0x980c4296
     error InvalidIndex(); // 0x63df8171
     error DuplicateIndices(); // 0x7a69f8d3
     error WrongRevealOrder(); // 0xe3ae7cc0
     error RevealOrderHasDuplicates(); // 0x06efcba4
-    error InvalidS();
     error AllCvsNotSubmitted(); // 0xad029eb9
     error InvalidSecretLength(); // 0xe0767fa4
-    error ShouldNotBeZero();
     error NotConsumer(); // 0x8c7dc13d
-    error SRequested();
+    error SRequested(); // 0x53489cf9
     error InvalidRound(); // 0xa2b52a54
     error AlreadyRefunded(); // 0xa85e6f1a
-    error RandomNumGenerated();
-    error AlreadySubmittedMerkleRoot();
+    error RandomNumGenerated(); // 0xd51a29b7
+    error AlreadySubmittedMerkleRoot(); // 0x1c044d8b
     error AlreadyRequestedToSubmitS(); // 0x0d934196
     error AlreadyRequestedToSubmitCv(); // 0x899a05f2
     error AlreadyRequestedToSubmitCo(); // 0x13efcda2
@@ -83,7 +82,7 @@ contract CommitReveal2Storage {
     error NotHalted(); // 0x78b19eb2
     error MerkleRootIsSubmitted(); // 0x22b9d231
     error AllCosNotSubmitted(); // 0x15467973
-    error AllSubmittedCo();
+    error AllSubmittedCo(); // 0x1c7f7cc9
     error ZeroLength(); // 0xbf557497
     error LeaderLowDeposit(); // 0xc0013a5a
     error CoNotRequested(); // 0x11974969
