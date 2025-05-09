@@ -277,7 +277,7 @@ interface CommitReveal2 {
      * @dev If no `requestToSubmitXX()` has been made in the current round, returns 0xffffffff (all bits set).
      *      Otherwise, returns the current value of `s_zeroBitIfSubmittedCvBitmap`, which tracks Cv submission status.
      *      The least-significant bit (LSB) corresponds to operator index 0, the next bit to index 1, and so on.
-     *      A bit value of 0 means the operator has submitted their `Cv` value on-chain.    
+     *      A bit value of 0 means the operator has submitted their `Cv` value on-chain.
      * @return A uint256 bitmap representing submission status of requested `Cv` values.
      */
     function getZeroBitIfSubmittedCvOnChainBitmap() external view returns (uint256);
