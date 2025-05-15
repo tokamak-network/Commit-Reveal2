@@ -15,6 +15,8 @@ contract ConsumerExample is ConsumerBase {
         uint256 fulfillBlockNumber;
     }
 
+    error ETHTransferFailed(); // 0xb12d13eb
+
     mapping(address requester => uint256[] requestIds) public s_requesterRequestIds;
     mapping(uint256 requestId => RequestStatus) public s_requests; /* requestId --> requestStatus */
     mapping(uint256 requestId => RequestInfo) public s_blockNumbers;
@@ -56,6 +58,15 @@ contract ConsumerExample is ConsumerBase {
             RequestStatus memory request = s_requests[requestIds[i]];
             isFulFilled[i] = request.fulfilled;
             randomNumbers[i] = request.randomNumber;
+        }
+    }
+
+    function withdraw() external {
+        assembly ("memory-safe") {
+            if iszero(call(gas(), caller(), selfbalance(), 0x00, 0x00, 0x00, 0x00)) {
+                mstore(0x00, 0xb12d13eb) // `ETHTransferFailed()`.
+                revert(0x1c, 0x04)
+            }
         }
     }
 }
