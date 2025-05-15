@@ -12,8 +12,9 @@ import {ICommitReveal2} from "./ICommitReveal2.sol";
  */
 abstract contract ConsumerBase {
     error OnlyCoordinatorCanFulfill(address have, address want);
-
+    error InsufficientBalance();
     /// @dev The RNGCoordinator contract
+
     ICommitReveal2 internal immutable i_commitreveal2;
 
     /**
@@ -31,6 +32,7 @@ abstract contract ConsumerBase {
      */
     function _requestRandomNumber(uint32 callbackGasLimit) internal returns (uint256, uint256) {
         uint256 requestFee = i_commitreveal2.estimateRequestPrice(callbackGasLimit, tx.gasprice);
+        require(requestFee <= address(this).balance, InsufficientBalance());
         uint256 requestId = i_commitreveal2.requestRandomNumber{value: requestFee}(callbackGasLimit);
         return (requestId, requestFee);
     }
