@@ -29,10 +29,10 @@ abstract contract ConsumerBase {
      * @return requestId The ID of the request
      * @dev Request Randomness to the Coordinator
      */
-    function _requestRandomNumber(uint32 callbackGasLimit) internal returns (uint256) {
+    function _requestRandomNumber(uint32 callbackGasLimit) internal returns (uint256, uint256) {
         uint256 requestFee = i_commitreveal2.estimateRequestPrice(callbackGasLimit, tx.gasprice);
         uint256 requestId = i_commitreveal2.requestRandomNumber{value: requestFee}(callbackGasLimit);
-        return requestId;
+        return (requestId, requestFee);
     }
 
     function refund(uint256 round) external {

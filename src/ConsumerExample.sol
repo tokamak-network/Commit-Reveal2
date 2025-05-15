@@ -9,24 +9,34 @@ contract ConsumerExample is ConsumerBase {
         uint256 randomNumber;
     }
 
+    struct RequestInfo {
+        uint256 requestBlockNumber;
+        uint256 requestFee;
+        uint256 fulfillBlockNumber;
+    }
+
     mapping(address requester => uint256[] requestIds) public s_requesterRequestIds;
     mapping(uint256 requestId => RequestStatus) public s_requests; /* requestId --> requestStatus */
+    mapping(uint256 requestId => RequestInfo) public s_blockNumbers;
 
     // * for testing
     uint256 public lastRequestId;
 
     // past requests Id.
-    uint32 public constant CALLBACK_GAS_LIMIT = 80000;
+    uint32 public constant CALLBACK_GAS_LIMIT = 90000;
 
     constructor(address coordinator) ConsumerBase(coordinator) {}
 
     function requestRandomNumber() external payable {
-        uint256 requestId = _requestRandomNumber(CALLBACK_GAS_LIMIT);
+        (uint256 requestId, uint256 requestFee) = _requestRandomNumber(CALLBACK_GAS_LIMIT);
         s_requesterRequestIds[msg.sender].push(requestId);
+        s_blockNumbers[requestId].requestBlockNumber = block.number;
+        s_blockNumbers[requestId].requestFee = requestFee;
     }
 
     function fulfillRandomRandomNumber(uint256 requestId, uint256 randomNumber) internal override {
         s_requests[requestId] = RequestStatus(true, randomNumber);
+        s_blockNumbers[requestId].fulfillBlockNumber = block.number;
         lastRequestId = requestId;
     }
 

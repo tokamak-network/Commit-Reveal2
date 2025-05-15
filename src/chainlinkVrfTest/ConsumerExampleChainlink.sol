@@ -17,7 +17,7 @@ contract ConsumerExampleChainlink is VRFV2PlusWrapperConsumerBase {
     uint256 public lastRequestId;
 
     // past requests Id.
-    uint32 public constant CALLBACK_GAS_LIMIT = 80000;
+    uint32 public constant CALLBACK_GAS_LIMIT = 90000;
 
     constructor(address wrapper) VRFV2PlusWrapperConsumerBase(wrapper) {}
 
