@@ -87,7 +87,7 @@ deploy-consumer-example:
 	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
 
 activateAndDeposit:
-	@forge script script/Interactions.s.sol:OperatorsActivateAndDeposit $(NO_SIMULATION)
+	@forge script script/Interactions.s.sol:OperatorsActivateAndDeposit $(NETWORK_ARGS)
 
 anvilActivateAndDeposit:
 	@forge script script/Interactions.s.sol:AnvilActivateAndDeposit $(NETWORK_ARGS)
@@ -101,6 +101,11 @@ requestRandomNumber:
 
 testrequestAndSubmitMerkleRoot:
 	@forge script script/Interactions.s.sol:SuccessfulPaths $(NETWORK_ARGS)
+
+testSubmitAndGenerate: testsubmitMerkleRoot testgenerateRand
+
+testsubmitMerkleRoot:
+	@forge script script/Interactions.s.sol:SuccessfulPaths --sig "submitMerkleRoot()" $(NETWORK_ARGS)
 
 testgenerateRand:
 	@forge script script/Interactions.s.sol:SuccessfulPaths --sig "generateRandomNumber()" $(NETWORK_ARGS)
