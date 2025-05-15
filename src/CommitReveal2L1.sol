@@ -44,7 +44,7 @@ contract CommitReveal2L1 is CommitReveal2 {
         ) + s_flatFee;
     }
 
-    function requestRandomNumber(uint32 callbackGasLimit) external payable override returns (uint256 newRound) {
+    function requestRandomNumber(uint32 callbackGasLimit) external payable override returns (uint256) {
         assembly ("memory-safe") {
             // ** check if the callbackGasLimit is within the limit
             if gt(callbackGasLimit, MAX_CALLBACK_GAS_LIMIT) {
@@ -86,7 +86,7 @@ contract CommitReveal2L1 is CommitReveal2 {
                 revert(0x1c, 0x04)
             }
 
-            newRound := sload(s_requestCount.slot)
+            let newRound := sload(s_requestCount.slot)
             sstore(s_requestCount.slot, add(newRound, 1))
 
             // ** set the bit
@@ -105,7 +105,7 @@ contract CommitReveal2L1 is CommitReveal2 {
             if eq(sload(s_isInProcess.slot), COMPLETED) {
                 sstore(s_currentRound.slot, newRound)
                 sstore(s_isInProcess.slot, IN_PROGRESS)
-                startTime := timestamp()
+                startTime := add(timestamp(), 1) // Just in case of timestamp collision
                 mstore(0, startTime)
                 mstore(0x20, IN_PROGRESS)
                 log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
@@ -118,6 +118,7 @@ contract CommitReveal2L1 is CommitReveal2 {
             sstore(add(requestInfoSlot, 1), startTime)
             sstore(add(requestInfoSlot, 2), callvalue())
             sstore(add(requestInfoSlot, 3), callbackGasLimit)
+            return(0x00, 0x20)
         }
     }
 }
