@@ -72,6 +72,7 @@ contract CommitReveal2Storage {
     error SRequested(); // 0x53489cf9
     error InvalidRound(); // 0xa2b52a54
     error AlreadyRefunded(); // 0xa85e6f1a
+    error AlreadyCompleted(); // 0x195332a5
     error RandomNumGenerated(); // 0xd51a29b7
     error AlreadySubmittedMerkleRoot(); // 0x1c044d8b
     error AlreadyRequestedToSubmitS(); // 0x0d934196
@@ -258,11 +259,18 @@ contract CommitReveal2Storage {
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
 
-    function getCurStartTime() public view returns (uint256) {
+    function getMerkleRoot(uint256 startTime) external view returns (bytes32, bool) {
+        if (s_merkleRootSubmittedTimestamp[startTime] == 0) {
+            return (bytes32(0), false);
+        }
+        return (s_merkleRoot, true);
+    }
+
+    function getCurStartTime() external view returns (uint256) {
         return s_requestInfo[s_currentRound].startTime;
     }
 
-    function getZeroBitIfSubmittedCvOnChainBitmap() public view returns (uint256) {
+    function getZeroBitIfSubmittedCvOnChainBitmap() external view returns (uint256) {
         uint256 requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[s_currentRound];
         if (requestedToSubmitCvTimestamp == 0) {
             return 0xffffffff;

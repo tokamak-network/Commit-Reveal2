@@ -379,6 +379,10 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             switch eq(nextRound, sload(s_requestCount.slot))
             case 1 {
                 // there is no next round
+                if eq(sload(s_isInProcess.slot), COMPLETED) {
+                    mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
+                    revert(0x1c, 0x04)
+                }
                 sstore(s_isInProcess.slot, COMPLETED)
                 mstore(0x00, startTime)
                 mstore(0x20, COMPLETED)
