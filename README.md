@@ -1,6 +1,12 @@
-# $Commit-Reveal^{2}$
+## About
+This repository contains an implementation of the **Commit-Reveal²** protocol, as described in the paper:
 
-A secure and efficient implementation of the $Commit-Reveal^{2}$ protocol, offering both fully on-chain and hybrid off-chain leveraged solutions for randomness generation.
+Suhyeon Lee and Euisin Gee, **"Commit-Reveal²: Randomized Reveal Order Mitigates Last-Revealer Attacks in Commit-Reveal,"** *ICBC 2025 - IEEE International Conference on Blockchain and Cryptocurrency, June 2025*
+
+The Commit-Reveal² protocol ia a blockchain randomness generation mechanism using a two-layer commit-reveal process to reduce the last-revealer attack risk.
+
+## Warning
+The code in this repository has not been audited. Use it with caution. Thoroughly review and test the code before using it in a production environment.
 
 ## Directory Structure
 
