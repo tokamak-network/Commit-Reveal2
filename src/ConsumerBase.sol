@@ -4,24 +4,23 @@ pragma solidity ^0.8.28;
 import {ICommitReveal2} from "./ICommitReveal2.sol";
 
 /**
- * @notice Interface for contracts using VRF randomness
- * @dev USAGE
+ * @notice Abstract contract for contracts using VRF randomness
  *
- * @dev Consumer contracts must inherit from VRFConsumerBase, and can
- * @dev initialize Coordinator address in their constructor as
+ * @dev Consumer contracts must inherit from ConsumerBase, and can
+ * @dev initialize Coordinator address in their constructor
  */
 abstract contract ConsumerBase {
     error OnlyCoordinatorCanFulfill(address have, address want);
     error InsufficientBalance();
     /// @dev The RNGCoordinator contract
 
-    ICommitReveal2 internal immutable i_commitreveal2;
+    ICommitReveal2 internal s_commitreveal2;
 
     /**
      * @param rngCoordinator The address of the RNGCoordinator contract
      */
     constructor(address rngCoordinator) {
-        i_commitreveal2 = ICommitReveal2(rngCoordinator);
+        s_commitreveal2 = ICommitReveal2(rngCoordinator);
     }
 
     receive() external payable virtual {}
@@ -31,14 +30,14 @@ abstract contract ConsumerBase {
      * @dev Request Randomness to the Coordinator
      */
     function _requestRandomNumber(uint32 callbackGasLimit) internal returns (uint256, uint256) {
-        uint256 requestFee = i_commitreveal2.estimateRequestPrice(callbackGasLimit, tx.gasprice);
+        uint256 requestFee = s_commitreveal2.estimateRequestPrice(callbackGasLimit, tx.gasprice);
         require(requestFee <= address(this).balance, InsufficientBalance());
-        uint256 requestId = i_commitreveal2.requestRandomNumber{value: requestFee}(callbackGasLimit);
+        uint256 requestId = s_commitreveal2.requestRandomNumber{value: requestFee}(callbackGasLimit);
         return (requestId, requestFee);
     }
 
-    function refund(uint256 round) external {
-        i_commitreveal2.refund(round);
+    function _refund(uint256 round) internal {
+        s_commitreveal2.refund(round);
     }
 
     /**
@@ -54,7 +53,7 @@ abstract contract ConsumerBase {
      * @dev Callback function for the Coordinator to call after the request is fulfilled. This function is called by the Coordinator, 0x00fc98b8
      */
     function rawFulfillRandomNumber(uint256 round, uint256 randomNumber) external {
-        require(msg.sender == address(i_commitreveal2), OnlyCoordinatorCanFulfill(msg.sender, address(i_commitreveal2)));
+        require(msg.sender == address(s_commitreveal2), OnlyCoordinatorCanFulfill(msg.sender, address(s_commitreveal2)));
         fulfillRandomRandomNumber(round, randomNumber);
     }
 }
