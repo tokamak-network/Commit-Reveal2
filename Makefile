@@ -110,11 +110,10 @@ testgenerateRand:
 withdraw:
 	@forge script script/Interactions.s.sol:Withdraw $(NETWORK_ARGS)
 
-deploy-vrf:
-	@forge script script/ChainlinkConsumerTest.s.sol:DeployChainlinkConsumer $(NETWORK_ARGS)
+## * Dispute Logic Interactions
 
-request-vrf:
-	@forge script script/ChainlinkConsumerTest.s.sol:RequestRandomNumber $(NETWORK_ARGS)
+failToRequestSubmitCvOrSubmitMerkleRoot:
+	@forge script script/DisputeLogicInteractions.s.sol:FailToRequestSubmitCvOrSubmitMerkleRoot $(NETWORK_ARGS)
 
 # verify-commitreveal2:
 # 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Commit Reveal2" "1") \
@@ -123,6 +122,12 @@ request-vrf:
 # verify-consumer-example:
 # 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(address)" $(DRB)) \
 # 	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) ConsumerExample
+
+deploy-vrf:
+	@forge script script/ChainlinkConsumerTest.s.sol:DeployChainlinkConsumer $(NETWORK_ARGS)
+
+request-vrf:
+	@forge script script/ChainlinkConsumerTest.s.sol:RequestRandomNumber $(NETWORK_ARGS)
 
 test:
 	@forge test --gas-limit 9999999999999999999 --isolate -vv
