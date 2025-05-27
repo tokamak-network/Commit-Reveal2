@@ -279,7 +279,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
             s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](6);
         for (uint256 i; i < 6; i++) {
@@ -345,10 +345,29 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
-        // ** 12. generateRandomNumber()
+        // // ** 12. generateRandomNumber()
+        // mine(1);
+        // s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
+        // mine(1);
+
+        // ** 17. generateRandomNumberWhenSomeCvsAreOnChain()
+        s_tempArray = [0, 1, 4, 8, 9]; // the index of the operators whose cv is not on-chain
+        s_packedVsForAllCvsNotOnChain = 0;
+        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
+        for (uint256 i; i < s_tempArray.length; i++) {
+            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
+            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
+            uint256 v = s_vs[s_tempArray[i]];
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
+        }
+        vm.startPrank(LEADERNODE);
         mine(1);
-        s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
-        mine(1);
+        s_commitReveal2.generateRandomNumberWhenSomeCvsAreOnChain(
+            s_secrets, s_sigRSsForAllCvsNotOnChain, s_packedVsForAllCvsNotOnChain, s_packedRevealOrders
+        );
+        // gas
+        uint256 gasUsed = vm.lastCallGas().gasTotalUsed;
+        console2.log("gasUsed", gasUsed);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(4);
         console2.log(s_fulfilled, s_randomNumber);
         consoleDepositsAndSlashRewardAccumulated(
@@ -398,7 +417,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
             s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](0);
         mine(1);
@@ -503,9 +522,24 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         }
 
         // ** 12. generateRandomNumber()
+
         mine(1);
-        s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
+        // s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
+        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](10);
+        s_packedVsForAllCvsNotOnChain = 0;
+        for (uint256 i; i < 10; i++) {
+            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[i];
+            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[i];
+            uint256 v = s_vs[i];
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
+        }
+        s_commitReveal2.generateRandomNumberWhenSomeCvsAreOnChain(
+            s_secrets, s_sigRSsForAllCvsNotOnChain, s_packedVsForAllCvsNotOnChain, s_packedRevealOrders
+        );
         mine(1);
+
+        gasUsed = vm.lastCallGas().gasTotalUsed;
+        console2.log("gasUsed", gasUsed);
         (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(6);
         console2.log(s_fulfilled, s_randomNumber);
         consoleDepositsAndSlashRewardAccumulated(
@@ -593,7 +627,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
             s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](0);
         mine(1);
@@ -1227,7 +1261,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
             s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](2);
         for (uint256 i; i < 2; i++) {
@@ -1320,7 +1354,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
             s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
             uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (s_tempArray[i] * 8));
+            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
         }
         s_secretsReceivedOffchainInRevealOrder = new bytes32[](0);
         mine(1);

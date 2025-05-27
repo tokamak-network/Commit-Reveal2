@@ -18,8 +18,10 @@ contract OperatorsActivateAndDeposit is BaseScript {
             } //vm.deal(s_operators[i], 10000 ether);
 
             console2.log("operator ", i);
+            console2.log("operator address", s_operators[i]);
             console2.log("balance %e", s_operators[i].balance);
             uint256 depositAmount = s_commitReveal2.s_depositAmount(s_operators[i]);
+
             uint256 requiredDeposit = s_activationThreshold - depositAmount;
             require(s_operators[i].balance >= requiredDeposit, "Insufficient balance");
             if (depositAmount < s_activationThreshold) {
@@ -98,6 +100,20 @@ contract SuccessfulPaths is BaseScript {
         s_consumerExample.requestRandomNumber{value: requestFee}();
         vm.stopBroadcast();
 
+        // ** Off-chain: Cvi Submission
+        // ** //////////////////////////////////////////////// **
+        BaseScript.generateSCoCv();
+
+        // ** 2. submitMerkleRoot()
+        // ** //////////////////////////////////////////////// **
+        bytes32 merkleRoot = _createMerkleRoot(s_cvs);
+        vm.startBroadcast();
+        s_commitReveal2.submitMerkleRoot(merkleRoot);
+        vm.stopBroadcast();
+    }
+
+    function submitMerkleRoot() public {
+        BaseScript.scriptSetUp();
         // ** Off-chain: Cvi Submission
         // ** //////////////////////////////////////////////// **
         BaseScript.generateSCoCv();

@@ -78,6 +78,27 @@ interface CommitReveal2 {
 
     // ** CommitReveal2 Dispute
     /**
+     * @notice Finalizes the random number generation when some operators’ commitments (`Cv`) were submitted on-chain.
+     * @dev Combines both off-chain and on-chain data to compute the result.
+     *      Emits `Status` and `RandomNumberGenerated` events, similar to `generateRandomNumber()`.
+     * @param allSecrets Secrets submitted for all operators, in activated operator index order.
+     * @param sigRSsForAllCvsNotOnChain The [(r,s)_i, ...] signatures for all operators whose `C_vi` are not on-chain.
+     *        Their `C_vi` values may have been submitted through `submitCv`, `requestToSubmitCo`.
+     *        Use `getZeroBitIfSubmittedCvOnChainBitmap()` to check which `C_vi` values are on-chain.
+     * @param packedVsForAllCvsNotOnChain The packed 'v' values for the above signatures.
+     *        Example: [28, 27, 27] → 0x...00001b1b1c
+     * @param packedRevealOrders The specified reveal order indices, packed as bytes into a uint256.
+     *        Computed using (Rv > C_vi ? Rv - C_vi : C_vi - Rv) in descending order,
+     *        where Rv = keccak256(C_o0, ..., C_on). Example: [2, 1, 3] → 0x...0000030102
+     */
+    function generateRandomNumberWhenSomeCvsAreOnChain(
+        bytes32[] calldata allSecrets,
+        CommitReveal2Storage.SigRS[] calldata sigRSsForAllCvsNotOnChain,
+        uint256 packedVsForAllCvsNotOnChain,
+        uint256 packedRevealOrders
+    ) external;
+
+    /**
      * @notice Requests on-chain submissions of commitments (`Cv`) from a subset of activated operators.
      * @dev Only callable by the leader node (owner). Emits RequestedToSubmitCv(uint256 startTime, uint256 packedIndices).
      *
@@ -118,8 +139,8 @@ interface CommitReveal2 {
      * @dev onlyOwner(leaderNode) function, emit RequestedToSubmitSFromIndexK(uint256 startTime, uint256 indexK)
      * @param allCos All C_oi must be submitted even if some operators submitted their Co in SubmitCo function, because the calldata is cheaper than `sstore` and `sload`.
      * @param secretsReceivedOffchainInRevealOrder The secrets that are received off-chain in revealOrders. [secret_k, ...], when k is the revealOrder[i]
-     * @param packedVsForAllCvsNotOnChain The packed 'v's of the signatures for all operators' whose C_vi are not on-chain. The C_vi could have been submitted in SubmitCv(There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.), RequestToSubmitCo ... functions. e.g. [28, 27, 27] -> 0x00000000000000000000000000000000000000000000000000000000001b1b1c
-     * @param sigRSsForAllCvsNotOnChain The [(r,s)_i, ...] for all operators' whose C_vi are not on-chain. The C_vi could have been submitted in SubmitCv(There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.), RequestToSubmitCo ... functions.
+     * @param packedVsForAllCvsNotOnChain The packed 'v's of the signatures for all operators' whose C_vi are not on-chain. The C_vi could have been submitted in SubmitCv, RequestToSubmitCo ... functions.(There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.). e.g. [28, 27, 27] -> 0x00000000000000000000000000000000000000000000000000000000001b1b1c
+     * @param sigRSsForAllCvsNotOnChain The [(r,s)_i, ...] for all operators' whose C_vi are not on-chain. The C_vi could have been submitted in SubmitCv, RequestToSubmitCo ... functions.(There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.).
      * @param packedRevealOrders The specified index ordering for (R_v > C_vi ? Rv - C_vi : C_vi - Rv) in decending, when Rv = keccak256(C_o0, ..., C_on). eg. [2, 1, 3] -> 0x0000000000000000000000000000000000000000000000000000000000030102
      */
     function requestToSubmitS(
@@ -255,6 +276,8 @@ interface CommitReveal2 {
      * @notice Returns the bitmap tracking which operators have submitted their `Cv` values on-chain.
      * @dev If no `requestToSubmitXX()` has been made in the current round, returns 0xffffffff (all bits set).
      *      Otherwise, returns the current value of `s_zeroBitIfSubmittedCvBitmap`, which tracks Cv submission status.
+     *      The least-significant bit (LSB) corresponds to operator index 0, the next bit to index 1, and so on.
+     *      A bit value of 0 means the operator has submitted their `Cv` value on-chain.
      * @return A uint256 bitmap representing submission status of requested `Cv` values.
      */
     function getZeroBitIfSubmittedCvOnChainBitmap() external view returns (uint256);

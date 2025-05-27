@@ -86,8 +86,11 @@ anvil-deploy-commit-reveal2:
 deploy-consumer-example:
 	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
 
+deploy-consumer-v2:
+	@forge script script/DeployConsumerExampleV2.s.sol:DeployConsumerExampleV2 $(NETWORK_ARGS) $(CR2) --sig "run(address)"
+
 activateAndDeposit:
-	@forge script script/Interactions.s.sol:OperatorsActivateAndDeposit $(NO_SIMULATION)
+	@forge script script/Interactions.s.sol:OperatorsActivateAndDeposit $(NETWORK_ARGS)
 
 anvilActivateAndDeposit:
 	@forge script script/Interactions.s.sol:AnvilActivateAndDeposit $(NETWORK_ARGS)
@@ -99,10 +102,13 @@ CE := 0x0000000000000000000000000000000000000000
 requestRandomNumber:
 	@forge script script/Interactions.s.sol:RequestRandomNumber $(NETWORK_ARGS) $(CE) --sig "run(address)"
 
-requestRandomNumber:
-
 testrequestAndSubmitMerkleRoot:
 	@forge script script/Interactions.s.sol:SuccessfulPaths $(NETWORK_ARGS)
+
+testSubmitAndGenerate: testsubmitMerkleRoot testgenerateRand
+
+testsubmitMerkleRoot:
+	@forge script script/Interactions.s.sol:SuccessfulPaths --sig "submitMerkleRoot()" $(NETWORK_ARGS)
 
 testgenerateRand:
 	@forge script script/Interactions.s.sol:SuccessfulPaths --sig "generateRandomNumber()" $(NETWORK_ARGS)
