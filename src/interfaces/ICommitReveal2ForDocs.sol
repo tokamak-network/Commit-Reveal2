@@ -122,7 +122,7 @@ interface CommitReveal2 {
      *         after the Merkle root has been submitted.
      * @dev onlyOwner(leaderNode) function. emit RequestedToSubmitCo(uint256 startTime, uint256 packedIndices);
      *
-     * Why 4 parameters instead of just packedIndices:
+     * Why cvRSs and packedVs parameters are needed:
      * During the commit phase, some nodes broadcast C_vi off-chain with signatures, while others
      * submit C_vi on-chain via requestToSubmitCv function. For nodes that only broadcast off-chain,
      * there's no on-chain C_vi to verify C_vi == hash(C_oi) when they submit C_oi. Without this
