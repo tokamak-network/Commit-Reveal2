@@ -118,13 +118,34 @@ interface CommitReveal2 {
     function requestToSubmitCv(uint256 packedIndicesAscendingFromLSB) external;
 
     /**
-     * @notice Requests on-chain submission of “C_oi” values (Reveal-1) from a subset of operators
+     * @notice Requests on-chain submission of "C_oi" values (Reveal-1) from a subset of operators
      *         after the Merkle root has been submitted.
      * @dev onlyOwner(leaderNode) function. emit RequestedToSubmitCo(uint256 startTime, uint256 packedIndices);
-     * @param cvRSsForCvsNotOnChainAndReqToSubmitCo The [(C_vi, (r,s)_i), ...], i is the index of the operator who are required to submit their C_o onchain and their C_v is not on-chain. (The C_vi could have been submitted in SubmitCv function. There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.)
-     * @param packedVsForCvsNotOnChainAndReqToSubmitCo, The packed 'v'_i, i is the index of the operator who are required to submit their C_o onchain and their C_v is not on-chain. (The C_vi could have been submitted in SubmitCv function. There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.), e.g. [28, 27, 27] -> 0x00000000000000000000000000000000000000000000000000000000001b1b1c
-     * @param indicesLength The length of the packedIndicesFirstCvNotOnChainRestCvOnChain. e.g. [3, 4, 5, 0, 1, 2] -> 6
-     * @param packedIndicesFirstCvNotOnChainRestCvOnChain The packed indices of the operator who are required to submit their C_o onchain. e.g. ([0, 1, 2, 3, 4, 5] needs to submit their C_oi. [3, 4, 5] operators' C_vi are not on chain and [0, 1, 2] operators' C_vi are on-chain possibly in SubmitCv function. There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.) -> [3, 4, 5, 0, 1, 2] -> 0x0000000000000000000000000000000000000000000000000000020100050403
+     *
+     * Why 4 parameters instead of just packedIndices:
+     * During the commit phase, some nodes broadcast C_vi off-chain with signatures, while others
+     * submit C_vi on-chain via requestToSubmitCv function. For nodes that only broadcast off-chain,
+     * there's no on-chain C_vi to verify C_vi == hash(C_oi) when they submit C_oi. Without this
+     * verification, they could submit arbitrary values and break the protocol. Therefore, the leader
+     * node must submit the off-chain C_vi values with signatures to prove authenticity.
+     *
+     * @param cvRSsForCvsNotOnChainAndReqToSubmitCo The [(C_vi, (r,s)_i), ...], i is the index of
+     *        the operator who are required to submit their C_o onchain and their C_v is not on-chain.
+     *        (The C_vi could have been submitted in SubmitCv function. There is
+     *        getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.)
+     * @param packedVsForCvsNotOnChainAndReqToSubmitCo The packed 'v'_i, i is the index of the operator
+     *        who are required to submit their C_o onchain and their C_v is not on-chain. (The C_vi
+     *        could have been submitted in SubmitCv function. There is getZeroBitIfSubmittedCvOnChainBitmap()
+     *        function to check if the C_vi is on-chain.), e.g. [28, 27, 27] ->
+     *        0x00000000000000000000000000000000000000000000000000000000001b1b1c
+     * @param indicesLength The length of the packedIndicesFirstCvNotOnChainRestCvOnChain.
+     *        e.g. [3, 4, 5, 0, 1, 2] -> 6
+     * @param packedIndicesFirstCvNotOnChainRestCvOnChain The packed indices of the operator who are
+     *        required to submit their C_o onchain. e.g. ([0, 1, 2, 3, 4, 5] needs to submit their C_oi.
+     *        [3, 4, 5] operators' C_vi are not on chain and [0, 1, 2] operators' C_vi are on-chain
+     *        possibly in SubmitCv function. There is getZeroBitIfSubmittedCvOnChainBitmap() function
+     *        to check if the C_vi is on-chain.) -> [3, 4, 5, 0, 1, 2] ->
+     *        0x0000000000000000000000000000000000000000000000000000020100050403
      */
     function requestToSubmitCo(
         CommitReveal2Storage.CvAndSigRS[] memory cvRSsForCvsNotOnChainAndReqToSubmitCo,
