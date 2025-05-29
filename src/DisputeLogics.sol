@@ -232,8 +232,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
 
             // ** event
             mstore(0x00, startTime)
-            mstore(0x20, packedIndicesFirstCvNotOnChainRestCvOnChain)
-            log1(0x00, 0x40, 0xa3be0347f45bfc2dee4a4ba1d73c735d156d2c7f4c8134c13f48659942996846) // emit RequestedToSubmitCo(uint256 startTime, uint256 packedIndices);
+            mstore(0x20, indicesLength)
+            mstore(0x40, packedIndicesFirstCvNotOnChainRestCvOnChain)
+            log1(0x00, 0x60, 0x3a1aae8ec96f949b8b598464ca094f2ba50e8826b0bd3245fd24ec868a27ab57) // emit RequestedToSubmitCo(uint256 startTime, uint256 indicesLength, uint256 packedIndices);
         }
     }
 

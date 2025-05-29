@@ -102,7 +102,7 @@ contract CommitReveal2Storage {
 
     //event RequestedToSubmitCv(uint256 startTime, uint256[] indices);
     event RequestedToSubmitCv(uint256 startTime, uint256 packedIndices); // 0x18d0e75c02ebf9429b0b69ace609256eb9c9e12d5c9301a2d4a04fd7599b5cfc
-    event RequestedToSubmitCo(uint256 startTime, uint256 packedIndices); // 0xa3be0347f45bfc2dee4a4ba1d73c735d156d2c7f4c8134c13f48659942996846
+    event RequestedToSubmitCo(uint256 startTime, uint256 indicesLength, uint256 packedIndices); // 0x3a1aae8ec96f949b8b598464ca094f2ba50e8826b0bd3245fd24ec868a27ab57
     event CvSubmitted(uint256 startTime, bytes32 cv, uint256 index);
     event CoSubmitted(uint256 startTime, bytes32 co, uint256 index); // 0x881e94fac6a4a0f5fbeeb59a652c0f4179a070b4e73db759ec4ef38e080eb4a8
     event RequestedToSubmitSFromIndexK(uint256 startTime, uint256 indexK); // 0x6f5c0fbf1eb0f90db5f97e1e5b4c0bc94060698d6f59c07e07695ddea198b778
