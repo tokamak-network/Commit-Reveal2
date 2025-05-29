@@ -73,9 +73,9 @@ ifeq ($(findstring --network thanossepolia,$(ARGS)), --network thanossepolia)
 	NETWORK_ARGS := --rpc-url $(THANOS_SEPOLIA_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) -vv
 endif
 
-deploy: deploy-commit-reveal2 deploy-consumer-example
+deploy: deploy-commit-reveal2 deploy-consumer-example-v2
 
-anvil-deploy: anvil-deploy-commit-reveal2 deploy-consumer-example
+anvil-deploy: anvil-deploy-commit-reveal2 deploy-consumer-example-v2
 
 deploy-commit-reveal2:
 	@forge script script/DeployCommitReveal2.s.sol:DeployCommitReveal2 $(NETWORK_ARGS)
@@ -86,7 +86,10 @@ anvil-deploy-commit-reveal2:
 deploy-consumer-example:
 	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
 
-deploy-consumer-v2:
+deploy-consumer-example-v2:
+	@forge script script/DeployConsumerExampleV2.s.sol:DeployConsumerExampleV2 $(NETWORK_ARGS)
+
+deploy-consumer-v2-with-cr2:
 	@forge script script/DeployConsumerExampleV2.s.sol:DeployConsumerExampleV2 $(NETWORK_ARGS) $(CR2) --sig "run(address)"
 
 activateAndDeposit:
@@ -117,9 +120,14 @@ withdraw:
 	@forge script script/Interactions.s.sol:Withdraw $(NETWORK_ARGS)
 
 ## * Dispute Logic Interactions
+resume:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:Resume $(NETWORK_ARGS)
+
+requestToSubmitCv:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:RequestToSubmitCv $(NETWORK_ARGS)
 
 failToRequestSubmitCvOrSubmitMerkleRoot:
-	@forge script script/DisputeLogicInteractions.s.sol:FailToRequestSubmitCvOrSubmitMerkleRoot $(NETWORK_ARGS)
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:FailToRequestSubmitCvOrSubmitMerkleRoot $(NETWORK_ARGS)
 
 # verify-commitreveal2:
 # 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Commit Reveal2" "1") \
@@ -137,6 +145,9 @@ request-vrf:
 
 test:
 	@forge test --gas-limit 9999999999999999999 --isolate -vv
+
+test-all-logics:
+	@forge test --mp test/staging/CommitReveal2WithDispute.t.sol -vv --gas-limit 9999999999999999999
 
 fuzz_test:
 	@forge test --mp test/fuzz/CommitReveal2Fuzz.t.sol -vv --isolate

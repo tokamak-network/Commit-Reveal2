@@ -32,4 +32,8 @@ contract DeployConsumerExampleV2 is Script {
             consumer = deployUsingDevOpsTools();
         }
     }
+
+    function run() public returns (ConsumerExampleV2 consumer) {
+        consumer = deployUsingDevOpsTools();
+    }
 }
