@@ -129,6 +129,13 @@ interface CommitReveal2 {
      * verification, they could submit arbitrary values and break the protocol. Therefore, the leader
      * node must submit the off-chain C_vi values with signatures to prove authenticity.
      *
+     * IMPORTANT - Consistent Node Index Ordering:
+     * All parameter arrays must maintain the same node index ordering. The order in
+     * cvRSsForCvsNotOnChainAndReqToSubmitCo, packedVsForCvsNotOnChainAndReqToSubmitCo, and
+     * packedIndicesFirstCvNotOnChainRestCvOnChain must correspond to the same nodes in the same sequence.
+     * For example, if packedIndices contains [3,4,5,0,1,2], then the first three elements in cvRSs
+     * and packedVs must correspond to nodes 3,4,5 in that exact order.
+     *
      * @param cvRSsForCvsNotOnChainAndReqToSubmitCo The [(C_vi, (r,s)_i), ...], i is the index of
      *        the operator who are required to submit their C_o onchain and their C_v is not on-chain.
      *        (The C_vi could have been submitted in SubmitCv function. There is
