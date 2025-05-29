@@ -11,8 +11,8 @@ import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 import {NetworkHelperConfig} from "./../NetworkHelperConfig.s.sol";
 
 contract BaseScript is Script, CommitReveal2Helper {
-    uint256[2] public s_privateKeysForRealNetwork;
-    address[2] public s_operators;
+    uint256[3] public s_privateKeysForRealNetwork;
+    address[3] public s_operators;
     uint256 s_activationThreshold;
 
     function anvilSetUp() public {
@@ -29,7 +29,7 @@ contract BaseScript is Script, CommitReveal2Helper {
     }
 
     function scriptSetUp() public {
-        s_numOfOperators = 2;
+        s_numOfOperators = 3;
         // *** Get the most recent deployment of CommitReveal2 ***
         // ** //////////////////////////////////////////////// **
         string memory contractName =
@@ -45,9 +45,14 @@ contract BaseScript is Script, CommitReveal2Helper {
 
         // *** Get accounts ***
         // ** //////////////////////////////////////////////// **
-        string[2] memory keys = ["PRIVATE_KEY2", "PRIVATE_KEY3"];
-        s_privateKeysForRealNetwork = [uint256(vm.envBytes32(keys[0])), uint256(vm.envBytes32(keys[1]))];
-        s_operators = [vm.addr(s_privateKeysForRealNetwork[0]), vm.addr(s_privateKeysForRealNetwork[1])];
+        string[3] memory keys = ["PRIVATE_KEY2", "PRIVATE_KEY3", "PRIVATE_KEY4"];
+        s_privateKeysForRealNetwork =
+            [uint256(vm.envBytes32(keys[0])), uint256(vm.envBytes32(keys[1])), uint256(vm.envBytes32(keys[2]))];
+        s_operators = [
+            vm.addr(s_privateKeysForRealNetwork[0]),
+            vm.addr(s_privateKeysForRealNetwork[1]),
+            vm.addr(s_privateKeysForRealNetwork[2])
+        ];
         s_activationThreshold = s_commitReveal2.s_activationThreshold();
         console2.log("activationThreshold %e", s_activationThreshold);
 

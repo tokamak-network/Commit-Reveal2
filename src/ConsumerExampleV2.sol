@@ -4,6 +4,9 @@ pragma solidity ^0.8.28;
 import {ConsumerBase} from "./ConsumerBase.sol";
 
 contract ConsumerExampleV2 is ConsumerBase {
+    error NotTheRequester();
+    error ETHTransferFailed();
+
     struct MainInfo {
         uint256 requestId;
         address requester;
@@ -22,8 +25,20 @@ contract ConsumerExampleV2 is ConsumerBase {
     DetailInfo[100] public s_detailInfos;
     mapping(uint256 requestId => uint256 index) public s_requestIdToIndexPlusOne;
     uint256 public s_requestCount;
+    uint256 public constant TSLOT = 0;
 
     constructor(address coordinator) ConsumerBase(coordinator) {}
+
+    receive() external payable override {
+        if (msg.sender == address(s_commitreveal2)) {
+            assembly ("memory-safe") {
+                if iszero(call(gas(), tload(TSLOT), callvalue(), 0x00, 0x00, 0x00, 0x00)) {
+                    mstore(0x00, 0xb12d13eb) // `ETHTransferFailed()`.
+                    revert(0x1c, 0x04)
+                }
+            }
+        }
+    }
 
     function requestRandomNumber() external payable {
         (uint256 requestId, uint256 requestFee) = _requestRandomNumber(CALLBACK_GAS_LIMIT);
@@ -45,9 +60,14 @@ contract ConsumerExampleV2 is ConsumerBase {
     }
 
     function refund(uint256 requestId) external {
-        _refund(requestId);
         uint256 index = s_requestIdToIndexPlusOne[requestId] - 1;
-        s_mainInfos[index].isRefunded = true;
+        MainInfo storage mainInfo = s_mainInfos[index];
+        require(msg.sender == mainInfo.requester, NotTheRequester());
+        mainInfo.isRefunded = true;
+        assembly ("memory-safe") {
+            tstore(TSLOT, caller())
+        }
+        _refund(requestId);
     }
 
     function withdraw() external {
@@ -77,7 +97,8 @@ contract ConsumerExampleV2 is ConsumerBase {
             uint256 requestFee,
             uint256 requestBlockNumber,
             uint256 fulfillBlockNumber,
-            uint256 randomNumber
+            uint256 randomNumber,
+            bool isRefunded
         )
     {
         uint256 index = s_requestIdToIndexPlusOne[requestId] - 1;
@@ -88,7 +109,8 @@ contract ConsumerExampleV2 is ConsumerBase {
             detailInfo.requestFee,
             detailInfo.requestBlockNumber,
             mainInfo.fulfillBlockNumber,
-            mainInfo.randomNumber
+            mainInfo.randomNumber,
+            mainInfo.isRefunded
         );
     }
 }

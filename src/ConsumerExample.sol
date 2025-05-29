@@ -38,6 +38,10 @@ contract ConsumerExample is ConsumerBase {
         s_requestInfos[requestId].requester = msg.sender;
     }
 
+    function refund(uint256 requestId) external {
+        _refund(requestId);
+    }
+
     function fulfillRandomRandomNumber(uint256 requestId, uint256 randomNumber) internal override {
         s_requests[requestId] = RequestStatus(true, randomNumber);
         s_requestInfos[requestId].fulfillBlockNumber = block.number;
