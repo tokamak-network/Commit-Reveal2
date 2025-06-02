@@ -64,11 +64,19 @@ interface CommitReveal2 {
     function submitMerkleRoot(bytes32 merkleRoot) external;
 
     /**
-     * @notice Finalizes the random number generation by using all the operators’ secrets for the current round.
+     * @notice Finalizes the random number generation by using all the operators' secrets for the current round.
      * @dev emit Status(uint256 curStartTime, uint256 curState) for operators, emit RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess) for consumers
+     *
+     * When to use this function:
+     * - Use when the leader has collected all C_{v,i} signatures off-chain
+     * - This is the standard path when all operators cooperated during the commit phase
+     * - Alternative: generateRandomNumberWhenSomeCvsAreOnChain() can also be used in this scenario
+     *
      * @param secretSigRSs [(secret_0, (r,s)_0, ..., secret_n, (r,s)_n], when 0-n is the activated operator index.
      * @param packedVs, The packed 'v's of each signatures. eg. [v_1, ..., v_n] -> [28, 27, 27] -> 0x00000000000000000000000000000000000000000000000000000000001b1b1c, when 0-n is the activated operator index.
-     * @param packedRevealOrders The specified index ordering for (R_v > C_vi ? Rv - C_vi : C_vi - Rv) in decending, when Rv = keccak256(C_o0, ..., C_on). eg. [2, 1, 3] -> 0x0000000000000000000000000000000000000000000000000000000000030102
+     * @param packedRevealOrders The specified index ordering for (R_v > C_vi ? Rv - C_vi : C_vi - Rv) in descending, when Rv = keccak256(C_o0, ..., C_on). eg. [2, 1, 3] -> 0x0000000000000000000000000000000000000000000000000000000000030102
+     *        If requestToSubmitCo was NOT called: leader already has all Co values off-chain and can calculate directly
+     *        If requestToSubmitCo was called: must fetch on-chain Co values using events or bitmap query
      */
     function generateRandomNumber(
         CommitReveal2Storage.SecretAndSigRS[] memory secretSigRSs,
@@ -78,9 +86,15 @@ interface CommitReveal2 {
 
     // ** CommitReveal2 Dispute
     /**
-     * @notice Finalizes the random number generation when some operators’ commitments (`Cv`) were submitted on-chain.
+     * @notice Finalizes the random number generation when some operators' commitments (`Cv`) were submitted on-chain.
      * @dev Combines both off-chain and on-chain data to compute the result.
      *      Emits `Status` and `RandomNumberGenerated` events, similar to `generateRandomNumber()`.
+     *
+     * When to use this function:
+     * - MUST use when requestToSubmitCv was called (some operators didn't provide signatures off-chain)
+     * - CAN use even when all signatures were collected off-chain (handles both cases)
+     * - After requestToSubmitCo, choose this or generateRandomNumber() based on previous signature collection
+     *
      * @param allSecrets Secrets submitted for all operators, in activated operator index order.
      * @param sigRSsForAllCvsNotOnChain The [(r,s)_i, ...] signatures for all operators whose `C_vi` are not on-chain.
      *        Their `C_vi` values may have been submitted through `submitCv`, `requestToSubmitCo`.
@@ -90,6 +104,10 @@ interface CommitReveal2 {
      * @param packedRevealOrders The specified reveal order indices, packed as bytes into a uint256.
      *        Computed using (Rv > C_vi ? Rv - C_vi : C_vi - Rv) in descending order,
      *        where Rv = keccak256(C_o0, ..., C_on). Example: [2, 1, 3] → 0x...0000030102
+     *        If requestToSubmitCo was NOT called: leader already has all Co values off-chain and can calculate directly
+     *        If requestToSubmitCo was called: must fetch on-chain Co values via:
+     *        1) Listening to CoSubmitted events
+     *        2) Using getZeroBitIfSubmittedCoOnChainBitmap() and s_cos(index)
      */
     function generateRandomNumberWhenSomeCvsAreOnChain(
         bytes32[] calldata allSecrets,
@@ -135,6 +153,16 @@ interface CommitReveal2 {
      * packedIndicesFirstCvNotOnChainRestCvOnChain must correspond to the same nodes in the same sequence.
      * For example, if packedIndices contains [3,4,5,0,1,2], then the first three elements in cvRSs
      * and packedVs must correspond to nodes 3,4,5 in that exact order.
+     *
+     * Next Steps - Random Number Generation:
+     * After calling this function and waiting for operators to submit their Co values, the leader should:
+     * 1) If requestToSubmitCv was called previously (missing signatures):
+     *    - MUST use generateRandomNumberWhenSomeCvsAreOnChain()
+     * 2) If all C_{v,i} signatures were collected off-chain:
+     *    - Can use either generateRandomNumber() or generateRandomNumberWhenSomeCvsAreOnChain()
+     *
+     * The choice depends on signature collection status from earlier stages, not on this function call.
+     *
      *
      * @param cvRSsForCvsNotOnChainAndReqToSubmitCo The [(C_vi, (r,s)_i), ...], i is the index of
      *        the operator who are required to submit their C_o onchain and their C_v is not on-chain.
