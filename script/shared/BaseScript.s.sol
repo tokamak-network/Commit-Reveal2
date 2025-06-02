@@ -25,7 +25,7 @@ contract BaseScript is Script, CommitReveal2Helper {
         // *** Get most recent deployment of ConsumerExample **
         // ** //////////////////////////////////////////////// **
         s_consumerExample =
-            ConsumerExample(payable(DevOpsTools.get_most_recent_deployment("ConsumerExample", block.chainid)));
+            ConsumerExample(payable(DevOpsTools.get_most_recent_deployment("ConsumerExampleV2", block.chainid)));
     }
 
     function scriptSetUp() public {
@@ -40,8 +40,8 @@ contract BaseScript is Script, CommitReveal2Helper {
         // *** Get most recent deployment of ConsumerExample **
         // ** //////////////////////////////////////////////// **
         s_consumerExample =
-            ConsumerExample(payable(DevOpsTools.get_most_recent_deployment("ConsumerExample", block.chainid)));
-        console2.log("consumerExample", address(s_consumerExample));
+            ConsumerExample(payable(DevOpsTools.get_most_recent_deployment("ConsumerExampleV2", block.chainid)));
+        console2.log("ConsumerExampleV2", address(s_consumerExample));
 
         // *** Get accounts ***
         // ** //////////////////////////////////////////////// **
@@ -65,43 +65,11 @@ contract BaseScript is Script, CommitReveal2Helper {
     function generateSCoCv() public {
         // ** Off-chain: Cvi Submission
         // ** //////////////////////////////////////////////// **
-        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_commitReveal2.s_currentRound());
-
-        s_secrets = new bytes32[](s_operators.length);
-        s_cos = new bytes32[](s_operators.length);
-        s_cvs = new bytes32[](s_operators.length);
-        s_vs = new uint8[](s_operators.length);
-        s_rs = new bytes32[](s_operators.length);
-        s_ss = new bytes32[](s_operators.length);
-
-        s_secretSigRSs = new CommitReveal2.SecretAndSigRS[](s_operators.length);
-        s_packedVs = 0;
-        s_packedRevealOrders = 0;
-
+        s_startTimestamp = s_commitReveal2.getCurStartTime();
+        uint256[] memory privateKeys = new uint256[](s_operators.length);
         for (uint256 i; i < s_operators.length; i++) {
-            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv();
-            (s_vs[i], s_rs[i], s_ss[i]) =
-                vm.sign(s_privateKeysForRealNetwork[i], _getTypedDataHash(s_startTimestamp, s_cvs[i]));
-
-            uint256 v = uint256(s_vs[i]);
-            s_packedVs = s_packedVs | (v << (i * 8));
-            s_secretSigRSs[i] = CommitReveal2Storage.SecretAndSigRS({
-                secret: s_secrets[i],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[i], s: s_ss[i]})
-            });
+            privateKeys[i] = s_privateKeysForRealNetwork[i];
         }
-
-        // *** Set Reveal Orders
-        uint256[] memory diffs = new uint256[](s_operators.length);
-        uint256[] memory revealOrders = new uint256[](s_operators.length);
-        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
-        for (uint256 i; i < s_operators.length; i++) {
-            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
-            revealOrders[i] = i;
-        }
-        Sort.sort(diffs, revealOrders);
-        for (uint256 i; i < s_operators.length; i++) {
-            s_packedRevealOrders = s_packedRevealOrders | (revealOrders[i] << (i * 8));
-        }
+        _setSCoCv(s_operators.length, privateKeys);
     }
 }
