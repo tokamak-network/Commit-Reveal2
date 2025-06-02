@@ -36,6 +36,17 @@ contract OperatorsActivateAndDeposit is BaseScript {
     }
 }
 
+contract FundMyAccounts is BaseScript {
+    function run() public {
+        BaseScript.scriptSetUp();
+        for (uint256 i; i < s_numOfOperators; i++) {
+            vm.startBroadcast(0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897);
+            s_operators[i].call{value: 1000 ether}("");
+            vm.stopBroadcast();
+        }
+    }
+}
+
 contract AnvilActivateAndDeposit is BaseScript {
     function run() public {
         BaseScript.scriptSetUp();
@@ -121,6 +132,8 @@ contract SuccessfulPaths is BaseScript {
         // ** 2. submitMerkleRoot()
         // ** //////////////////////////////////////////////// **
         bytes32 merkleRoot = _createMerkleRoot(s_cvs);
+        console2.log("merkleRoot");
+        console2.logBytes32(merkleRoot);
         vm.startBroadcast();
         s_commitReveal2.submitMerkleRoot(merkleRoot);
         vm.stopBroadcast();
