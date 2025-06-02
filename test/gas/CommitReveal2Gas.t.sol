@@ -10,7 +10,6 @@ import {CommitReveal2Helper} from "./../shared/CommitReveal2Helper.sol";
 import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 import {DeployCommitReveal2} from "./../../script/DeployCommitReveal2.s.sol";
 import {DeployConsumerExample} from "./../../script/DeployConsumerExample.s.sol";
-import {CommitReveal2CallbackTest} from "./CallbackGasTest.t.sol";
 
 contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
     uint256 public s_numOfTests;
@@ -34,15 +33,6 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         vm.deal(s_anyAddress, 10000 ether);
     }
 
-    function _consoleAverageExceptIndex0(uint256[] memory arr, string memory msg1) internal pure {
-        uint256 sum;
-        uint256 len = arr.length;
-        for (uint256 i = 1; i < len; i++) {
-            sum += arr[i];
-        }
-        console2.log(msg1, sum / (len - 1));
-    }
-
     function _getAverageExceptIndex0(uint256[] memory arr) internal pure returns (uint256) {
         uint256 sum;
         uint256 len = arr.length;
@@ -52,11 +42,11 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         return sum / (len - 1);
     }
 
-    function test_activateDeactivate() public {
-        setOperatorAdresses(32);
-        s_networkHelperConfig = new NetworkHelperConfig();
-        s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
+    function _consoleAverageExceptIndex0(uint256[] memory arr, string memory msg1) internal pure {
+        console2.log(msg1, _getAverageExceptIndex0(arr));
+    }
 
+    function _deployContracts() internal {
         // ** Deploy CommitReveal2
         address commitRevealAddress;
         (commitRevealAddress, s_networkHelperConfig) = (new DeployCommitReveal2()).run();
@@ -64,6 +54,14 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
         // ** Deploy ConsumerExample
         s_consumerExample = (new DeployConsumerExample()).deployConsumerExampleUsingConfig(address(s_commitReveal2));
+    }
+
+    function test_activateDeactivate() public {
+        setOperatorAdresses(32);
+        s_networkHelperConfig = new NetworkHelperConfig();
+        s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
+
+        _deployContracts();
 
         // *** Deposit And Activate Operators
         s_numOfOperators = 32;
@@ -93,16 +91,32 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         }
     }
 
-    function test_forCalculateRequestFee() public {
-        console2.log("Commit-Reveal^2 Gas-----------------------");
-        // ** Set Test vars
+    error OnlyCoordinatorCanFulfill(address caller, address coordinator);
+
+    function rawFulfillRandomNumber(uint256 round, uint256 randomNumber) external {
+        require(msg.sender == address(s_commitReveal2), OnlyCoordinatorCanFulfill(msg.sender, address(s_commitReveal2)));
+        fulfillRandomRandomNumber(round, randomNumber);
+    }
+
+    function fulfillRandomRandomNumber(uint256 requestId, uint256 randomNumber) internal {}
+
+    function test_forCalculateRequestFeeWithoutCallback() public {
+        console2.log("Without Callback Gas-----------------------");
         setOperatorAdresses(32);
-        s_networkHelperConfig = new NetworkHelperConfig();
-        s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
+
+        vm.startPrank(address(s_commitReveal2));
+        ConsumerExample(payable(address(this))).rawFulfillRandomNumber(type(uint256).max, type(uint256).max);
+        vm.stopPrank();
+        uint256 callbackGas = vm.lastCallGas().gasTotalUsed;
+        console2.log("callbackGas", callbackGas);
+        callbackGas -= 21000; // base fee
+        console2.log("Setting callbackGasLimit to", callbackGas);
+        console2.log("--------------------");
+
         // ** Test
         for (s_numOfOperators = 2; s_numOfOperators <= 32; s_numOfOperators++) {
             // ** Deploy CommitReveal2 and ConsumerExample
-            _deployContractsforCalRequestFee(s_activeNetworkConfig);
+            _deployContracts();
 
             // *** Deposit And Activate Operators
             for (uint256 i; i < s_numOfOperators; i++) {
@@ -112,12 +126,12 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
                 s_depositAndActivateGas.push(vm.lastCallGas().gasTotalUsed);
             }
             // ** 1 -> 2 -> 12
-            s_requestFee = s_commitReveal2.estimateRequestPrice(s_consumerExample.CALLBACK_GAS_LIMIT(), tx.gasprice);
-
-            vm.startPrank(s_anyAddress);
             uint256[] memory revealOrders;
+            uint256 requestFee = s_commitReveal2.estimateRequestPrice(callbackGas, tx.gasprice);
             for (uint256 i; i < s_numOfTests; i++) {
-                s_consumerExample.requestRandomNumber{value: s_requestFee}();
+                vm.startPrank(address(this));
+                s_commitReveal2.requestRandomNumber{value: requestFee}(uint32(callbackGas));
+                vm.stopPrank();
                 s_requestRandomNumberGas.push(vm.lastCallGas().gasTotalUsed);
 
                 // ** Off-chain: Cv submission
@@ -133,9 +147,14 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
 
                 // ** 12. generateRandomNumber()
                 mine(1);
+                vm.recordLogs();
                 s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
                 s_generateRandomNumberGas.push(vm.lastCallGas().gasTotalUsed);
+                Vm.Log[] memory entries = vm.getRecordedLogs();
+                (,, bool callbackSuccess) = abi.decode(entries[1].data, (uint256, uint256, bool));
+                assertTrue(callbackSuccess);
                 mine(1);
+                vm.stopPrank();
             }
 
             console2.log("numOfOperators, requestRandomNumberGas, submitMerkleRootGas, generateRandomNumberGas");
@@ -161,10 +180,6 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
             abi.encodeWithSelector(s_commitReveal2.submitMerkleRoot.selector, bytes32(type(uint256).max)).length
         );
         console2.log("=======================");
-    }
-
-    function test_disputeFunctionsForReturnGas() public {
-        setOperatorAdresses(32);
     }
 
     function test_optimisticCaseGasChart() public {
@@ -219,24 +234,5 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
             console2.log("--------------------");
             vm.stopPrank();
         }
-    }
-
-    function _deployContractsforCalRequestFee(NetworkHelperConfig.NetworkConfig storage activeNetworkConfig) internal {
-        vm.startPrank(LEADERNODE);
-        s_commitReveal2 = CommitReveal2(
-            new CommitReveal2CallbackTest{value: activeNetworkConfig.activationThreshold}(
-                activeNetworkConfig.activationThreshold,
-                activeNetworkConfig.flatFee,
-                activeNetworkConfig.name,
-                activeNetworkConfig.version,
-                activeNetworkConfig.offChainSubmissionPeriod,
-                activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
-                activeNetworkConfig.onChainSubmissionPeriod,
-                activeNetworkConfig.offChainSubmissionPeriodPerOperator,
-                activeNetworkConfig.onChainSubmissionPeriodPerOperator
-            )
-        );
-        s_consumerExample = new ConsumerExample(payable(address(s_commitReveal2)));
-        vm.stopPrank();
     }
 }
