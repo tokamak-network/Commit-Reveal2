@@ -13,11 +13,11 @@ contract ConsumerExampleV2 is ConsumerBase {
         uint256 fulfillBlockNumber;
         uint256 randomNumber;
         bool isRefunded;
+        uint256 requestFee;
     }
 
     struct DetailInfo {
         uint256 requestBlockNumber;
-        uint256 requestFee;
     }
 
     uint32 public constant CALLBACK_GAS_LIMIT = 85000;
@@ -49,7 +49,7 @@ contract ConsumerExampleV2 is ConsumerBase {
         mainInfo.requester = msg.sender;
         DetailInfo storage detailInfo = s_detailInfos[index];
         detailInfo.requestBlockNumber = block.number;
-        detailInfo.requestFee = requestFee;
+        mainInfo.requestFee = requestFee;
     }
 
     function fulfillRandomRandomNumber(uint256 requestId, uint256 randomNumber) internal override {
@@ -106,7 +106,7 @@ contract ConsumerExampleV2 is ConsumerBase {
         DetailInfo storage detailInfo = s_detailInfos[index];
         return (
             mainInfo.requester,
-            detailInfo.requestFee,
+            mainInfo.requestFee,
             detailInfo.requestBlockNumber,
             mainInfo.fulfillBlockNumber,
             mainInfo.randomNumber,

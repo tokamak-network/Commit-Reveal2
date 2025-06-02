@@ -147,6 +147,7 @@ contract CommitReveal2Storage {
     uint256 public s_requestedToSubmitCvPackedIndices;
     uint256 public s_zeroBitIfSubmittedCvBitmap;
     bytes32[32] public s_cvs;
+    bytes32[32] public s_cos;
 
     mapping(uint256 startTime => uint256) public s_merkleRootSubmittedTimestamp;
     bytes32 public s_merkleRoot;
@@ -267,12 +268,12 @@ contract CommitReveal2Storage {
         return (s_merkleRoot, true);
     }
 
-    function getCurStartTime() external view returns (uint256) {
+    function getCurStartTime() public view returns (uint256) {
         return s_requestInfo[s_currentRound].startTime;
     }
 
     function getZeroBitIfSubmittedCvOnChainBitmap() external view returns (uint256) {
-        uint256 requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[s_currentRound];
+        uint256 requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[getCurStartTime()];
         if (requestedToSubmitCvTimestamp == 0) {
             return 0xffffffff;
         }
