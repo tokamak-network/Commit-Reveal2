@@ -4,6 +4,11 @@ pragma solidity 0.8.28;
 /// @title Packed round requested state library
 /// @notice Stores a packed mapping of round to its requested state
 /// @notice The mapping uses uint248 for keys since rounds are represented as uint256 and there are 256 (2^8) values per word.
+/**
+ * @notice This code is adapted from Uniswap's TickBitmap implementation
+ * @dev Original source: https://github.com/Uniswap/v4-core/blob/main/src/libraries/TickBitmap.sol
+ * Modified to fit our specific use case
+ */
 library Bitmap {
     function position(uint256 round) internal pure returns (uint248 wordPos, uint8 bitPos) {
         assembly ("memory-safe") {

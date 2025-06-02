@@ -3,7 +3,6 @@ pragma solidity ^0.8.28;
 
 import {OperatorManager} from "./OperatorManager.sol";
 import {CommitReveal2Storage} from "./CommitReveal2Storage.sol";
-import {ConsumerBase} from "./ConsumerBase.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {

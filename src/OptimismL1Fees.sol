@@ -4,6 +4,11 @@ pragma solidity ^0.8.28;
 import {IOVM_GasPriceOracle} from "./IOVM_GasPriceOracle.sol";
 import {Ownable} from "@solady/src/auth/Ownable.sol";
 
+/**
+ * @notice This code is adapted from Chainlink's OptimismL1Fees implementation
+ * @dev Original source: https://github.com/smartcontractkit/chainlink/blob/develop/contracts/src/v0.8/vrf/dev/OptimismL1Fees.sol
+ * Modified to fit our specific use case
+ */
 abstract contract OptimismL1Fees is Ownable {
     /// @dev This is the padding size for unsigned RLP-encoded transaction without the signature data
     /// @dev The padding size was estimated based on hypothetical max RLP-encoded transaction size

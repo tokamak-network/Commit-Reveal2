@@ -2,7 +2,6 @@
 pragma solidity ^0.8.28;
 
 import {FailLogics} from "./FailLogics.sol";
-import {ConsumerBase} from "./ConsumerBase.sol";
 import {OptimismL1Fees} from "./OptimismL1Fees.sol";
 import {Bitmap} from "./libraries/Bitmap.sol";
 
