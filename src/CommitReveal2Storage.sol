@@ -279,4 +279,12 @@ contract CommitReveal2Storage {
         }
         return s_zeroBitIfSubmittedCvBitmap;
     }
+
+    function getZeroBitIfSubmittedCoOnChainBitmap() external view returns (uint256) {
+        uint256 requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[getCurStartTime()];
+        if (requestedToSubmitCoTimestamp == 0) {
+            return 0xffffffff;
+        }
+        return s_zeroBitIfSubmittedCoBitmap;
+    }
 }
