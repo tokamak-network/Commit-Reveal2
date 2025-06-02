@@ -3,7 +3,6 @@ pragma solidity ^0.8.28;
 
 import {OperatorManager} from "./OperatorManager.sol";
 import {CommitReveal2Storage} from "./CommitReveal2Storage.sol";
-import {ConsumerBase} from "./ConsumerBase.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
@@ -274,6 +273,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 s_zeroBitIfSubmittedCoBitmap.slot,
                 and(sload(s_zeroBitIfSubmittedCoBitmap.slot), not(shl(activatedOperatorIndex, 1)))
             ) // set to zero bit
+            sstore(add(s_cos.slot, activatedOperatorIndex), co)
             // ** event
             mstore(0x40, activatedOperatorIndex)
             log1(0x00, 0x60, 0x881e94fac6a4a0f5fbeeb59a652c0f4179a070b4e73db759ec4ef38e080eb4a8) // emit CoSubmitted(uint256 startTime, bytes32 co, uint256 index)

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.28;
 
 import {FailLogics} from "./FailLogics.sol";
-import {ConsumerBase} from "./ConsumerBase.sol";
 import {OptimismL1Fees} from "./OptimismL1Fees.sol";
 import {Bitmap} from "./libraries/Bitmap.sol";
 
@@ -454,8 +453,13 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
         }
     }
 
-    function refund(uint256 round) external notInProcess {
+    function refund(uint256 round) external {
         assembly ("memory-safe") {
+            // ** check if the contract is halted
+            if iszero(eq(sload(s_isInProcess.slot), HALTED)) {
+                mstore(0, 0x78b19eb2) // selector for NotHalted()
+                revert(0x1c, 0x04)
+            }
             // ** check if the round is valid
             if iszero(lt(round, sload(s_requestCount.slot))) {
                 mstore(0, 0xa2b52a54) // selector for InvalidRound()

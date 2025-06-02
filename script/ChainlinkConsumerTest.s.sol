@@ -2,7 +2,7 @@
 pragma solidity 0.8.28;
 
 import {Script, console2} from "forge-std/Script.sol";
-import {ConsumerExampleChainlink} from "../src/chainlinkVrfTest/ConsumerExampleChainlink.sol";
+import {ConsumerExampleChainlink} from "../src/test/chainlinkVrfTest/ConsumerExampleChainlink.sol";
 import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
 
 contract DeployChainlinkConsumer is Script {

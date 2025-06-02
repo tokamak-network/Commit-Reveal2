@@ -1,17 +1,3 @@
-# Copyright 2024 justin
-# 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     https://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 -include .env
 
 .PHONY: all test clean deploy fund help install snapshot format anvil 
@@ -73,9 +59,9 @@ ifeq ($(findstring --network thanossepolia,$(ARGS)), --network thanossepolia)
 	NETWORK_ARGS := --rpc-url $(THANOS_SEPOLIA_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) -vv
 endif
 
-deploy: deploy-commit-reveal2 deploy-consumer-example
+deploy: deploy-commit-reveal2 deploy-consumer-example-v2
 
-anvil-deploy: anvil-deploy-commit-reveal2 deploy-consumer-example
+anvil-deploy: anvil-deploy-commit-reveal2 deploy-consumer-example-v2
 
 deploy-commit-reveal2:
 	@forge script script/DeployCommitReveal2.s.sol:DeployCommitReveal2 $(NETWORK_ARGS)
@@ -86,7 +72,10 @@ anvil-deploy-commit-reveal2:
 deploy-consumer-example:
 	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
 
-deploy-consumer-v2:
+deploy-consumer-example-v2:
+	@forge script script/DeployConsumerExampleV2.s.sol:DeployConsumerExampleV2 $(NETWORK_ARGS)
+
+deploy-consumer-v2-with-cr2:
 	@forge script script/DeployConsumerExampleV2.s.sol:DeployConsumerExampleV2 $(NETWORK_ARGS) $(CR2) --sig "run(address)"
 
 activateAndDeposit:
@@ -116,22 +105,35 @@ testgenerateRand:
 withdraw:
 	@forge script script/Interactions.s.sol:Withdraw $(NETWORK_ARGS)
 
+## * Dispute Logic Interactions
+
+fundMyAccounts:
+	@forge script script/Interactions.s.sol:FundMyAccounts $(NETWORK_ARGS)
+
+resume:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:Resume $(NETWORK_ARGS)
+
+requestToSubmitCv:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:RequestToSubmitCv $(NETWORK_ARGS)
+
+failToRequestSubmitCvOrSubmitMerkleRoot:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:FailToRequestSubmitCvOrSubmitMerkleRoot $(NETWORK_ARGS)
+
+
 deploy-vrf:
 	@forge script script/ChainlinkConsumerTest.s.sol:DeployChainlinkConsumer $(NETWORK_ARGS)
 
 request-vrf:
 	@forge script script/ChainlinkConsumerTest.s.sol:RequestRandomNumber $(NETWORK_ARGS)
 
-# verify-commitreveal2:
-# 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(uint256,uint256,uint256,string,string)" 1000000000000000 10000000000000 10 "Commit Reveal2" "1") \
-# 	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) CommitReveal2
-
-# verify-consumer-example:
-# 	@CONSTRUCTOR_ARGS=$$(cast abi-encode "constructor(address)" $(DRB)) \
-# 	forge verify-contract --constructor-args CONSTRUCTOR_ARGS --verifier blockscout --verifier-url $(THANOS_SEPOLIA_EXPLORER) --rpc-url $(THANOS_SEPOLIA_URL) $(ADDRESS) ConsumerExample
-
 test:
+	@forge test --gas-limit 9999999999999999999 --isolate
+
+test-vv:
 	@forge test --gas-limit 9999999999999999999 --isolate -vv
+
+test-flowchart:
+	@forge test --mp test/staging/CommitReveal2Flowchart.t.sol -vvv --gas-limit 9999999999999999999
 
 fuzz_test:
 	@forge test --mp test/fuzz/CommitReveal2Fuzz.t.sol -vv --isolate

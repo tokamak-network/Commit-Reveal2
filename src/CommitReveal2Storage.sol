@@ -59,6 +59,7 @@ contract CommitReveal2Storage {
     error OnChainCvNotEqualDoubleHashS(); // 0xa39ecadf
     error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
+    error AlreadyHalted(); // 0xd6c912e6
     error NoCvsOnChain(); // 0x96fbee7b
     error LengthExceedsMax(); // 0x12466af8
     error SignatureAndIndexDoNotMatch(); // 0x980c4296
@@ -146,6 +147,7 @@ contract CommitReveal2Storage {
     uint256 public s_requestedToSubmitCvPackedIndices;
     uint256 public s_zeroBitIfSubmittedCvBitmap;
     bytes32[32] public s_cvs;
+    bytes32[32] public s_cos;
 
     mapping(uint256 startTime => uint256) public s_merkleRootSubmittedTimestamp;
     bytes32 public s_merkleRoot;
@@ -266,15 +268,23 @@ contract CommitReveal2Storage {
         return (s_merkleRoot, true);
     }
 
-    function getCurStartTime() external view returns (uint256) {
+    function getCurStartTime() public view returns (uint256) {
         return s_requestInfo[s_currentRound].startTime;
     }
 
     function getZeroBitIfSubmittedCvOnChainBitmap() external view returns (uint256) {
-        uint256 requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[s_currentRound];
+        uint256 requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[getCurStartTime()];
         if (requestedToSubmitCvTimestamp == 0) {
             return 0xffffffff;
         }
         return s_zeroBitIfSubmittedCvBitmap;
+    }
+
+    function getZeroBitIfSubmittedCoOnChainBitmap() external view returns (uint256) {
+        uint256 requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[getCurStartTime()];
+        if (requestedToSubmitCoTimestamp == 0) {
+            return 0xffffffff;
+        }
+        return s_zeroBitIfSubmittedCoBitmap;
     }
 }

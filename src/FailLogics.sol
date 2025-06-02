@@ -8,6 +8,11 @@ contract FailLogics is DisputeLogics {
 
     function failToRequestSubmitCvOrSubmitMerkleRoot() external {
         assembly ("memory-safe") {
+            // ** check if the contract is halted
+            if eq(sload(s_isInProcess.slot), HALTED) {
+                mstore(0, 0xd6c912e6) // selector for AlreadyHalted()
+                revert(0x1c, 0x04)
+            }
             mstore(0x00, sload(s_currentRound.slot))
             mstore(0x20, s_requestInfo.slot)
             mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime

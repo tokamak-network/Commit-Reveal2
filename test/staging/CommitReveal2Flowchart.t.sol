@@ -9,17 +9,58 @@ import {CommitReveal2Helper, CommitReveal2Storage} from "./../shared/CommitRevea
 import {DeployCommitReveal2} from "./../../script/DeployCommitReveal2.s.sol";
 import {DeployConsumerExample} from "./../../script/DeployConsumerExample.s.sol";
 
+// https://excalidraw.com/#json=cx0cU1CsPe7yD29U_Bfq7,BnMMBTvI3eXxp50_ENxAtA
+// * 1. requestRandomNumber()
+// * 2. submitMerkleRoot()
+// * 3. requestToSubmitCv()
+// * 4. submitCv()
+// * 5. failToRequestSubmitCVAndSubmitMerkleRoot()
+// * 6. submitMerkleRoot()
+// * 7. failToSubmitCv()
+// * 8. failToSubmitMerkleRootAfterDispute()
+// * 9. requestToSubmitCo()
+// * 10. submitCo()
+// * 11. failToSubmitCo()
+// * 12. generateRandomNumber()
+// * 13. requestToSubmitS()
+// * 14. submitS()
+// * 15. failToRequestSAndGenerateRandomNumber()
+// * 16. failToSubmitAllS()
+/**
+ * All Successful Paths
+ * a. 1 -> 2 -> 12
+ * b. 1 -> 2 -> 13 -> 14
+ * c. 1 -> 2 -> 9 -> 10 -> 12
+ * d. 1 -> 2 -> 9 -> 10 -> 13 -> 14
+ * e. 1 -> 3 ->4 -> 6 -> 12
+ * f. 1 -> 3 ->4 -> 6 -> 13 -> 14
+ * g. 1 -> 3 ->4 -> 6 -> 9 -> 10 -> 12
+ * h. 1 -> 3 ->4 -> 6 -> 9 -> 10 -> 13 -> 14
+ *
+ *  All Failure Paths
+ * i. 1 -> 5
+ * j. 1 -> 3 -> 4 -> 7
+ * k. 1 -> 3 -> 7
+ * l. 1 -> 3 -> 4-> 8
+ * m. 1 -> 2 -> 9 -> 11
+ * n. 1 -> 2 -> 9 -> 10 -> 11
+ * o. 1 -> 3 -> 4 -> 6 -> 9 -> 11
+ * p. 1 -> 3 -> 4 -> 6 -> 9 -> 10 -> 11
+ * q. 1 -> 2 -> 15
+ * r. 1 -> 2 -> 9 -> 10 -> 15
+ * s. 1 -> 2 -> 9 -> 10 -> 13 -> 14 -> 16
+ * t. 1 -> 2 -> 9 -> 10 -> 13  -> 16
+ */
 contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
     function setUp() public override {
         BaseTest.setUp();
         if (block.chainid == 31337) vm.txGasPrice(10 gwei);
-
         vm.stopPrank();
+
         address commitReveal2Address;
         (commitReveal2Address, s_networkHelperConfig) = (new DeployCommitReveal2()).run();
         s_commitReveal2 = CommitReveal2(commitReveal2Address);
         s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
-
         s_consumerExample = (new DeployConsumerExample()).deployConsumerExampleUsingConfig(address(s_commitReveal2));
 
         // *** Deposit And Activate
@@ -35,58 +76,11 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.deal(s_anyAddress, 10000 ether);
     }
 
-    // * 1. requestRandomNumber()
-    // * 2. submitMerkleRoot()
-    // * 3. requestToSubmitCv()
-    // * 4. submitCv()
-    // * 5. failToRequestSubmitCVAndSubmitMerkleRoot()
-    // * 6. submitMerkleRoot()
-    // * 7. failToSubmitCv()
-    // * 8. failToSubmitMerkleRootAfterDispute()
-    // * 9. requestToSubmitCo()
-    // * 10. submitCo()
-    // * 11. failToSubmitCo()
-    // * 12. generateRandomNumber()
-    // * 13. requestToSubmitS()
-    // * 14. submitS()
-    // * 15. failToRequestSAndGenerateRandomNumber()
-    // * 16. failToSubmitAllS()
-
-    /**
-     * All Successful Paths
-     * a. 1 -> 2 -> 12
-     * b. 1 -> 2 -> 13 -> 14
-     * c. 1 -> 2 -> 9 -> 10 -> 12
-     * d. 1 -> 2 -> 9 -> 10 -> 13 -> 14
-     * e. 1 -> 3 ->4 -> 6 -> 12
-     * f. 1 -> 3 ->4 -> 6 -> 13 -> 14
-     * g. 1 -> 3 ->4 -> 6 -> 9 -> 10 -> 12
-     * h. 1 -> 3 ->4 -> 6 -> 9 -> 10 -> 13 -> 14
-     *
-     *  All Failure Paths
-     * i. 1 -> 5
-     * j. 1 -> 3 -> 4 -> 7
-     * k. 1 -> 3 -> 7
-     * l. 1 -> 3 -> 4-> 8
-     * m. 1 -> 2 -> 9 -> 11
-     * n. 1 -> 2 -> 9 -> 10 -> 11
-     * o. 1 -> 3 -> 4 -> 6 -> 9 -> 11
-     * p. 1 -> 3 -> 4 -> 6 -> 9 -> 10 -> 11
-     * q. 1 -> 2 -> 15
-     * r. 1 -> 2 -> 9 -> 10 -> 15
-     * s. 1 -> 2 -> 9 -> 10 -> 13 -> 14 -> 16
-     * t. 1 -> 2 -> 9 -> 10 -> 13  -> 16
-     */
     function test_allPaths() public {
-        // ** a,b,c,d,e,f
-        // * a. 1 -> 2 -> 12
+        // * path a. 1 -> 2 -> 12
         // ** 1. Request Three Times
-        mine(1);
         s_requestFee = s_commitReveal2.estimateRequestPrice(s_consumerExample.CALLBACK_GAS_LIMIT(), tx.gasprice);
         console2.log("requestFee", s_requestFee);
-        mine(1);
-        vm.recordLogs();
-        mine(1);
         for (uint256 i; i < 3; i++) {
             s_consumerExample.requestRandomNumber{value: s_requestFee}();
         }
@@ -97,16 +91,16 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 2. submitMerkleRoot()
         vm.startPrank(LEADERNODE);
-        mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
         // ** 12. generateRandomNumber()
-        mine(1);
         s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
         mine(1);
-        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(0);
-        console2.log(s_fulfilled, s_randomNumber);
+        s_lastRequestId = s_consumerExample.lastRequestId();
+        (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
+        assertEq(s_fulfilled, true);
+        console2.log("\nRound", s_lastRequestId, "fulfilled");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -116,42 +110,36 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         uint256[] memory revealOrders = _setSCoCvRevealOrders(s_privateKeys);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
         // ** 13. requestToSubmitS()
         // *** Let's assume the k of 0, 1, 2, 3 submitted their s_secrets off-chain
-
         // *** The signatures are required except the operator who submitted the Cvi on-chain.
         // *** The signatures should be organized in the order of activatedOperator Index
         // **** In b case, no one submitted the Cvi on-chain, all the signatures are required.
-        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](10);
-        for (uint256 i; i < s_operatorAddresses.length; i++) {
-            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[i];
-            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[i];
-        }
         /// *** We need to send the s_secrets of the k 0, 1, 2, 3 operators
-        s_secretsReceivedOffchainInRevealOrder = new bytes32[](4);
-        for (uint256 i; i < 4; i++) {
-            s_secretsReceivedOffchainInRevealOrder[i] = s_secrets[revealOrders[i]];
-        }
+        _setParametersForRequestToSubmitS(4, revealOrders);
         /// *** Finally request to submit the s_secrets
-        mine(1);
         s_commitReveal2.requestToSubmitS(
-            s_cos, s_secretsReceivedOffchainInRevealOrder, s_packedVs, s_sigRSsForAllCvsNotOnChain, s_packedRevealOrders
+            s_cos,
+            s_secretsReceivedOffchainInRevealOrder,
+            s_packedVsForAllCvsNotOnChain,
+            s_sigRSsForAllCvsNotOnChain,
+            s_packedRevealOrders
         );
         mine(1);
 
         // ** 14. submitS(), k 4-9 submit their s_secrets
         for (uint256 i = 4; i < s_operatorAddresses.length; i++) {
             vm.startPrank(s_operatorAddresses[revealOrders[i]]);
-            mine(1);
             s_commitReveal2.submitS(s_secrets[revealOrders[i]]);
             mine(1);
             vm.stopPrank();
         }
-        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(1);
-        console2.log(s_fulfilled, s_randomNumber);
+        s_lastRequestId = s_consumerExample.lastRequestId();
+        (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
+        assertEq(s_fulfilled, true);
+        console2.log("\nRound", s_lastRequestId, "fulfilled");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -162,7 +150,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.startPrank(LEADERNODE);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
@@ -171,19 +158,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
         // *** In c case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
         s_tempArray = [2, 5, 9];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](3);
-        s_tempVs = new uint256[](3);
-        s_indicesLength = s_tempArray.length;
-        for (uint256 i; i < 3; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
-        }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain = _packArrayIntoUint256(s_tempArray);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -197,19 +172,19 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
         for (uint256 i; i < 3; i++) {
             vm.startPrank(s_operatorAddresses[s_tempArray[i]]);
-            mine(1);
             s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
             mine(1);
             vm.stopPrank();
         }
 
         // ** 12. generateRandomNumber()
-        mine(1);
         // any operator can generate the random number
         s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
         mine(1);
-        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(s_commitReveal2.s_currentRound());
-        console2.log(s_fulfilled, s_randomNumber);
+        s_lastRequestId = s_consumerExample.lastRequestId();
+        (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
+        assertEq(s_fulfilled, true);
+        console2.log("\nRound", s_lastRequestId, "fulfilled");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -224,7 +199,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.startPrank(LEADERNODE);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
@@ -233,19 +207,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
         // *** In d case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
         s_tempArray = [7, 8, 3];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_tempArray.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
-        }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain = _packArrayIntoUint256(s_tempArray);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -259,7 +221,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
         for (uint256 i; i < 3; i++) {
             vm.startPrank(s_operatorAddresses[s_tempArray[i]]);
-            mine(1);
             s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
             mine(1);
             vm.stopPrank();
@@ -268,24 +229,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 13. requestToSubmitS()
         // *** Let's assume the k of 0, 1, 2, 3, 4, 5 submitted their s_secrets off-chain
-
         // *** In d case, some(3,7,8) submitted the Cvi on-chain (in submitCo() function), the signatures are required except the operator who submitted the Cvi on-chain.
         // *** The signatures should be organized in the order of activatedOperator Index
-        s_tempArray = [0, 1, 2, 4, 5, 6, 9];
-
-        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForAllCvsNotOnChain = 0;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
-            uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
-        }
-        s_secretsReceivedOffchainInRevealOrder = new bytes32[](6);
-        for (uint256 i; i < 6; i++) {
-            s_secretsReceivedOffchainInRevealOrder[i] = s_secrets[revealOrders[i]];
-        }
-        mine(1);
+        _setParametersForRequestToSubmitS(6, revealOrders);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.requestToSubmitS(
             s_cos,
@@ -299,13 +245,15 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 14. submitS(), k 6-9 submit their s_secrets
         for (uint256 i = 6; i < s_operatorAddresses.length; i++) {
             vm.startPrank(s_operatorAddresses[revealOrders[i]]);
-            mine(1);
             s_commitReveal2.submitS(s_secrets[revealOrders[i]]);
             mine(1);
             vm.stopPrank();
         }
-        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(3);
-        console2.log(s_fulfilled, s_randomNumber);
+
+        s_lastRequestId = s_consumerExample.lastRequestId();
+        (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
+        assertEq(s_fulfilled, true);
+        console2.log("\nRound", s_lastRequestId, "fulfilled");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -341,35 +289,21 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 6. submitMerkleRoot()
         vm.startPrank(LEADERNODE);
-        mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
-        // // ** 12. generateRandomNumber()
-        // mine(1);
-        // s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
-        // mine(1);
-
         // ** 17. generateRandomNumberWhenSomeCvsAreOnChain()
-        s_tempArray = [0, 1, 4, 8, 9]; // the index of the operators whose cv is not on-chain
-        s_packedVsForAllCvsNotOnChain = 0;
-        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
-            uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
-        }
+        _setParametersForGenerateRandomNumberWhenSomeCvsAreOnChain();
         vm.startPrank(LEADERNODE);
-        mine(1);
         s_commitReveal2.generateRandomNumberWhenSomeCvsAreOnChain(
             s_secrets, s_sigRSsForAllCvsNotOnChain, s_packedVsForAllCvsNotOnChain, s_packedRevealOrders
         );
-        // gas
-        uint256 gasUsed = vm.lastCallGas().gasTotalUsed;
-        console2.log("gasUsed", gasUsed);
-        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(4);
-        console2.log(s_fulfilled, s_randomNumber);
+        mine(1);
+
+        s_lastRequestId = s_consumerExample.lastRequestId();
+        (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
+        assertEq(s_fulfilled, true);
+        console2.log("\nRound", s_lastRequestId, "fulfilled");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -380,7 +314,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 3. requestToSubmitCv()
         // *** The leadernode requests the operators index 0,9 to submit their cv
-        mine(1);
         s_tempArray = [0, 9];
         s_indicesLength = s_tempArray.length;
         s_packedIndices = 0;
@@ -403,24 +336,13 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 6. submitMerkleRoot()
         vm.startPrank(LEADERNODE);
-        mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
         // ** 13. requestToSubmitS()
         // *** Let's assume none of the operators submitted their s_secrets off-chain
         // *** index 0, 9 already submitted their cv on-chain
-        s_tempArray = [1, 2, 3, 4, 5, 6, 7, 8];
-        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForAllCvsNotOnChain = 0;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
-            uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
-        }
-        s_secretsReceivedOffchainInRevealOrder = new bytes32[](0);
-        mine(1);
+        _setParametersForRequestToSubmitS(0, revealOrders);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.requestToSubmitS(
             s_cos,
@@ -439,8 +361,11 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             mine(1);
             vm.stopPrank();
         }
-        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(5);
-        console2.log(s_fulfilled, s_randomNumber);
+
+        s_lastRequestId = s_consumerExample.lastRequestId();
+        (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
+        assertEq(s_fulfilled, true);
+        console2.log("\nRound", s_lastRequestId, "fulfilled");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -488,20 +413,12 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** The indices who already submitted the Cvi on-chain should be appended at the end.
         // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
         // *** In g case, some(0,9) submitted the Cvi on-chain (in submitCv() function), the s_cvs and signatures of the operators who are requested to submit their Co are required.
-        s_tempArray = [1, 2, 3, 4, 5, 6, 7, 8, 0, 9];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_tempArray.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
+        s_activatedOperatorsLength = s_commitReveal2.getActivatedOperators().length;
+        s_tempArray = new uint256[](s_activatedOperatorsLength);
+        for (uint256 i; i < s_activatedOperatorsLength; i++) {
+            s_tempArray[i] = i;
         }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain = _packArrayIntoUint256(s_tempArray);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -515,33 +432,22 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
         for (uint256 i; i < 10; i++) {
             vm.startPrank(s_operatorAddresses[i]);
-            mine(1);
             s_commitReveal2.submitCo(s_cos[i]);
             mine(1);
             vm.stopPrank();
         }
 
         // ** 12. generateRandomNumber()
-
-        mine(1);
-        // s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
-        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](10);
-        s_packedVsForAllCvsNotOnChain = 0;
-        for (uint256 i; i < 10; i++) {
-            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[i];
-            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[i];
-            uint256 v = s_vs[i];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
-        }
+        _setParametersForGenerateRandomNumberWhenSomeCvsAreOnChain();
         s_commitReveal2.generateRandomNumberWhenSomeCvsAreOnChain(
             s_secrets, s_sigRSsForAllCvsNotOnChain, s_packedVsForAllCvsNotOnChain, s_packedRevealOrders
         );
         mine(1);
 
-        gasUsed = vm.lastCallGas().gasTotalUsed;
-        console2.log("gasUsed", gasUsed);
-        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(6);
-        console2.log(s_fulfilled, s_randomNumber);
+        s_lastRequestId = s_consumerExample.lastRequestId();
+        (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
+        assertEq(s_fulfilled, true);
+        console2.log("\nRound", s_lastRequestId, "fulfilled");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -549,7 +455,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // * h. 1 -> 3 ->4 -> 6 -> 9 -> 10 -> 13 -> 14
         // ** 3. requestToSubmitCv()
         // *** The leadernode requests everyone to submit their cv
-        mine(1);
         s_tempArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         s_indicesLength = s_tempArray.length;
         s_packedIndices = 0;
@@ -574,7 +479,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 6. submitMerkleRoot()
         vm.startPrank(LEADERNODE);
-        mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
@@ -582,22 +486,12 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** Let's request everyone to submit their Co
         // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
         // *** In h case, everyone submitted the Cvi on-chain (in submitCv() function), no s_cvs and signatures are required.
-        s_tempArray = new uint256[](0); // cvs not on-chain
-        s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
+        s_activatedOperatorsLength = s_commitReveal2.getActivatedOperators().length;
+        s_tempArray = new uint256[](s_activatedOperatorsLength);
+        for (uint256 i; i < s_activatedOperatorsLength; i++) {
+            s_tempArray[i] = i;
         }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain =
-            _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -611,7 +505,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
         for (uint256 i; i < 10; i++) {
             vm.startPrank(s_operatorAddresses[i]);
-            mine(1);
             s_commitReveal2.submitCo(s_cos[i]);
             mine(1);
             vm.stopPrank();
@@ -620,17 +513,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 13. requestToSubmitS()
         // *** Let's assume none of the operators submitted their s_secrets off-chain
         // *** everyone submitted their cv on-chain
-        s_tempArray = new uint256[](0); // secrets received off-chain
-        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForAllCvsNotOnChain = 0;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
-            uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
-        }
-        s_secretsReceivedOffchainInRevealOrder = new bytes32[](0);
-        mine(1);
+        _setParametersForRequestToSubmitS(0, revealOrders);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.requestToSubmitS(
             s_cos,
@@ -644,20 +527,23 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 14. submitS(), k 0-9 submit their s_secrets
         for (uint256 i = 0; i < s_operatorAddresses.length; i++) {
             vm.startPrank(s_operatorAddresses[revealOrders[i]]);
-            mine(1);
             s_commitReveal2.submitS(s_secrets[revealOrders[i]]);
             mine(1);
             vm.stopPrank();
         }
-        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(7);
-        console2.log(s_fulfilled, s_randomNumber);
+
+        s_lastRequestId = s_consumerExample.lastRequestId();
+        (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
+        assertEq(s_fulfilled, true);
+        console2.log("\nRound", s_lastRequestId, "fulfilled");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
 
         // * i. 1 -> 5, round: 8
         // ** 5.
-        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(8);
+        s_currentRound = s_commitReveal2.s_currentRound();
+        (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_currentRound);
         // ** s_offChainSubmissionPeriod passed
         mine(s_activeNetworkConfig.offChainSubmissionPeriod);
         // ** s_requestOrSubmitOrFailDecisionPeriod passed
@@ -668,7 +554,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToRequestSubmitCvOrSubmitMerkleRoot();
         mine(1);
         // *** After the protocol halts, the round can be restarted or the consumer can refund the round.
-
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "Failed");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -677,27 +564,27 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_consumerExample.refund(8);
         mine(1);
         vm.stopPrank();
-        console2.log("after refund");
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "Refunded");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
 
         vm.startPrank(LEADERNODE);
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
-        console2.log("After resume");
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "Resumed");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
 
         // With currentRound=8, lastFulfilledRound=7, and requestCount=9, let's call requestRandomNumber 3 more times.
-
         for (uint256 i; i < 3; i++) {
             s_consumerExample.requestRandomNumber{value: s_requestFee}();
         }
         mine(1);
-        consoleDepositsAndSlashRewardAccumulated(
-            s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
-        );
 
         // * j. 1 -> 3 -> 4 -> 7, round: 9
         // ** Off-chain: Cvi Submission
@@ -705,7 +592,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 3. requestToSubmitCv()
         // *** The leadernode requests the operators index 0,2,4,6,8 to submit their cv
-        mine(1);
         s_tempArray = [0, 2, 4, 6, 8];
         s_indicesLength = s_tempArray.length;
         s_packedIndices = 0;
@@ -735,7 +621,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
-        console2.log("After 2, 6, 8 failToSubmitCv");
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After 2, 6, 8 failToSubmitCv");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -743,7 +631,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // * k. 1 -> 3 -> 7, round: 9
         // ** 3. requestToSubmitCv()
         // *** The leadernode requests the operators index 0 to submit their cv
-        mine(1);
         s_tempArray = [0];
         s_indicesLength = s_tempArray.length;
         s_packedIndices = 0;
@@ -762,6 +649,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitCv();
         mine(1);
         vm.stopPrank();
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After 0 failToSubmitCv");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -769,7 +659,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // * l. 1 -> 3 -> 4 -> 8, round 9, operatorNum = 6
         // ** 3. requestToSubmitCv()
         // *** The leadernode requests the operators index 1, 3, 5 to submit their cv
-        mine(1);
         s_tempArray = [1, 3, 5];
         s_indicesLength = s_tempArray.length;
         s_packedIndices = 0;
@@ -797,12 +686,21 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitMerkleRootAfterDispute();
         mine(1);
         vm.stopPrank();
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitMerkleRootAfterDispute");
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
+        );
 
         // ** let's resume the round 9
         vm.startPrank(LEADERNODE);
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
         mine(1);
         vm.stopPrank();
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After resume");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -812,7 +710,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
@@ -822,21 +719,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // *** The s_cvs and signatures of the operators who are requested to submit their Co are required except the operator who submitted the Cvi on-chain.
         // *** In m case, no one submitted the Cvi on-chain, all the s_cvs and signatures of the operators who are requested to submit their Co are required.
         s_tempArray = [2, 3];
-        s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [2, 3];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
-        }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain =
-            _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -853,6 +736,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitCo");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -862,29 +748,18 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
         // ** 9. requestToSubmitCo()
         // *** Let's request all the operators to submit their Co
-        s_tempArray = [0, 1, 2, 3];
-        s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 1, 2, 3];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
+        s_activatedOperatorsLength = s_commitReveal2.getActivatedOperators().length;
+        s_tempArray = new uint256[](s_activatedOperatorsLength);
+        for (uint256 i; i < s_activatedOperatorsLength; i++) {
+            s_tempArray[i] = i;
         }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain =
-            _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -898,7 +773,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
         for (uint256 i = 1; i < 4; i++) {
             vm.startPrank(s_activatedOperators[i]);
-            mine(1);
             s_commitReveal2.submitCo(s_cos[i]);
             mine(1);
             vm.stopPrank();
@@ -911,6 +785,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitCo();
         mine(1);
         vm.stopPrank();
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitCo");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -919,10 +796,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** Off-chain: Cvi Submission
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
-
         // ** 3. requestToSubmitCv()
         // *** The leadernode requests the operators index 0,1,2 to submit their cv
-        mine(1);
         s_tempArray = [0, 1, 2];
         s_indicesLength = s_tempArray.length;
         s_packedIndices = 0;
@@ -945,28 +820,17 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 6. submitMerkleRoot()
         vm.startPrank(LEADERNODE);
-        mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
         // ** 9. requestToSubmitCo()
         // *** Let's request all the operators to submit their Co
-        s_tempArray = [0, 1, 2];
-        s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 1, 2];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
+        s_activatedOperatorsLength = s_commitReveal2.getActivatedOperators().length;
+        s_tempArray = new uint256[](s_activatedOperatorsLength);
+        for (uint256 i; i < s_activatedOperatorsLength; i++) {
+            s_tempArray[i] = i;
         }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain =
-            _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -983,6 +847,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitCo");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1000,6 +867,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After Some Withdraw");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1027,7 +897,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 3. requestToSubmitCv()
         // *** The leadernode requests the operators index 0,1,2 to submit their cv
-        mine(1);
         s_tempArray = [0, 1, 2];
         s_indicesLength = s_tempArray.length;
         s_packedIndices = 0;
@@ -1050,29 +919,14 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
 
         // ** 6. submitMerkleRoot()
         vm.startPrank(LEADERNODE);
-        mine(1);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
         // ** 9. requestToSubmitCo()
         // *** Let's request [0,1,2, 3, 4, 5] to submit their Co
         // *** 0,1,2 submitted their cv on-chain
-        s_tempArray = [3, 4, 5]; // cvs not on chain
-        s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [3, 4, 5, 0, 1, 2];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
-        }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain =
-            _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
-        mine(1);
+        s_tempArray = [0, 1, 2, 3, 4, 5];
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -1086,7 +940,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
         for (uint256 i = 0; i < 2; i++) {
             vm.startPrank(s_activatedOperators[s_tempArray[i]]);
-            mine(1);
             s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
             mine(1);
             vm.stopPrank();
@@ -1099,6 +952,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitCo();
         mine(1);
         vm.stopPrank();
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After submitCo");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1108,7 +964,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
@@ -1121,6 +976,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToRequestSorGenerateRandomNumber();
         mine(1);
         vm.stopPrank();
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After failToRequestSOrGenerateRandomNumber");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1130,7 +988,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
         mine(1);
         vm.stopPrank();
-        console2.log("After resume");
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After resume");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1140,7 +1000,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
@@ -1148,21 +1007,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 9. requestToSubmitCo()
         // *** Let's request [0, 3] to submit their Co
         s_tempArray = [0, 3];
-        s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 3];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
-        }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain =
-            _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -1176,7 +1021,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
         for (uint256 i = 0; i < 2; i++) {
             vm.startPrank(s_activatedOperators[s_tempArray[i]]);
-            mine(1);
             s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
             mine(1);
             vm.stopPrank();
@@ -1190,6 +1034,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToRequestSorGenerateRandomNumber();
         mine(1);
         vm.stopPrank();
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After failToRequestSOrGenerateRandomNumber");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1199,7 +1046,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
         mine(1);
         vm.stopPrank();
-        console2.log("After resume");
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After resume");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1209,7 +1058,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
@@ -1217,21 +1065,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 9. requestToSubmitCo()
         // *** Let's request [1, 2, 3] to submit their Co
         s_tempArray = [1, 2, 3];
-        s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [1, 2, 3];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
-        }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain =
-            _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -1245,7 +1079,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
         for (uint256 i; i < 3; i++) {
             vm.startPrank(s_activatedOperators[s_tempArray[i]]);
-            mine(1);
             s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
             mine(1);
             vm.stopPrank();
@@ -1254,20 +1087,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 13. requestToSubmitS()
         // *** Let's assume only k 0, 1 submitted their s_secrets off-chain
         // *** [1, 2, 3] submitted their cv on-chain
-        s_tempArray = [0, 4, 5]; // s_cvs not on chain
-        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForAllCvsNotOnChain = 0;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
-            uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
-        }
-        s_secretsReceivedOffchainInRevealOrder = new bytes32[](2);
-        for (uint256 i; i < 2; i++) {
-            s_secretsReceivedOffchainInRevealOrder[i] = s_secrets[revealOrders[i]];
-        }
-        mine(1);
+        _setParametersForRequestToSubmitS(2, revealOrders);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.requestToSubmitS(
             s_cos,
@@ -1281,7 +1101,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 14. submitS(), k 2 - 3 submit their s_secrets, 4 - 5 fail to submit their s_secrets
         for (uint256 i = 2; i < 4; i++) {
             vm.startPrank(s_activatedOperators[revealOrders[i]]);
-            mine(1);
             s_commitReveal2.submitS(s_secrets[revealOrders[i]]);
             mine(1);
             vm.stopPrank();
@@ -1293,6 +1112,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitS();
         mine(1);
         vm.stopPrank();
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitS");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1302,7 +1124,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
@@ -1310,21 +1131,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 9. requestToSubmitCo()
         // *** Let's request [0, 1, 2, 3, 4] to submit their Co
         s_tempArray = [0, 1, 2, 3, 4];
-        s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp = [0, 1, 2, 3, 4];
-        s_cvRSsForCvsNotOnChainAndReqToSubmitCo = new CommitReveal2.CvAndSigRS[](s_tempArray.length);
-        s_tempVs = new uint256[](s_tempArray.length);
-        s_indicesLength = s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp.length;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
-                cv: s_cvs[s_tempArray[i]],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[s_tempArray[i]], s: s_ss[s_tempArray[i]]})
-            });
-            s_tempVs[i] = s_vs[s_tempArray[i]];
-        }
-        s_packedVsForAllCvsNotOnChain = _packArrayIntoUint256(s_tempVs);
-        s_indicesFirstCvNotOnChainRestCvOnChain =
-            _packArrayIntoUint256(s_indicesFirstCvNotOnChainRestCvOnChainArrayTemp);
-        mine(1);
+        _setParametersForRequestToSubmitCo(s_tempArray);
         s_commitReveal2.requestToSubmitCo(
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
             s_packedVsForAllCvsNotOnChain,
@@ -1338,7 +1145,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
         for (uint256 i; i < 5; i++) {
             vm.startPrank(s_activatedOperators[s_tempArray[i]]);
-            mine(1);
             s_commitReveal2.submitCo(s_cos[s_tempArray[i]]);
             mine(1);
             vm.stopPrank();
@@ -1347,17 +1153,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 13. requestToSubmitS()
         // *** Let's assume no one submitted their s_secrets off-chain
         // *** [0, 1, 2, 3, 4] submitted their cv on-chain
-        s_tempArray = new uint256[](0);
-        s_sigRSsForAllCvsNotOnChain = new CommitReveal2.SigRS[](s_tempArray.length);
-        s_packedVsForAllCvsNotOnChain = 0;
-        for (uint256 i; i < s_tempArray.length; i++) {
-            s_sigRSsForAllCvsNotOnChain[i].r = s_rs[s_tempArray[i]];
-            s_sigRSsForAllCvsNotOnChain[i].s = s_ss[s_tempArray[i]];
-            uint256 v = s_vs[s_tempArray[i]];
-            s_packedVsForAllCvsNotOnChain = s_packedVsForAllCvsNotOnChain | (v << (i * 8));
-        }
-        s_secretsReceivedOffchainInRevealOrder = new bytes32[](0);
-        mine(1);
+        _setParametersForRequestToSubmitS(0, revealOrders);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.requestToSubmitS(
             s_cos,
@@ -1374,6 +1170,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitS();
         mine(1);
         vm.stopPrank();
+        s_currentRound = s_commitReveal2.s_currentRound();
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitS");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1383,17 +1182,17 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
 
         // ** 2. submitMerkleRoot()
-        mine(1);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
         mine(1);
 
         // ** 12. generateRandomNumber()
-        mine(1);
         s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
-        mine(1);
-        (s_fulfilled, s_randomNumber) = s_consumerExample.s_requests(0);
-        console2.log(s_fulfilled, s_randomNumber);
+        s_lastRequestId = s_consumerExample.lastRequestId();
+        (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
+        assertEq(s_fulfilled, true);
+        console2.log("\nRound", s_currentRound);
+        console2.log("StartTimestamp", s_startTimestamp, "After generateRandomNumber");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );

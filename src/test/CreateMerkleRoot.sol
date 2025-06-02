@@ -1,35 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 import {Bitmap} from "./../../src/libraries/Bitmap.sol";
 
-contract CreateMerkleRootSolidity is CommitReveal2 {
-    constructor(
-        uint256 activationThreshold,
-        uint256 flatFee,
-        string memory name,
-        string memory version,
-        uint256 offChainSubmissionPeriod,
-        uint256 requestOrSubmitOrFailDecisionPeriod,
-        uint256 onChainSubmissionPeriod,
-        uint256 offChainSubmissionPeriodPerOperator,
-        uint256 onChainSubmissionPeriodPerOperator
-    )
-        payable
-        CommitReveal2(
-            activationThreshold,
-            flatFee,
-            name,
-            version,
-            offChainSubmissionPeriod,
-            requestOrSubmitOrFailDecisionPeriod,
-            onChainSubmissionPeriod,
-            offChainSubmissionPeriodPerOperator,
-            onChainSubmissionPeriodPerOperator
-        )
-    {}
-
+contract CreateMerkleRootSolidity {
     function createMR(bytes32[] memory leaves) external pure returns (bytes32) {
         return createMerkleRoot(leaves);
     }
@@ -69,36 +43,10 @@ contract CreateMerkleRootSolidity is CommitReveal2 {
     }
 }
 
-contract CreateMerkleRootInlineAssembly is CommitReveal2 {
-    constructor(
-        uint256 activationThreshold,
-        uint256 flatFee,
-        string memory name,
-        string memory version,
-        uint256 offChainSubmissionPeriod,
-        uint256 requestOrSubmitOrFailDecisionPeriod,
-        uint256 onChainSubmissionPeriod,
-        uint256 offChainSubmissionPeriodPerOperator,
-        uint256 onChainSubmissionPeriodPerOperator
-    )
-        payable
-        CommitReveal2(
-            activationThreshold,
-            flatFee,
-            name,
-            version,
-            offChainSubmissionPeriod,
-            requestOrSubmitOrFailDecisionPeriod,
-            onChainSubmissionPeriod,
-            offChainSubmissionPeriodPerOperator,
-            onChainSubmissionPeriodPerOperator
-        )
-    {}
-
+contract CreateMerkleRootInlineAssembly {
     function createMR(bytes32[] memory leaves) external pure returns (bytes32) {
         return _createMerkleRoot(leaves);
     }
-
     /**
      * @notice Constructs a Merkle tree from an array of leaves and returns its root.
      * @dev Uses inline assembly to iteratively combine leaves or intermediate hashes:
@@ -108,6 +56,7 @@ contract CreateMerkleRootInlineAssembly is CommitReveal2 {
      * @param leaves The array of leaves to be combined into a Merkle tree (length must be > 1).
      * @return r The computed Merkle root.
      */
+
     function _createMerkleRoot(bytes32[] memory leaves) internal pure returns (bytes32 r) {
         assembly ("memory-safe") {
             let leavesLen := mload(leaves)
