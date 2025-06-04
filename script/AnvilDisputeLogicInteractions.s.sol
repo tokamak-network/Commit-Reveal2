@@ -8,7 +8,7 @@ contract FailToRequestSubmitCvOrSubmitMerkleRoot is BaseScript {
     function run() public {
         BaseScript.scriptSetUp();
         if (block.chainid == 31337) {
-            vm.warp(block.timestamp + 40);
+            vm.warp(block.timestamp + 50);
             vm.roll(block.number + 1);
         }
         vm.startBroadcast();

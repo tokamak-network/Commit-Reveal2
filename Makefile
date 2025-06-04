@@ -100,7 +100,7 @@ testsubmitMerkleRoot:
 	@forge script script/Interactions.s.sol:SuccessfulPaths --sig "submitMerkleRoot()" $(NETWORK_ARGS)
 
 testgenerateRand:
-	@forge script script/Interactions.s.sol:SuccessfulPaths --sig "generateRandomNumber()" $(NETWORK_ARGS)
+	@forge script script/Interactions.s.sol:SuccessfulPaths --sig "generateRandomNumber()" $(NETWORK_ARGS) -vv
 
 withdraw:
 	@forge script script/Interactions.s.sol:Withdraw $(NETWORK_ARGS)

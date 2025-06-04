@@ -129,7 +129,7 @@ contract CommitReveal2Helper is Test {
         s_packedVs = 0;
         s_packedRevealOrders = 0;
 
-        for (uint256 i; i < s_activatedOperators.length; i++) {
+        for (uint256 i; i < length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv(s_startTimestamp);
             (s_vs[i], s_rs[i], s_ss[i]) = vm.sign(privatekeys[i], _getTypedDataHashV4(s_startTimestamp, s_cvs[i]));
             uint256 v = uint256(s_vs[i]);
@@ -140,15 +140,15 @@ contract CommitReveal2Helper is Test {
             });
         }
         // *** Set Reveal Orders
-        uint256[] memory diffs = new uint256[](s_activatedOperators.length);
-        revealOrders = new uint256[](s_activatedOperators.length);
+        uint256[] memory diffs = new uint256[](length);
+        revealOrders = new uint256[](length);
         s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
-        for (uint256 i; i < s_activatedOperators.length; i++) {
+        for (uint256 i; i < length; i++) {
             diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
             revealOrders[i] = i;
         }
         Sort.sort(diffs, revealOrders);
-        for (uint256 i; i < s_activatedOperators.length; i++) {
+        for (uint256 i; i < length; i++) {
             s_packedRevealOrders = s_packedRevealOrders | (revealOrders[i] << (i * 8));
         }
     }
