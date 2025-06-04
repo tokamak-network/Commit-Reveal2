@@ -480,7 +480,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(add(fmp, shl(5, storedSLength)), s) // last secret
                 let randomNumber := keccak256(fmp, shl(5, activatedOperatorsLength))
                 let nextRound := add(round, 1)
-                switch eq(nextRound, sload(s_requestCount.slot))
+                let requestCount := sload(s_requestCount.slot)
+                switch eq(nextRound, requestCount)
                 case 1 {
                     sstore(s_isInProcess.slot, COMPLETED)
                     mstore(0x00, startTime)
@@ -488,14 +489,75 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                     log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
                 }
                 default {
-                    mstore(0x00, nextRound) // round
-                    mstore(0x20, s_requestInfo.slot)
-                    let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
-                    sstore(add(keccak256(0x00, 0x40), 1), nextTimestamp)
-                    sstore(s_currentRound.slot, nextRound)
-                    mstore(0x00, nextTimestamp)
-                    mstore(0x20, IN_PROGRESS)
-                    log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                    // get next round
+                    function leastSignificantBit(x) -> r {
+                        x := and(x, sub(0, x))
+                        r :=
+                            shl(
+                                5,
+                                shr(
+                                    252,
+                                    shl(
+                                        shl(
+                                            2,
+                                            shr(
+                                                250,
+                                                mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff)
+                                            )
+                                        ),
+                                        0x8040405543005266443200005020610674053026020000107506200176117077
+                                    )
+                                )
+                            )
+                        r :=
+                            or(
+                                r,
+                                byte(
+                                    and(div(0xd76453e0, shr(r, x)), 0x1f),
+                                    0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                                )
+                            )
+                    }
+                    function nextRequestedRound(_round) -> _next, _requested {
+                        let wordPos := shr(8, _round)
+                        let bitPos := and(_round, 0xff)
+                        let mask := not(sub(shl(bitPos, 1), 1))
+                        mstore(0x00, wordPos)
+                        mstore(0x20, s_roundBitmap.slot)
+                        let masked := and(sload(keccak256(0x00, 0x40)), mask)
+                        _requested := gt(masked, 0)
+                        switch _requested
+                        case 1 { _next := sub(add(_round, leastSignificantBit(masked)), bitPos) }
+                        default { _next := sub(add(_round, 255), bitPos) }
+                    }
+                    let requested
+                    for { let i } lt(i, 10) { i := add(i, 1) } {
+                        nextRound, requested := nextRequestedRound(nextRound)
+                        if requested {
+                            mstore(0x00, nextRound) // round
+                            mstore(0x20, s_requestInfo.slot)
+                            let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
+                            sstore(add(keccak256(0x00, 0x40), 1), nextTimestamp)
+                            sstore(s_currentRound.slot, nextRound)
+                            mstore(0x00, nextTimestamp)
+                            mstore(0x20, IN_PROGRESS)
+                            log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                            break
+                        }
+                        if iszero(lt(nextRound, requestCount)) {
+                            if eq(sload(s_isInProcess.slot), COMPLETED) {
+                                mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
+                                revert(0x1c, 0x04)
+                            }
+                            sstore(s_isInProcess.slot, COMPLETED)
+                            sstore(s_currentRound.slot, sub(requestCount, 1))
+                            mstore(0x00, startTime)
+                            mstore(0x20, COMPLETED)
+                            log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                            break
+                        }
+                        nextRound := add(nextRound, 1)
+                    }
                 }
 
                 // ** reward the flatFee to last revealer
@@ -702,8 +764,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             // ** create random number
             let randomNumber := keccak256(secrets, activatedOperatorsLengthInBytes)
             let nextRound := add(round, 1)
-
-            switch eq(nextRound, sload(s_requestCount.slot))
+            let requestCount := sload(s_requestCount.slot)
+            switch eq(nextRound, requestCount)
             case 1 {
                 // there is no next round
                 if eq(sload(s_isInProcess.slot), COMPLETED) {
@@ -716,15 +778,72 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }
             default {
-                // there is a next round
-                mstore(0x00, nextRound) // round
-                mstore(0x20, s_requestInfo.slot)
-                let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
-                sstore(add(keccak256(0x00, 0x40), 1), nextTimestamp)
-                sstore(s_currentRound.slot, nextRound)
-                mstore(0x00, nextTimestamp)
-                mstore(0x20, IN_PROGRESS)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                // get next round
+                function leastSignificantBit(x) -> r {
+                    x := and(x, sub(0, x))
+                    r :=
+                        shl(
+                            5,
+                            shr(
+                                252,
+                                shl(
+                                    shl(
+                                        2,
+                                        shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
+                                    ),
+                                    0x8040405543005266443200005020610674053026020000107506200176117077
+                                )
+                            )
+                        )
+                    r :=
+                        or(
+                            r,
+                            byte(
+                                and(div(0xd76453e0, shr(r, x)), 0x1f),
+                                0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                            )
+                        )
+                }
+                function nextRequestedRound(_round) -> _next, _requested {
+                    let wordPos := shr(8, _round)
+                    let bitPos := and(_round, 0xff)
+                    let mask := not(sub(shl(bitPos, 1), 1))
+                    mstore(0x00, wordPos)
+                    mstore(0x20, s_roundBitmap.slot)
+                    let masked := and(sload(keccak256(0x00, 0x40)), mask)
+                    _requested := gt(masked, 0)
+                    switch _requested
+                    case 1 { _next := sub(add(_round, leastSignificantBit(masked)), bitPos) }
+                    default { _next := sub(add(_round, 255), bitPos) }
+                }
+                let requested
+                for { let i } lt(i, 10) { i := add(i, 1) } {
+                    nextRound, requested := nextRequestedRound(nextRound)
+                    if requested {
+                        mstore(0x00, nextRound) // round
+                        mstore(0x20, s_requestInfo.slot)
+                        let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
+                        sstore(add(keccak256(0x00, 0x40), 1), nextTimestamp)
+                        sstore(s_currentRound.slot, nextRound)
+                        mstore(0x00, nextTimestamp)
+                        mstore(0x20, IN_PROGRESS)
+                        log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                        break
+                    }
+                    if iszero(lt(nextRound, requestCount)) {
+                        if eq(sload(s_isInProcess.slot), COMPLETED) {
+                            mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
+                            revert(0x1c, 0x04)
+                        }
+                        sstore(s_isInProcess.slot, COMPLETED)
+                        sstore(s_currentRound.slot, sub(requestCount, 1))
+                        mstore(0x00, startTime)
+                        mstore(0x20, COMPLETED)
+                        log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                        break
+                    }
+                    nextRound := add(nextRound, 1)
+                }
             }
             // ** reward the flatFee to last revealer
             // ** reward the leaderNode (requestFee - flatFee) for submitMerkleRoot and generateRandomNumber

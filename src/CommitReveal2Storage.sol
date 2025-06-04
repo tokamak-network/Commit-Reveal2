@@ -59,6 +59,7 @@ contract CommitReveal2Storage {
     error OnChainCvNotEqualDoubleHashS(); // 0xa39ecadf
     error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
+    error TooManyRequestsQueued(); // 0x02cd147b
     error AlreadyHalted(); // 0xd6c912e6
     error NoCvsOnChain(); // 0x96fbee7b
     error LengthExceedsMax(); // 0x12466af8
