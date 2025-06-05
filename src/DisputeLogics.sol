@@ -31,8 +31,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             mstore(0x20, packedIndicesAscendingFromLSB)
-            let i := 1
-            for {} true { i := add(i, 1) } {
+            for { let i := 1 } true { i := add(i, 1) } {
                 let currentIndex := and(mload(sub(0x20, i)), 0xff)
                 if gt(currentIndex, maxIndex) {
                     mstore(0, 0x63df8171) // InvalidIndex()
@@ -41,7 +40,6 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 if iszero(gt(currentIndex, previousIndex)) { break }
             }
             sstore(requestedToSubmitCvTimestampSlot, timestamp())
-            sstore(s_requestedToSubmitCvLength.slot, i)
             sstore(s_requestedToSubmitCvPackedIndices.slot, packedIndicesAscendingFromLSB)
             sstore(s_zeroBitIfSubmittedCvBitmap.slot, 0xffffffff) // set all bits to 1
             log1(0x00, 0x40, 0x18d0e75c02ebf9429b0b69ace609256eb9c9e12d5c9301a2d4a04fd7599b5cfc) // emit RequestedToSubmitCv(uint256 startTime, uint256 packedIndices)

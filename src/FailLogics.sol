@@ -146,15 +146,27 @@ contract FailLogics is DisputeLogics {
             }
 
             // ** who didn't submit cv even though requested
-            let requestedToSubmitCvLength := sload(s_requestedToSubmitCvLength.slot)
             let didntSubmitCvLength
             let addressToDeactivatesPtr := mload(0x40) // fmp
             let zeroBitIfSubmittedCvBitmap := sload(s_zeroBitIfSubmittedCvBitmap.slot)
             mstore(0x20, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x20, 0x20)
             mstore(0x20, sload(s_requestedToSubmitCvPackedIndices.slot))
-            for { let i } lt(i, requestedToSubmitCvLength) { i := add(i, 1) } {
-                let operatorIndex := and(mload(sub(0x20, i)), 0xff)
+            // Handle first iteration separately to avoid checking previousIndex
+            let operatorIndex := and(mload(0x20), 0xff)
+            if gt(and(zeroBitIfSubmittedCvBitmap, shl(operatorIndex, 1)), 0) {
+                // if bit is still set, meaning no Cv submitted for this operator
+                mstore(
+                    add(addressToDeactivatesPtr, shl(5, didntSubmitCvLength)),
+                    sload(add(firstActivatedOperatorSlot, operatorIndex))
+                )
+                didntSubmitCvLength := add(didntSubmitCvLength, 1)
+            }
+            let previousIndex := operatorIndex
+            // Continue with remaining iterations
+            for { let i := 1 } true { i := add(i, 1) } {
+                operatorIndex := and(mload(sub(0x20, i)), 0xff)
+                if iszero(gt(operatorIndex, previousIndex)) { break }
                 if gt(and(zeroBitIfSubmittedCvBitmap, shl(operatorIndex, 1)), 0) {
                     // if bit is still set, meaning no Cv submitted for this operator
                     mstore(
@@ -163,7 +175,9 @@ contract FailLogics is DisputeLogics {
                     )
                     didntSubmitCvLength := add(didntSubmitCvLength, 1)
                 }
+                previousIndex := operatorIndex
             }
+            log0(0x20, 0x20)
             if iszero(didntSubmitCvLength) {
                 mstore(0, 0x7d39a81b) // AllSubmittedCv()
                 revert(0x1c, 0x04)

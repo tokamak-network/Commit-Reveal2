@@ -144,7 +144,6 @@ contract CommitReveal2Storage {
      *   - Updated by the leader node via `submitMerkleRoot()`.
      */
     mapping(uint256 startTime => uint256) public s_requestedToSubmitCvTimestamp;
-    uint256 public s_requestedToSubmitCvLength;
     uint256 public s_requestedToSubmitCvPackedIndices;
     uint256 public s_zeroBitIfSubmittedCvBitmap;
     bytes32[32] public s_cvs;
