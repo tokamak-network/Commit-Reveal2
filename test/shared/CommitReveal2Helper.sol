@@ -294,7 +294,6 @@ contract CommitReveal2Helper is Test {
         s_cvRSsForCvsNotOnChainAndReqToSubmitCo =
             new CommitReveal2.CvAndSigRS[](lengthOfIndicesOfCvsNotOnChainAndReqToSubmitCo);
         s_tempVs = new uint256[](lengthOfIndicesOfCvsNotOnChainAndReqToSubmitCo);
-
         for (uint256 i; i < lengthOfIndicesOfCvsNotOnChainAndReqToSubmitCo; i++) {
             s_cvRSsForCvsNotOnChainAndReqToSubmitCo[i] = CommitReveal2Storage.CvAndSigRS({
                 cv: s_cvs[s_tempArray[i]],

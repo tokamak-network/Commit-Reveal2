@@ -286,6 +286,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
             mine(1);
             vm.stopPrank();
         }
+        console2.log("wow");
 
         // ** 6. submitMerkleRoot()
         vm.startPrank(LEADERNODE);
