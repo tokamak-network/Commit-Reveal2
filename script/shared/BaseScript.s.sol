@@ -62,7 +62,7 @@ contract BaseScript is Script, CommitReveal2Helper {
         s_activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
     }
 
-    function generateSCoCv() public {
+    function generateSCoCv() public returns (uint256[] memory revealOrders) {
         // ** Off-chain: Cvi Submission
         // ** //////////////////////////////////////////////// **
         s_startTimestamp = s_commitReveal2.getCurStartTime();
@@ -70,6 +70,6 @@ contract BaseScript is Script, CommitReveal2Helper {
         for (uint256 i; i < s_operators.length; i++) {
             privateKeys[i] = s_privateKeysForRealNetwork[i];
         }
-        _setSCoCv(s_operators.length, privateKeys);
+        revealOrders = _setSCoCv(s_operators.length, privateKeys);
     }
 }

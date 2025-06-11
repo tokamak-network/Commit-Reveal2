@@ -61,6 +61,8 @@ endif
 
 deploy: deploy-commit-reveal2 deploy-consumer-example-v2
 
+set-test: deploy fundMyAccounts activateAndDeposit
+
 anvil-deploy: anvil-deploy-commit-reveal2 deploy-consumer-example-v2
 
 deploy-commit-reveal2:
@@ -116,8 +118,31 @@ resume:
 requestToSubmitCv:
 	@forge script script/AnvilDisputeLogicInteractions.s.sol:RequestToSubmitCv $(NETWORK_ARGS)
 
+requestToSubmitCo:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:RequestToSubmitCo $(NETWORK_ARGS)
+
+requestToSubmitS:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:RequestToSubmitS $(NETWORK_ARGS)
+
+INDEX := 0
+
+submitCv:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:SubmitCv $(NETWORK_ARGS) --sig "run(uint256)" $(INDEX)
+
+submitCo:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:SubmitCo $(NETWORK_ARGS) --sig "run(uint256)" $(INDEX)
+
+submitS:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:SubmitS $(NETWORK_ARGS) --sig "run(uint256)" $(INDEX)
+
+generateRandomNumberWhenSomeCvsAreOnChain:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:GenerateRandomNumberWhenSomeCvsAreOnChain $(NETWORK_ARGS)
+
 failToRequestSubmitCvOrSubmitMerkleRoot:
 	@forge script script/AnvilDisputeLogicInteractions.s.sol:FailToRequestSubmitCvOrSubmitMerkleRoot $(NETWORK_ARGS)
+
+failToRequestSorGenerateRandomNumber:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:FailToRequestSorGenerateRandomNumber $(NETWORK_ARGS)
 
 
 deploy-vrf:
