@@ -120,7 +120,7 @@ interface CommitReveal2 {
      * @notice Requests on-chain submissions of commitments (`Cv`) from a subset of activated operators.
      * @dev Only callable by the leader node (owner). Emits RequestedToSubmitCv(uint256 startTime, uint256 packedIndices).
      *
-     * `packedIndices` encodes operator indices from least-significant byte (rightmost) to most-significant (left).
+     * `packedIndicesAscendingFromLSB` encodes operator indices from least-significant byte (rightmost) to most-significant (left).
      * Each byte represents a 0-based index in the activated operator list and must be in strictly ascending order.
      * For example:
      * - [1, 4, 7] → 0x...0000070401
@@ -331,7 +331,7 @@ interface CommitReveal2 {
     /**
      * @notice Returns the bitmap tracking which operators have submitted their `Cv` values on-chain.
      * @dev If no `requestToSubmitXX()` has been made in the current round, returns 0xffffffff (all bits set).
-     *      Otherwise, returns the current value of `s_zeroBitIfSubmittedCvBitmap`, which tracks Cv submission status.
+     *      Otherwise, returns the current value of `zeroBitIfSubmittedCvBitmap`, which tracks Cv submission status.
      *      The least-significant bit (LSB) corresponds to operator index 0, the next bit to index 1, and so on.
      *      A bit value of 0 means the operator has submitted their `Cv` value on-chain.
      * @return A uint256 bitmap representing submission status of requested `Cv` values.
@@ -401,7 +401,7 @@ interface CommitReveal2 {
     function s_requestedToSubmitCoPackedIndices() external view returns (uint256);
     function s_requestedToSubmitCoTimestamp(uint256 startTime) external view returns (uint256);
     function s_requestedToSubmitCvLength() external view returns (uint256);
-    function s_requestedToSubmitCvPackedIndices() external view returns (uint256);
+    function s_requestedToSubmitCvPackedIndicesAscFromLSB() external view returns (uint256);
     function s_requestedToSubmitCvTimestamp(uint256 startTime) external view returns (uint256);
     function s_requestedToSubmitSFromIndexK() external view returns (uint256);
     function s_roundBitmap(uint248 wordPos) external view returns (uint256);
@@ -409,5 +409,5 @@ interface CommitReveal2 {
     function s_slashRewardPerOperatorPaidX8(address) external view returns (uint256);
     function s_slashRewardPerOperatorX8() external view returns (uint256);
     function s_zeroBitIfSubmittedCoBitmap() external view returns (uint256);
-    function s_zeroBitIfSubmittedCvBitmap() external view returns (uint256);
+    function s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2() external view returns (uint256);
 }
