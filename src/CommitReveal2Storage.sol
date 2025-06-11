@@ -49,6 +49,7 @@ contract CommitReveal2Storage {
     error ExceedCallbackGasLimit(); // 0x1cf7ab79
     error NotEnoughActivatedOperators(); // 0x77599fd9
     error InsufficientAmount(); // 0x5945ea56
+    error CvNotRequestedForThisOperator(); // 0x998cf22e
     error NotActivatedOperator(); // 0x1b256530
     error MerkleVerificationFailed(); // 0x624dc351
     error InvalidSignatureS(); // 0xbf4bf5b8
@@ -144,8 +145,8 @@ contract CommitReveal2Storage {
      *   - Updated by the leader node via `submitMerkleRoot()`.
      */
     mapping(uint256 startTime => uint256) public s_requestedToSubmitCvTimestamp;
-    uint256 public s_requestedToSubmitCvPackedIndices;
-    uint256 public s_zeroBitIfSubmittedCvBitmap;
+    uint256 public s_requestedToSubmitCvPackedIndicesAscFromLSB;
+    uint256 public s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2;
     bytes32[32] public s_cvs;
     bytes32[32] public s_cos;
 
@@ -277,7 +278,7 @@ contract CommitReveal2Storage {
         if (requestedToSubmitCvTimestamp == 0) {
             return 0xffffffff;
         }
-        return s_zeroBitIfSubmittedCvBitmap;
+        return s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2 & 0xffffffff;
     }
 
     function getZeroBitIfSubmittedCoOnChainBitmap() external view returns (uint256) {
@@ -286,5 +287,41 @@ contract CommitReveal2Storage {
             return 0xffffffff;
         }
         return s_zeroBitIfSubmittedCoBitmap;
+    }
+
+    function getSecrets(uint256 length) external view returns (bytes32[] memory secrets) {
+        secrets = new bytes32[](length);
+        for (uint256 i = 0; i < length; i++) {
+            secrets[i] = s_secrets[i];
+        }
+        return secrets;
+    }
+
+    function getDisputeInfos(uint256 startTime)
+        external
+        view
+        returns (
+            uint256 requestedToSubmitCvTimestamp,
+            uint256 requestedToSubmitCvPackedIndicesAscFromLSB,
+            uint256 zeroBitIfSubmittedCvBitmap,
+            uint256 requestedToSubmitCoTimestamp,
+            uint256 requestedToSubmitCoPackedIndices,
+            uint256 requestedToSubmitCoLength,
+            uint256 zeroBitIfSubmittedCoBitmap,
+            uint256 previousSSubmitTimestamp,
+            uint256 packedRevealOrders,
+            uint256 requestedToSubmitSFromIndexK
+        )
+    {
+        requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[startTime];
+        requestedToSubmitCvPackedIndicesAscFromLSB = s_requestedToSubmitCvPackedIndicesAscFromLSB;
+        zeroBitIfSubmittedCvBitmap = s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2;
+        requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[startTime];
+        requestedToSubmitCoPackedIndices = s_requestedToSubmitCoPackedIndices;
+        requestedToSubmitCoLength = s_requestedToSubmitCoLength;
+        zeroBitIfSubmittedCoBitmap = s_zeroBitIfSubmittedCoBitmap;
+        previousSSubmitTimestamp = s_previousSSubmitTimestamp[startTime];
+        packedRevealOrders = s_packedRevealOrders;
+        requestedToSubmitSFromIndexK = s_requestedToSubmitSFromIndexK;
     }
 }

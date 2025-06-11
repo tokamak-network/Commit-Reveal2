@@ -148,10 +148,10 @@ contract FailLogics is DisputeLogics {
             // ** who didn't submit cv even though requested
             let didntSubmitCvLength
             let addressToDeactivatesPtr := mload(0x40) // fmp
-            let zeroBitIfSubmittedCvBitmap := sload(s_zeroBitIfSubmittedCvBitmap.slot)
+            let zeroBitIfSubmittedCvBitmap := sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
             mstore(0x20, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x20, 0x20)
-            mstore(0x20, sload(s_requestedToSubmitCvPackedIndices.slot))
+            mstore(0x20, sload(s_requestedToSubmitCvPackedIndicesAscFromLSB.slot))
             // Handle first iteration separately to avoid checking previousIndex
             let operatorIndex := and(mload(0x20), 0xff)
             if gt(and(zeroBitIfSubmittedCvBitmap, shl(operatorIndex, 1)), 0) {

@@ -24,12 +24,14 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0xf6b442ac) // MerkleRootIsSubmitted()
                 revert(0x1c, 0x04)
             }
+            let bitSetIfRequestedToSubmitCv
             let maxIndex := sub(sload(s_activatedOperators.slot), 1) // max index
             let previousIndex := and(packedIndicesAscendingFromLSB, 0xff)
             if gt(previousIndex, maxIndex) {
                 mstore(0, 0x63df8171) // InvalidIndex()
                 revert(0x1c, 0x04)
             }
+            bitSetIfRequestedToSubmitCv := or(bitSetIfRequestedToSubmitCv, shl(previousIndex, 1))
             mstore(0x20, packedIndicesAscendingFromLSB)
             for { let i := 1 } true { i := add(i, 1) } {
                 let currentIndex := and(mload(sub(0x20, i)), 0xff)
@@ -38,10 +40,15 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                     revert(0x1c, 0x04)
                 }
                 if iszero(gt(currentIndex, previousIndex)) { break }
+                bitSetIfRequestedToSubmitCv := or(bitSetIfRequestedToSubmitCv, shl(currentIndex, 1))
+                previousIndex := currentIndex
             }
             sstore(requestedToSubmitCvTimestampSlot, timestamp())
-            sstore(s_requestedToSubmitCvPackedIndices.slot, packedIndicesAscendingFromLSB)
-            sstore(s_zeroBitIfSubmittedCvBitmap.slot, 0xffffffff) // set all bits to 1
+            sstore(s_requestedToSubmitCvPackedIndicesAscFromLSB.slot, packedIndicesAscendingFromLSB)
+            sstore(
+                s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot,
+                or(shl(128, bitSetIfRequestedToSubmitCv), 0xffffffff)
+            ) // set zeroBitIfSubmittedCvBitmap all bits to 1
             log1(0x00, 0x40, 0x18d0e75c02ebf9429b0b69ace609256eb9c9e12d5c9301a2d4a04fd7599b5cfc) // emit RequestedToSubmitCv(uint256 startTime, uint256 packedIndices)
         }
     }
@@ -51,8 +58,19 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             mstore(0x00, caller())
             mstore(0x20, s_activatedOperatorIndex1Based.slot)
             let activatedOperatorIndex := sub(sload(keccak256(0x00, 0x40)), 1) // overflows when s_activatedOperatorIndex1Based is 0
+            let bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2 :=
+                sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
             if gt(activatedOperatorIndex, MAX_OPERATOR_INDEX) {
                 mstore(0, 0x1b256530) // NotActivatedOperator()
+                revert(0x1c, 0x04)
+            }
+            if iszero(
+                and(
+                    shr(128, bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2),
+                    shl(activatedOperatorIndex, 1)
+                )
+            ) {
+                mstore(0, 0x998cf22e) // CvNotRequestedForThisOperator()
                 revert(0x1c, 0x04)
             }
             mstore(0x00, sload(s_currentRound.slot))
@@ -66,8 +84,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             }
             sstore(add(s_cvs.slot, activatedOperatorIndex), cv)
             sstore(
-                s_zeroBitIfSubmittedCvBitmap.slot,
-                and(sload(s_zeroBitIfSubmittedCvBitmap.slot), not(shl(activatedOperatorIndex, 1)))
+                s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot,
+                and(bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2, not(shl(activatedOperatorIndex, 1)))
             ) // set to zero
 
             mstore(0x20, cv)
@@ -138,7 +156,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 sstore(requestedToSubmitCvTimestampSlot, 1) // set to 1 to indicate that cvs are on-chain
                 zeroBitIfSubmittedCvBitmap := 0xffffffff // set all bits to 1
             }
-            default { zeroBitIfSubmittedCvBitmap := sload(s_zeroBitIfSubmittedCvBitmap.slot) }
+            default {
+                zeroBitIfSubmittedCvBitmap := sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
+            }
 
             // **
             let maxIndex := sub(operatorsLength, 1) // max index
@@ -196,7 +216,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 sstore(add(s_cvs.slot, requestToSubmitCoIndex), calldataload(cvsRSsOffset)) // cv
                 zeroBitIfSubmittedCvBitmap := and(zeroBitIfSubmittedCvBitmap, not(shl(requestToSubmitCoIndex, 1))) // set to zero
             }
-            sstore(s_zeroBitIfSubmittedCvBitmap.slot, zeroBitIfSubmittedCvBitmap) // update bitmap
+            sstore(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot, zeroBitIfSubmittedCvBitmap) // update bitmap
 
             // ** Operators who already submitted Cv on-chain, simply confirm it exists
             for { let i := cvRSsForCvsNotOnChainAndReqToSubmitCo.length } lt(i, indicesLength) { i := add(i, 1) } {
@@ -254,7 +274,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0x1b256530) // NotActivatedOperator()
                 revert(0x1c, 0x04)
             }
-            let zeroBitIfSubmittedCvBitmap := sload(s_zeroBitIfSubmittedCvBitmap.slot)
+            let zeroBitIfSubmittedCvBitmap := sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
             if gt(and(zeroBitIfSubmittedCvBitmap, shl(activatedOperatorIndex, 1)), 0) {
                 // if bit is still set, meaning no Cv submitted for this operator
                 // this operator was not requested to submit Co
@@ -319,7 +339,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 sstore(requestedToSubmitCvTimestampSlot, 1) // set to 1 to indicate that cvs are on-chain
                 zeroBitIfSubmittedCvBitmap := 0xffffffff // set all bits to 1
             }
-            default { zeroBitIfSubmittedCvBitmap := sload(s_zeroBitIfSubmittedCvBitmap.slot) }
+            default {
+                zeroBitIfSubmittedCvBitmap := sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
+            }
 
             // ****
             let cos := mload(0x40) // fmp
@@ -717,7 +739,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             mstore(add(fmp, 0x20), startTime)
             mstore(add(fmp, 0x60), hex"1901") // prefix and version
             mstore(add(fmp, 0x62), domainSeparator)
-            let zeroBitIfSubmittedCvBitmap := sload(s_zeroBitIfSubmittedCvBitmap.slot)
+            let zeroBitIfSubmittedCvBitmap := sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
             let sigCounter
             for { let i } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
                 index := shr(5, i)
