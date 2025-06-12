@@ -142,14 +142,14 @@ contract SuccessfulPaths is BaseScript {
     function generateRandomNumber() public {
         BaseScript.scriptSetUp();
         BaseScript.generateSCoCv();
-        uint256[] memory diffs = new uint256[](s_operators.length);
-        uint256[] memory revealOrders = new uint256[](s_operators.length);
-        s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
-        for (uint256 i; i < s_operators.length; i++) {
-            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
-            revealOrders[i] = i;
-        }
-        Sort.sort(diffs, revealOrders);
+        // uint256[] memory diffs = new uint256[](s_operators.length);
+        // uint256[] memory revealOrders = new uint256[](s_operators.length);
+        // s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
+        // for (uint256 i; i < s_operators.length; i++) {
+        //     diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+        //     revealOrders[i] = i;
+        // }
+        // Sort.sort(diffs, revealOrders);
         // ** 12. generateRandomNumber();
         // ** //////////////////////////////////////////////// **
         vm.startBroadcast();

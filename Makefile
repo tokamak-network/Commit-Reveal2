@@ -144,6 +144,8 @@ failToRequestSubmitCvOrSubmitMerkleRoot:
 failToRequestSorGenerateRandomNumber:
 	@forge script script/AnvilDisputeLogicInteractions.s.sol:FailToRequestSorGenerateRandomNumber $(NETWORK_ARGS)
 
+failToSubmitS:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:FailToSubmitS $(NETWORK_ARGS)
 
 deploy-vrf:
 	@forge script script/ChainlinkConsumerTest.s.sol:DeployChainlinkConsumer $(NETWORK_ARGS)
@@ -166,3 +168,5 @@ fuzz_test:
 doc:
 	@forge doc --serve --open
 
+mine:
+	@cast rpc anvil_mine 200

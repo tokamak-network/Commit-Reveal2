@@ -68,7 +68,7 @@ contract RequestToSubmitS is BaseScript {
     function run() public {
         BaseScript.scriptSetUp();
         uint256[] memory revealOrders = BaseScript.generateSCoCv();
-        indexK = 1;
+        indexK = 2;
         _setParametersForRequestToSubmitS(indexK, revealOrders);
         vm.startBroadcast(s_activeNetworkConfig.deployer);
         s_commitReveal2.requestToSubmitS(
@@ -139,6 +139,15 @@ contract FailToRequestSorGenerateRandomNumber is BaseScript {
         BaseScript.scriptSetUp();
         vm.startBroadcast();
         s_commitReveal2.failToRequestSorGenerateRandomNumber();
+        vm.stopBroadcast();
+    }
+}
+
+contract FailToSubmitS is BaseScript {
+    function run() public {
+        BaseScript.scriptSetUp();
+        vm.startBroadcast();
+        s_commitReveal2.failToSubmitS();
         vm.stopBroadcast();
     }
 }

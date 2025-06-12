@@ -14,6 +14,7 @@ contract BaseScript is Script, CommitReveal2Helper {
     uint256[3] public s_privateKeysForRealNetwork;
     address[3] public s_operators;
     uint256 s_activationThreshold;
+    mapping(address => uint256) s_privateKeysForAnvil;
 
     function anvilSetUp() public {
         // *** Get the most recent deployment of CommitReveal2 ***
@@ -53,6 +54,9 @@ contract BaseScript is Script, CommitReveal2Helper {
             vm.addr(s_privateKeysForRealNetwork[1]),
             vm.addr(s_privateKeysForRealNetwork[2])
         ];
+        s_privateKeysForAnvil[s_operators[0]] = s_privateKeysForRealNetwork[0];
+        s_privateKeysForAnvil[s_operators[1]] = s_privateKeysForRealNetwork[1];
+        s_privateKeysForAnvil[s_operators[2]] = s_privateKeysForRealNetwork[2];
         s_activationThreshold = s_commitReveal2.s_activationThreshold();
         console2.log("activationThreshold %e", s_activationThreshold);
 
@@ -63,13 +67,6 @@ contract BaseScript is Script, CommitReveal2Helper {
     }
 
     function generateSCoCv() public returns (uint256[] memory revealOrders) {
-        // ** Off-chain: Cvi Submission
-        // ** //////////////////////////////////////////////// **
-        s_startTimestamp = s_commitReveal2.getCurStartTime();
-        uint256[] memory privateKeys = new uint256[](s_operators.length);
-        for (uint256 i; i < s_operators.length; i++) {
-            privateKeys[i] = s_privateKeysForRealNetwork[i];
-        }
-        revealOrders = _setSCoCv(s_operators.length, privateKeys);
+        revealOrders = _setSCoCvRevealOrders(s_privateKeysForAnvil);
     }
 }
