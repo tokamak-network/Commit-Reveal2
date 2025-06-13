@@ -582,12 +582,12 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             mstore(0x00, sload(_OWNER_SLOT))
             mstore(0x20, s_depositAmount.slot)
             let ownerDepositSlot := keccak256(0x00, 0x40)
-            let ownderDepositAmount := sload(ownerDepositSlot)
+            let ownerDepositAmount := sload(ownerDepositSlot)
             if gt(callvalue(), 0) {
-                ownderDepositAmount := add(ownderDepositAmount, callvalue())
-                sstore(ownerDepositSlot, ownderDepositAmount)
+                ownerDepositAmount := add(ownerDepositAmount, callvalue())
+                sstore(ownerDepositSlot, ownerDepositAmount)
             }
-            if lt(ownderDepositAmount, sload(s_activationThreshold.slot)) {
+            if lt(ownerDepositAmount, sload(s_activationThreshold.slot)) {
                 mstore(0, 0xc0013a5a) // selector for LeaderLowDeposit()
                 revert(0x1c, 0x04)
             }
