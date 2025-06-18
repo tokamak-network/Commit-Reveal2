@@ -486,7 +486,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             // ** store S and emit event
-            mstore(0x60, activatedOperatorIndex)
+            mstore(0x40, activatedOperatorIndex)
             log1(0x00, 0x60, 0x1f2f0bf333e80ee899084dda13e87c0b04096ba331a8d993487a116d166947ec) // emit SSubmitted(uint256 startTime, bytes32 s, uint256 index)
 
             // ** If msg.sender is the last revealer, finalize the random number
@@ -503,6 +503,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 let requestCount := sload(s_requestCount.slot)
                 switch eq(nextRound, requestCount)
                 case 1 {
+                    if eq(sload(s_isInProcess.slot), COMPLETED) {
+                        mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
+                        revert(0x1c, 0x04)
+                    }
                     sstore(s_isInProcess.slot, COMPLETED)
                     mstore(0x00, startTime)
                     mstore(0x20, COMPLETED)
