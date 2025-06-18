@@ -56,6 +56,7 @@ contract CommitReveal2Storage {
     error SubmitAfterStartTime(); // 0xc2794058
     error InvalidSignature(); // 0x8baa579f
     error MerkleRootAlreadySubmitted(); // 0xa34402b2
+    error CannotRequestWhenHalted(); // 0x2caa910c
     error AllSubmittedCv(); // 0x7d39a81b
     error TooEarly(); // 0x085de625
     error OnChainCvNotEqualDoubleHashS(); // 0xa39ecadf

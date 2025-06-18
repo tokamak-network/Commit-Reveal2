@@ -152,7 +152,12 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             let startTime
             // ** check if the current round is completed
             // ** if the current round is completed, start a new round
-            if eq(sload(s_isInProcess.slot), COMPLETED) {
+            let currentState := sload(s_isInProcess.slot)
+            if eq(currentState, HALTED) {
+                mstore(0, 0x2caa910c) // selector for CannotRequestWhenHalted()
+                revert(0x1c, 0x04)
+            }
+            if eq(currentState, COMPLETED) {
                 sstore(s_currentRound.slot, newRound)
                 sstore(s_isInProcess.slot, IN_PROGRESS)
                 startTime := timestamp() // Just in case of timestamp collision
