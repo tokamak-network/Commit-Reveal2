@@ -510,15 +510,11 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             // solidity calls check that a contract actually exists at the destination, so we do the same
             let consumer := sload(currentRequestInfoSlot)
             switch extcodesize(consumer)
-            case 0 {
-                mstore(0x60, 0)
-                log1(0x20, 0x60, 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a) // emit RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess)
-            }
+            case 0 { return(0, 0) }
             default {
                 // call and return whether we succeeded. ignore return data
                 // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
-                mstore(0x60, call(callbackGasLimit, consumer, 0, 0x1c, 0x44, 0, 0))
-                log1(0x20, 0x60, 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a) // emit RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess
+                pop(call(callbackGasLimit, consumer, 0, 0x1c, 0x44, 0, 0))
             }
         }
     }

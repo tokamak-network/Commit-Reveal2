@@ -147,12 +147,8 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
 
                 // ** 12. generateRandomNumber()
                 mine(1);
-                vm.recordLogs();
                 s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
                 s_generateRandomNumberGas.push(vm.lastCallGas().gasTotalUsed);
-                Vm.Log[] memory entries = vm.getRecordedLogs();
-                (,, bool callbackSuccess) = abi.decode(entries[1].data, (uint256, uint256, bool));
-                assertTrue(callbackSuccess);
                 mine(1);
                 vm.stopPrank();
             }

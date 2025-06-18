@@ -193,6 +193,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         for (uint256 i; i < 3; i++) {
             s_consumerExample.requestRandomNumber{value: s_requestFee}();
         }
+        mine(1);
         // ** Off-chain: Cvi Submission
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
         vm.startPrank(LEADERNODE);

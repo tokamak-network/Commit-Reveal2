@@ -103,7 +103,6 @@ contract CommitReveal2Storage {
     // * Events
     event Status(uint256 curStartTime, uint256 curState); // 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762
     event MerkleRootSubmitted(uint256 startTime, bytes32 merkleRoot);
-    event RandomNumberGenerated(uint256 round, uint256 randomNumber, bool callbackSuccess); // 0x539d5cf812477a02d010f73c1704ff94bd28cfca386609a6b494561f64ee7f0a
 
     //event RequestedToSubmitCv(uint256 startTime, uint256[] indices);
     event RequestedToSubmitCv(uint256 startTime, uint256 packedIndices); // 0x18d0e75c02ebf9429b0b69ace609256eb9c9e12d5c9301a2d4a04fd7599b5cfc
