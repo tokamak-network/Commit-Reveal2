@@ -3,9 +3,8 @@ pragma solidity ^0.8.28;
 
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 import {BaseTest} from "./../shared/BaseTest.t.sol";
-import {console2, Vm} from "forge-std/Test.sol";
-import {Sort} from "./../shared/Sort.sol";
-import {CommitReveal2Helper, CommitReveal2Storage} from "./../shared/CommitReveal2Helper.sol";
+import {console2} from "forge-std/Test.sol";
+import {CommitReveal2Helper} from "./../shared/CommitReveal2Helper.sol";
 import {DeployCommitReveal2} from "./../../script/DeployCommitReveal2.s.sol";
 import {DeployConsumerExample} from "./../../script/DeployConsumerExample.s.sol";
 

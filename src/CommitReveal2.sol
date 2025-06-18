@@ -155,7 +155,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             if eq(sload(s_isInProcess.slot), COMPLETED) {
                 sstore(s_currentRound.slot, newRound)
                 sstore(s_isInProcess.slot, IN_PROGRESS)
-                startTime := add(timestamp(), 1) // Just in case of timestamp collision
+                startTime := timestamp() // Just in case of timestamp collision
                 mstore(0, startTime)
                 mstore(0x20, IN_PROGRESS)
                 log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
@@ -232,6 +232,11 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             mstore(0x00, sload(s_currentRound.slot))
             mstore(0x20, s_requestInfo.slot)
             mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
+            // ** To prevent the future signature replay attack, we check if the submitMerkleRoot is called after the startTime
+            if eq(mload(0x00), timestamp()) {
+                mstore(0, 0xc2794058) // selector for SubmitAfterStartTime()
+                revert(0x1c, 0x04)
+            }
             mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
             let merkleRootSubmittedTimestampSlot := keccak256(0x00, 0x40)
             if gt(sload(merkleRootSubmittedTimestampSlot), 0) {
@@ -436,10 +441,9 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                     if requested {
                         mstore(0x00, nextRound) // round
                         mstore(0x20, s_requestInfo.slot)
-                        let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
-                        sstore(add(keccak256(0x00, 0x40), 1), nextTimestamp)
+                        sstore(add(keccak256(0x00, 0x40), 1), timestamp())
                         sstore(s_currentRound.slot, nextRound)
-                        mstore(0x00, nextTimestamp)
+                        mstore(0x00, timestamp())
                         mstore(0x20, IN_PROGRESS)
                         log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
                         break
@@ -601,11 +605,10 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                     // Start this requested round
                     mstore(0x00, nextRequestedRound)
                     mstore(0x20, s_requestInfo.slot)
-                    let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
-                    sstore(add(keccak256(0x00, 0x40), 1), nextTimestamp) // startTime
+                    sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
                     sstore(s_currentRound.slot, nextRequestedRound)
                     sstore(s_isInProcess.slot, IN_PROGRESS)
-                    mstore(0x00, nextTimestamp)
+                    mstore(0x00, timestamp())
                     mstore(0x20, IN_PROGRESS)
                     log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
                     return(0, 0)

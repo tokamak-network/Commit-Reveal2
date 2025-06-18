@@ -53,6 +53,7 @@ contract CommitReveal2Storage {
     error NotActivatedOperator(); // 0x1b256530
     error MerkleVerificationFailed(); // 0x624dc351
     error InvalidSignatureS(); // 0xbf4bf5b8
+    error SubmitAfterStartTime(); // 0xc2794058
     error InvalidSignature(); // 0x8baa579f
     error MerkleRootAlreadySubmitted(); // 0xa34402b2
     error AllSubmittedCv(); // 0x7d39a81b
@@ -273,6 +274,11 @@ contract CommitReveal2Storage {
         return s_requestInfo[s_currentRound].startTime;
     }
 
+    function getCurRoundAndStartTime() external view returns (uint256, uint256) {
+        uint256 curRound = s_currentRound;
+        return (curRound, s_requestInfo[curRound].startTime);
+    }
+
     function getZeroBitIfSubmittedCvOnChainBitmap() external view returns (uint256) {
         uint256 requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[getCurStartTime()];
         if (requestedToSubmitCvTimestamp == 0) {
@@ -323,5 +329,19 @@ contract CommitReveal2Storage {
         previousSSubmitTimestamp = s_previousSSubmitTimestamp[startTime];
         packedRevealOrders = s_packedRevealOrders;
         requestedToSubmitSFromIndexK = s_requestedToSubmitSFromIndexK;
+    }
+
+    function getDisputeTimestamps(uint256 startTime)
+        external
+        view
+        returns (
+            uint256 requestedToSubmitCvTimestamp,
+            uint256 requestedToSubmitCoTimestamp,
+            uint256 previousSSubmitTimestamp
+        )
+    {
+        requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[startTime];
+        requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[startTime];
+        previousSSubmitTimestamp = s_previousSSubmitTimestamp[startTime];
     }
 }

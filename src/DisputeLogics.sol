@@ -556,10 +556,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                         if requested {
                             mstore(0x00, nextRound) // round
                             mstore(0x20, s_requestInfo.slot)
-                            let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
-                            sstore(add(keccak256(0x00, 0x40), 1), nextTimestamp)
+                            sstore(add(keccak256(0x00, 0x40), 1), timestamp())
                             sstore(s_currentRound.slot, nextRound)
-                            mstore(0x00, nextTimestamp)
+                            mstore(0x00, timestamp())
                             mstore(0x20, IN_PROGRESS)
                             log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
                             break
@@ -842,10 +841,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                     if requested {
                         mstore(0x00, nextRound) // round
                         mstore(0x20, s_requestInfo.slot)
-                        let nextTimestamp := add(timestamp(), 1) // Just in case of timestamp collision
-                        sstore(add(keccak256(0x00, 0x40), 1), nextTimestamp)
+                        sstore(add(keccak256(0x00, 0x40), 1), timestamp())
                         sstore(s_currentRound.slot, nextRound)
-                        mstore(0x00, nextTimestamp)
+                        mstore(0x00, timestamp())
                         mstore(0x20, IN_PROGRESS)
                         log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
                         break
