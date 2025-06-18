@@ -611,9 +611,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 if iszero(gt(sub(g, div(g, 64)), callbackGasLimit)) { revert(0, 0) }
                 // solidity calls check that a contract actually exists at the destination, so we do the same
                 let consumer := sload(currentRequestInfoSlot)
-                switch extcodesize(consumer)
-                case 0 { return(0, 0) }
-                default {
+                if gt(extcodesize(consumer), 0) {
                     // call and return whether we succeeded. ignore return data
                     // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
                     pop(call(callbackGasLimit, consumer, 0, 0x1c, 0x44, 0, 0))
@@ -900,9 +898,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             if iszero(gt(sub(g, div(g, 64)), callbackGasLimit)) { revert(0, 0) }
             // solidity calls check that a contract actually exists at the destination, so we do the same
             let consumer := sload(currentRequestInfoSlot)
-            switch extcodesize(consumer)
-            case 0 { return(0, 0) }
-            default {
+            if gt(extcodesize(consumer), 0) {
                 // call and return whether we succeeded. ignore return data
                 // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
                 pop(call(callbackGasLimit, consumer, 0, 0x1c, 0x44, 0, 0))
