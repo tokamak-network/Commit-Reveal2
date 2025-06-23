@@ -6,6 +6,7 @@ import {CommitReveal2} from "../src/CommitReveal2.sol";
 import {CommitReveal2L1} from "../src/CommitReveal2L1.sol";
 import {NetworkHelperConfig} from "./NetworkHelperConfig.s.sol";
 import {CommitReveal2Helper} from "./../test/shared/CommitReveal2Helper.sol";
+import {DeployMockGasPriceOracle} from "./../test/shared/DeployMockGasPriceOracle.sol";
 
 contract DeployCommitReveal2 is Script, CommitReveal2Helper {
     function run() public returns (address commitReveal2, NetworkHelperConfig networkHelperConfig) {
@@ -44,15 +45,14 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
         }
         vm.stopBroadcast();
     }
-}
 
-contract AnvilDeployCommitReveal2 is Script, CommitReveal2Helper {
-    function run() public returns (address commitReveal2, NetworkHelperConfig networkHelperConfig) {
+    function runForTest() public returns (address commitReveal2, NetworkHelperConfig networkHelperConfig) {
         networkHelperConfig = new NetworkHelperConfig();
         NetworkHelperConfig.NetworkConfig memory activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
-        vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
+
+        vm.startBroadcast(activeNetworkConfig.deployer);
         commitReveal2 = address(
-            new CommitReveal2L1{value: activeNetworkConfig.activationThreshold}(
+            new CommitReveal2{value: activeNetworkConfig.activationThreshold}(
                 activeNetworkConfig.activationThreshold,
                 activeNetworkConfig.flatFee,
                 activeNetworkConfig.name,
@@ -64,6 +64,8 @@ contract AnvilDeployCommitReveal2 is Script, CommitReveal2Helper {
                 activeNetworkConfig.onChainSubmissionPeriodPerOperator
             )
         );
+        DeployMockGasPriceOracle mockGasPriceOracle = new DeployMockGasPriceOracle();
+        mockGasPriceOracle.deployMockGasPriceOracle();
         vm.stopBroadcast();
     }
 }

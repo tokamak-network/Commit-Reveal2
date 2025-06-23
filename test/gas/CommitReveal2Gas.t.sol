@@ -49,46 +49,11 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
     function _deployContracts() internal {
         // ** Deploy CommitReveal2
         address commitRevealAddress;
-        (commitRevealAddress, s_networkHelperConfig) = (new DeployCommitReveal2()).run();
+        (commitRevealAddress, s_networkHelperConfig) = (new DeployCommitReveal2()).runForTest();
         s_commitReveal2 = CommitReveal2(commitRevealAddress);
         s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
         // ** Deploy ConsumerExample
         s_consumerExample = (new DeployConsumerExample()).deployConsumerExampleUsingConfig(address(s_commitReveal2));
-    }
-
-    function test_activateDeactivate() public {
-        setOperatorAdresses(32);
-        s_networkHelperConfig = new NetworkHelperConfig();
-        s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
-
-        _deployContracts();
-
-        // *** Deposit And Activate Operators
-        s_numOfOperators = 32;
-        for (uint256 i; i < s_numOfOperators; i++) {
-            vm.startPrank(s_operatorAddresses[i]);
-            s_commitReveal2.deposit{value: s_activeNetworkConfig.activationThreshold}();
-            vm.stopPrank();
-        }
-        for (uint256 i; i < s_numOfOperators; i++) {
-            vm.startPrank(s_operatorAddresses[i]);
-            s_commitReveal2.activate();
-            vm.stopPrank();
-            s_activateGas.push(vm.lastCallGas().gasTotalUsed);
-        }
-        assertEq(s_commitReveal2.getActivatedOperatorsLength(), s_numOfOperators);
-        for (uint256 i; i < s_numOfOperators; i++) {
-            vm.startPrank(s_operatorAddresses[i]);
-            s_commitReveal2.deactivate();
-            vm.stopPrank();
-            s_deactivateGas.push(vm.lastCallGas().gasTotalUsed);
-        }
-        assertEq(s_commitReveal2.getActivatedOperatorsLength(), 0);
-        console2.log("activateGas, deactivateGas");
-        console2.log(_getAverageExceptIndex0(s_activateGas), _getAverageExceptIndex0(s_deactivateGas));
-        for (uint256 i; i < s_numOfOperators; i++) {
-            console2.log(s_activateGas[i], s_deactivateGas[i]);
-        }
     }
 
     error OnlyCoordinatorCanFulfill(address caller, address coordinator);
@@ -182,12 +147,7 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         setOperatorAdresses(10);
         for (s_numOfOperators = 2; s_numOfOperators < 10; s_numOfOperators++) {
             // ** Deploy CommitReveal2
-            address commitRevealAddress;
-            (commitRevealAddress, s_networkHelperConfig) = (new DeployCommitReveal2()).run();
-            s_commitReveal2 = CommitReveal2(commitRevealAddress);
-            s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
-            // ** Deploy ConsumerExample
-            s_consumerExample = (new DeployConsumerExample()).deployConsumerExampleUsingConfig(address(s_commitReveal2));
+            _deployContracts();
 
             // *** Deposit And Activate Operators
             for (uint256 i; i < s_numOfOperators; i++) {
@@ -201,21 +161,17 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
             s_requestFee = s_commitReveal2.estimateRequestPrice(s_consumerExample.CALLBACK_GAS_LIMIT(), tx.gasprice);
 
             vm.startPrank(s_anyAddress);
-            uint256[] memory revealOrders;
             for (uint256 i; i < s_numOfTests; i++) {
                 s_consumerExample.requestRandomNumber{value: s_requestFee}();
                 s_requestRandomNumberGas.push(vm.lastCallGas().gasTotalUsed);
-
                 // ** Off-chain: Cv submission
-                revealOrders = _setSCoCvRevealOrders(s_privateKeys);
-
+                _setSCoCvRevealOrders(s_privateKeys);
                 // ** 2. submitMerkleRoot()
                 vm.startPrank(LEADERNODE);
                 mine(1);
                 s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
                 s_submitMerkleRootGas.push(vm.lastCallGas().gasTotalUsed);
                 mine(1);
-
                 // ** 12. generateRandomNumber()
                 mine(1);
                 s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);

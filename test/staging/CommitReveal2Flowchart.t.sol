@@ -57,7 +57,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.stopPrank();
 
         address commitReveal2Address;
-        (commitReveal2Address, s_networkHelperConfig) = (new DeployCommitReveal2()).run();
+        (commitReveal2Address, s_networkHelperConfig) = (new DeployCommitReveal2()).runForTest();
         s_commitReveal2 = CommitReveal2(commitReveal2Address);
         s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
         s_consumerExample = (new DeployConsumerExample()).deployConsumerExampleUsingConfig(address(s_commitReveal2));

@@ -34,7 +34,7 @@ library Sort {
      * @dev Load memory word (as a uint256) at location `ptr`.
      */
     function _mload(uint256 ptr) private pure returns (uint256 value) {
-        assembly {
+        assembly ("memory-safe") {
             value := mload(ptr)
         }
     }
@@ -43,7 +43,7 @@ library Sort {
      * @dev Swaps the elements memory location `ptr1` and `ptr2`.
      */
     function _swap(uint256 ptr1, uint256 ptr2) private pure {
-        assembly {
+        assembly ("memory-safe") {
             let value1 := mload(ptr1)
             let value2 := mload(ptr2)
             mstore(ptr1, value2)
