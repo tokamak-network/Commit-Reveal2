@@ -52,21 +52,6 @@ contract ConsumerExample is ConsumerBase {
         return address(s_commitreveal2);
     }
 
-    function getYourRequests()
-        external
-        view
-        returns (uint256[] memory requestIds, bool[] memory isFulFilled, uint256[] memory randomNumbers)
-    {
-        requestIds = s_requesterRequestIds[msg.sender];
-        isFulFilled = new bool[](requestIds.length);
-        randomNumbers = new uint256[](requestIds.length);
-        for (uint256 i = 0; i < requestIds.length; i++) {
-            RequestStatus memory request = s_requests[requestIds[i]];
-            isFulFilled[i] = request.fulfilled;
-            randomNumbers[i] = request.randomNumber;
-        }
-    }
-
     function withdraw() external {
         assembly ("memory-safe") {
             if iszero(call(gas(), caller(), selfbalance(), 0x00, 0x00, 0x00, 0x00)) {

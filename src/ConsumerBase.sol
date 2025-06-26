@@ -4,10 +4,14 @@ pragma solidity ^0.8.28;
 import {ICommitReveal2} from "./ICommitReveal2.sol";
 
 /**
- * @notice Abstract contract for contracts using VRF randomness
+ * @notice Abstract contract for contracts using CommitReveal2 DRB randomness
+ * ********************************************************************************
  *
  * @dev Consumer contracts must inherit from ConsumerBase, and can
- * @dev initialize Coordinator address in their constructor
+ * @dev initialize Coordinator address in their constructor.
+ * @dev Call the `_requestRandomNumber` function to request a random number.
+ * @dev Consumers must implement the fullfillRandomWords function, which will be called during
+ * @dev fulfillment with the randomness result.
  */
 abstract contract ConsumerBase {
     error OnlyCoordinatorCanFulfill(address have, address want);
