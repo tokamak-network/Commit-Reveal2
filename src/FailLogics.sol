@@ -8,32 +8,38 @@ contract FailLogics is DisputeLogics {
 
     function failToRequestSubmitCvOrSubmitMerkleRoot() external {
         assembly ("memory-safe") {
-            // ** check if the contract is halted
+            // ** check if the contract is HALTED
             if eq(sload(s_isInProcess.slot), HALTED) {
                 mstore(0, 0xd6c912e6) // selector for AlreadyHalted()
                 revert(0x1c, 0x04)
             }
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
-
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNum := sload(keccak256(0x40, 0x40))
+            mstore(0x00, trialNum)
             // ** Not requested to submit cv
-            mstore(0x20, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x60, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0, 0x899a05f2) // AlreadyRequestedToSubmitCv()
                 revert(0x1c, 0x04)
             }
             // ** MerkleRoot Not Submitted
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0, 0x1c044d8b) // AlreadySubmittedMerkleRoot()
                 revert(0x1c, 0x04)
             }
             // ** check time window
+            mstore(0x00, curRound)
+            mstore(0x20, s_requestInfo.slot)
+            let startTime := sload(add(keccak256(0x00, 0x40), 1))
             if lt(
                 timestamp(),
                 add(
-                    add(mload(0x00), sload(s_offChainSubmissionPeriod.slot)),
+                    add(startTime, sload(s_offChainSubmissionPeriod.slot)),
                     sload(s_requestOrSubmitOrFailDecisionPeriod.slot)
                 )
             ) {
@@ -61,18 +67,23 @@ contract FailLogics is DisputeLogics {
 
             // ** Halt the round
             sstore(s_isInProcess.slot, HALTED)
-            mstore(0x20, HALTED)
-            log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+            // 0x00 already has curRound
+            mstore(0x20, trialNum)
+            mstore(0x40, HALTED)
+            log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
         }
     }
 
     function failToSubmitMerkleRootAfterDispute() external {
         assembly ("memory-safe") {
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
-            mstore(0x20, s_requestedToSubmitCvTimestamp.slot)
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNum := sload(keccak256(0x40, 0x40))
+            mstore(0x00, trialNum)
             // ** check if it is requested to submit cv
+            mstore(0x60, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let requestedToSubmitCvTimestamp := sload(keccak256(0x00, 0x40))
             if iszero(requestedToSubmitCvTimestamp) {
                 mstore(0, 0xd3e6c959) // CvNotRequested()
@@ -90,7 +101,8 @@ contract FailLogics is DisputeLogics {
                 revert(0x1c, 0x04)
             }
             // ** MerkleRoot Not Submitted
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0, 0x1c044d8b) // AlreadySubmittedMerkleRoot()
                 revert(0x1c, 0x04)
@@ -114,20 +126,25 @@ contract FailLogics is DisputeLogics {
             sstore(depositSlot, add(sload(depositSlot), returnGasFee))
 
             // ** Halt the round
+            mstore(0x00, curRound)
+            mstore(0x20, trialNum)
             sstore(s_isInProcess.slot, HALTED)
-            mstore(0x20, HALTED)
-            log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+            mstore(0x40, HALTED)
+            log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
         }
     }
 
     function failToSubmitCv() external {
         assembly ("memory-safe") {
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            let startTimeSlot := add(keccak256(0x00, 0x40), 1)
-            mstore(0x00, sload(startTimeSlot)) // startTime
-            mstore(0x20, s_requestedToSubmitCvTimestamp.slot)
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNumSlot := keccak256(0x40, 0x40)
+            let trialNum := sload(trialNumSlot)
+            mstore(0x00, trialNum)
             // ** check if it is requested to submit cv
+            mstore(0x60, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let requestedToSubmitCvTimestamp := sload(keccak256(0x00, 0x40))
             if iszero(requestedToSubmitCvTimestamp) {
                 mstore(0, 0xd3e6c959) // CvNotRequested()
@@ -139,7 +156,8 @@ contract FailLogics is DisputeLogics {
                 revert(0x1c, 0x04)
             }
             // ** MerkleRoot Not Submitted
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0, 0x1c044d8b) // AlreadySubmittedMerkleRoot()
                 revert(0x1c, 0x04)
@@ -147,7 +165,7 @@ contract FailLogics is DisputeLogics {
 
             // ** who didn't submit cv even though requested
             let didntSubmitCvLength
-            let addressToDeactivatesPtr := mload(0x40) // fmp
+            let addressToDeactivatesPtr := 0x80 // fmp
             let zeroBitIfSubmittedCvBitmap := sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
             mstore(0x20, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x20, 0x20)
@@ -243,30 +261,39 @@ contract FailLogics is DisputeLogics {
             sstore(s_activatedOperators.slot, activatedOperatorLength)
 
             // ** restart or end this round
+            mstore(0x00, curRound)
             switch gt(sload(s_activatedOperators.slot), 1)
             case 1 {
-                sstore(startTimeSlot, timestamp())
-                mstore(0x00, timestamp())
-                mstore(0x20, IN_PROGRESS)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                mstore(0x20, s_requestInfo.slot)
+                sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
+                let newTrialNum := add(trialNum, 1) // trialNum++
+                sstore(trialNumSlot, newTrialNum)
+                // 0x00 already has curRound
+                mstore(0x20, newTrialNum)
+                mstore(0x40, IN_PROGRESS)
+                log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
             default {
                 sstore(s_isInProcess.slot, HALTED)
-                // memory 0x00 = startTime
-                mstore(0x20, HALTED)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                // 0x00 already has curRound
+                mstore(0x20, trialNum)
+                mstore(0x40, HALTED)
+                log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
         }
     }
 
     function failToSubmitCo() external {
         assembly ("memory-safe") {
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            let startTimeSlot := add(keccak256(0x00, 0x40), 1)
-            mstore(0x00, sload(startTimeSlot)) // startTime
-            mstore(0x20, s_requestedToSubmitCoTimestamp.slot)
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNumSlot := keccak256(0x40, 0x40)
+            let trialNum := sload(trialNumSlot)
+            mstore(0x00, trialNum)
             // ** check if it is requested to submit co
+            mstore(0x60, s_requestedToSubmitCoTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let requestedToSubmitCoTimestamp := sload(keccak256(0x00, 0x40))
             if iszero(requestedToSubmitCoTimestamp) {
                 mstore(0, 0x11974969) // CoNotRequested()
@@ -281,7 +308,7 @@ contract FailLogics is DisputeLogics {
             // ** who didn't submit co even though requested
             let requestedToSubmitCoLength := sload(s_requestedToSubmitCoLength.slot)
             let didntSubmitCoLength
-            let addressToDeactivatesPtr := mload(0x40) // fmp
+            let addressToDeactivatesPtr := 0x80 // fmp
             let zeroBitIfSubmittedCoBitmap := sload(s_zeroBitIfSubmittedCoBitmap.slot)
             mstore(0x20, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x20, 0x20)
@@ -361,32 +388,40 @@ contract FailLogics is DisputeLogics {
             sstore(s_activatedOperators.slot, activatedOperatorLength)
 
             // ** restart or end this round
+            mstore(0x00, curRound)
             switch gt(sload(s_activatedOperators.slot), 1)
             case 1 {
-                sstore(startTimeSlot, timestamp())
-                mstore(0x00, timestamp())
-                mstore(0x20, IN_PROGRESS)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                mstore(0x20, s_requestInfo.slot)
+                sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
+                let newTrialNum := add(trialNum, 1) // trialNum++
+                sstore(trialNumSlot, newTrialNum)
+                // 0x00 already has curRound
+                mstore(0x20, newTrialNum)
+                mstore(0x40, IN_PROGRESS)
+                log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
             default {
                 sstore(s_isInProcess.slot, HALTED)
-                // memory 0x00 = startTime
-                mstore(0x20, HALTED)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                // 0x00 already has curRound
+                mstore(0x20, trialNum)
+                mstore(0x40, HALTED)
+                log1(0x00, 0x60, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
             }
         }
     }
 
     function failToSubmitS() external {
         assembly ("memory-safe") {
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNumSlot := keccak256(0x40, 0x40)
+            let trialNum := sload(trialNumSlot)
+            mstore(0x00, trialNum)
             // ** Ensure S was requested
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            let startTimeSlot := add(keccak256(0x00, 0x40), 1)
-            mstore(0x00, sload(startTimeSlot))
-            mstore(0x20, s_previousSSubmitTimestamp.slot)
-            let previousSSubmitTimestampSlot := keccak256(0x00, 0x40)
-            let previousSSubmitTimestamp := sload(previousSSubmitTimestampSlot)
+            mstore(0x60, s_previousSSubmitTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
+            let previousSSubmitTimestamp := sload(keccak256(0x00, 0x40))
             if iszero(previousSSubmitTimestamp) {
                 mstore(0, 0x2d37f8d3) // SNotRequested()
                 revert(0x1c, 0x04)
@@ -454,48 +489,58 @@ contract FailLogics is DisputeLogics {
             sstore(s_activatedOperators.slot, activatedOperatorLength)
 
             // ** restart or end this round
+            mstore(0x00, curRound)
             switch gt(sload(s_activatedOperators.slot), 1)
             case 1 {
-                sstore(startTimeSlot, timestamp())
-                mstore(0x00, timestamp())
-                mstore(0x20, IN_PROGRESS)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                mstore(0x20, s_requestInfo.slot)
+                sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
+                let newTrialNum := add(trialNum, 1) // trialNum++
+                sstore(trialNumSlot, newTrialNum)
+                // 0x00 already has curRound
+                mstore(0x20, newTrialNum)
+                mstore(0x40, IN_PROGRESS)
+                log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
             default {
                 sstore(s_isInProcess.slot, HALTED)
-                // memory 0x00 = startTime
-                mstore(0x20, HALTED)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                // 0x00 already has curRound
+                mstore(0x20, trialNum)
+                mstore(0x40, HALTED)
+                log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
         }
     }
 
     function failToRequestSorGenerateRandomNumber() external {
         assembly ("memory-safe") {
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            let startTimeSlot := add(keccak256(0x00, 0x40), 1)
-            mstore(0x00, sload(startTimeSlot)) // startTime
+            // ** check if the contract is COMPLETED or HALTED
+            if iszero(eq(sload(s_isInProcess.slot), IN_PROGRESS)) {
+                mstore(0, 0xd51a29b7) // RandomNumGenerated()
+                revert(0x1c, 0x04)
+            }
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNum := sload(keccak256(0x40, 0x40))
+            mstore(0x00, trialNum)
             // ** Ensure S was not requested
-            mstore(0x20, s_previousSSubmitTimestamp.slot)
+            mstore(0x60, s_previousSSubmitTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0, 0x53489cf9) // SRequested()
                 revert(0x1c, 0x04)
             }
             // ** Ensure Merkle Root is submitted
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let merkleRootSubmittedTimestamp := sload(keccak256(0x00, 0x40))
             if iszero(merkleRootSubmittedTimestamp) {
                 mstore(0, 0x8e56b845) // MerkleRootNotSubmitted()
                 revert(0x1c, 0x04)
             }
-            // ** is in process
-            if iszero(eq(sload(s_isInProcess.slot), IN_PROGRESS)) {
-                mstore(0, 0xd51a29b7) // RandomNumGenerated()
-                revert(0x1c, 0x04)
-            }
             // ** check time window
-            mstore(0x20, s_requestedToSubmitCoTimestamp.slot)
+            mstore(0x60, s_requestedToSubmitCoTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let requestedToSubmitCoTimestamp := sload(keccak256(0x00, 0x40))
             let activatedOperatorLength := sload(s_activatedOperators.slot)
             switch gt(requestedToSubmitCoTimestamp, 0)
@@ -550,8 +595,10 @@ contract FailLogics is DisputeLogics {
 
             // ** Halt the round
             sstore(s_isInProcess.slot, HALTED)
-            mstore(0x20, HALTED)
-            log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+            mstore(0x00, curRound)
+            mstore(0x20, trialNum)
+            mstore(0x40, HALTED)
+            log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
         }
     }
 }

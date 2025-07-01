@@ -7,11 +7,13 @@ contract CommitReveal2Storage {
      * @notice Represents a commitment message containing a timestamp and a commitment value (`cv`).
      * @dev
      *   - Used in EIP-712 typed data hashing (see `MESSAGE_TYPEHASH`) for operator signatures.
-     *   - `timestamp` indicates when the commitment was made.
+     *   - `round`
+     *   - `trialNum` indicates the trial number of the round.
      *   - `cv` is a double hashed value of operator secret
      */
     struct Message {
-        uint256 timestamp;
+        uint256 round;
+        uint256 trialNum;
         bytes32 cv;
     }
 
@@ -101,16 +103,15 @@ contract CommitReveal2Storage {
     error CvNotEqualHashCo(); // 0x67b3c693
 
     // * Events
-    event Status(uint256 curStartTime, uint256 curState); // 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762
-    event MerkleRootSubmitted(uint256 startTime, bytes32 merkleRoot);
+    event Status(uint256 curRound, uint256 curTrialNum, uint256 curState); // 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813
+    event MerkleRootSubmitted(uint256 round, uint256 trialNum, bytes32 merkleRoot); // 0x45b19880b523c6750f7f39fca8d77d51101b315495adc482994a4fa2a8294466
 
-    //event RequestedToSubmitCv(uint256 startTime, uint256[] indices);
-    event RequestedToSubmitCv(uint256 startTime, uint256 packedIndices); // 0x18d0e75c02ebf9429b0b69ace609256eb9c9e12d5c9301a2d4a04fd7599b5cfc
-    event RequestedToSubmitCo(uint256 startTime, uint256 indicesLength, uint256 packedIndices); // 0x3a1aae8ec96f949b8b598464ca094f2ba50e8826b0bd3245fd24ec868a27ab57
-    event CvSubmitted(uint256 startTime, bytes32 cv, uint256 index);
-    event CoSubmitted(uint256 startTime, bytes32 co, uint256 index); // 0x881e94fac6a4a0f5fbeeb59a652c0f4179a070b4e73db759ec4ef38e080eb4a8
-    event RequestedToSubmitSFromIndexK(uint256 startTime, uint256 indexK); // 0x6f5c0fbf1eb0f90db5f97e1e5b4c0bc94060698d6f59c07e07695ddea198b778
-    event SSubmitted(uint256 startTime, bytes32 s, uint256 index); // 0x1f2f0bf333e80ee899084dda13e87c0b04096ba331a8d993487a116d166947ec
+    event RequestedToSubmitCv(uint256 round, uint256 trialNum, uint256 packedIndicesAscendingFromLSB); // 0x16759d80d11394de93184cfeb4e91cf57282cef239f68ed141c496600454f757
+    event RequestedToSubmitCo(uint256 round, uint256 trialNum, uint256 indicesLength, uint256 packedIndices); // 0xd4cc5cd95f180f10aaacba0729abc069b8080ec3a7e8e41856decb17bdc28ece
+    event CvSubmitted(uint256 round, uint256 trialNum, bytes32 cv, uint256 index); // 0x6a6385c5eaed19d346ec4f9bd0010cfba4ac1d0407e2e55f959cb8fcac30f873
+    event CoSubmitted(uint256 round, uint256 trialNum, bytes32 co, uint256 index); // 0xc294138987faa6e0ebef350caeac5cf5e1eff8dbbe8a158e421601f48674babd
+    event RequestedToSubmitSFromIndexK(uint256 round, uint256 trialNum, uint256 indexK); // 0x583f939e9612a50da8a140b5e7247ff7c3c899c45e4051a5ba045abea6177f08
+    event SSubmitted(uint256 round, uint256 trialNum, bytes32 s, uint256 index); // 0xfa070a58e2c77080acd5c2b1819669eb194bbeeca6f680a31a2076510be5a7b1
 
     // * State Variables
     // ** public
@@ -139,37 +140,36 @@ contract CommitReveal2Storage {
      */
     uint256 public s_requestCount;
 
+    mapping(uint256 round => uint256 trialNum) public s_trialNum;
+
     /**
      * @notice Stores the latest submitted Merkle root for the current round.
      * @dev
      *   - Used to validate operator commitments in the chain of trust for reveal phases.
      *   - Updated by the leader node via `submitMerkleRoot()`.
      */
-    mapping(uint256 startTime => uint256) public s_requestedToSubmitCvTimestamp;
+    mapping(uint256 round => mapping(uint256 trialNum => uint256)) public s_requestedToSubmitCvTimestamp;
     uint256 public s_requestedToSubmitCvPackedIndicesAscFromLSB;
     uint256 public s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2;
     bytes32[32] public s_cvs;
     bytes32[32] public s_cos;
 
-    mapping(uint256 startTime => uint256) public s_merkleRootSubmittedTimestamp;
+    mapping(uint256 round => mapping(uint256 trialNum => uint256)) public s_merkleRootSubmittedTimestamp;
     bytes32 public s_merkleRoot;
 
-    mapping(uint256 startTime => uint256) public s_requestedToSubmitCoTimestamp;
+    mapping(uint256 round => mapping(uint256 trialNum => uint256)) public s_requestedToSubmitCoTimestamp;
     uint256 public s_requestedToSubmitCoLength;
     uint256 public s_requestedToSubmitCoPackedIndices;
     uint256 public s_zeroBitIfSubmittedCoBitmap;
 
-    mapping(uint256 startTime => uint256) public s_previousSSubmitTimestamp;
+    mapping(uint256 round => mapping(uint256 trialNum => uint256)) public s_previousSSubmitTimestamp;
     /**
      * @notice Tracks the reveal order index in `secrets` when `requestToSubmitS()` is called
      * @dev
      *   - Used in `submitS()` to verify if the current operator is next in line.
      */
     uint256 public s_requestedToSubmitSFromIndexK;
-    /**
-     * @notice For each round (`timestamp`), stores an array of final secrets (`S`):
-     *         - `s_ss[timestamp][i]` is the revealed secret of operator `i`, if submitted on-chain.
-     */
+
     bytes32[32] public s_secrets;
     /**
      * @notice The array of operator indices in strictly descending difference order (rv and Cvi).
@@ -249,9 +249,9 @@ contract CommitReveal2Storage {
     uint256 internal constant MAX_CALLBACK_GAS_LIMIT = 2500000;
     uint256 internal constant GAS_FOR_CALL_EXACT_CHECK = 5_000;
 
-    bytes32 internal constant MESSAGE_TYPEHASH = keccak256("Message(uint256 timestamp,bytes32 cv)");
+    bytes32 internal constant MESSAGE_TYPEHASH = keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)");
     bytes32 internal constant MESSAGE_TYPEHASH_DIRECT =
-        0x2c78ac8207d32e75916e1a710ea4ff41cec9726e3198a7a8fc85639fb274018a; // keccak256("Message(uint256 timestamp,bytes32 cv)");
+        0x7c90823f4ccd06a00814473b1ad932d6313680c6d946963ecf1d30094346c24e; // keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)");
 
     // *** functions gasUsed;
     uint256 internal constant FAILTOSUBMITCVORSUBMITMERKLEROOT_GASUSED = 123;
@@ -263,8 +263,8 @@ contract CommitReveal2Storage {
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
 
-    function getMerkleRoot(uint256 startTime) external view returns (bytes32, bool) {
-        if (s_merkleRootSubmittedTimestamp[startTime] == 0) {
+    function getMerkleRoot(uint256 round, uint256 trialNum) external view returns (bytes32, bool) {
+        if (s_merkleRootSubmittedTimestamp[round][trialNum] == 0) {
             return (bytes32(0), false);
         }
         return (s_merkleRoot, true);
@@ -279,8 +279,14 @@ contract CommitReveal2Storage {
         return (curRound, s_requestInfo[curRound].startTime);
     }
 
+    function getCurRoundAndTrialNum() external view returns (uint256, uint256) {
+        uint256 curRound = s_currentRound;
+        return (curRound, s_trialNum[curRound]);
+    }
+
     function getZeroBitIfSubmittedCvOnChainBitmap() external view returns (uint256) {
-        uint256 requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[getCurStartTime()];
+        uint256 curRound = s_currentRound;
+        uint256 requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[curRound][s_trialNum[curRound]];
         if (requestedToSubmitCvTimestamp == 0) {
             return 0xffffffff;
         }
@@ -288,7 +294,8 @@ contract CommitReveal2Storage {
     }
 
     function getZeroBitIfSubmittedCoOnChainBitmap() external view returns (uint256) {
-        uint256 requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[getCurStartTime()];
+        uint256 curRound = s_currentRound;
+        uint256 requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[curRound][s_trialNum[curRound]];
         if (requestedToSubmitCoTimestamp == 0) {
             return 0xffffffff;
         }
@@ -303,7 +310,7 @@ contract CommitReveal2Storage {
         return secrets;
     }
 
-    function getDisputeInfos(uint256 startTime)
+    function getDisputeInfos(uint256 round, uint256 trialNum)
         external
         view
         returns (
@@ -319,19 +326,19 @@ contract CommitReveal2Storage {
             uint256 requestedToSubmitSFromIndexK
         )
     {
-        requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[startTime];
+        requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[round][trialNum];
         requestedToSubmitCvPackedIndicesAscFromLSB = s_requestedToSubmitCvPackedIndicesAscFromLSB;
         zeroBitIfSubmittedCvBitmap = s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2;
-        requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[startTime];
+        requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[round][trialNum];
         requestedToSubmitCoPackedIndices = s_requestedToSubmitCoPackedIndices;
         requestedToSubmitCoLength = s_requestedToSubmitCoLength;
         zeroBitIfSubmittedCoBitmap = s_zeroBitIfSubmittedCoBitmap;
-        previousSSubmitTimestamp = s_previousSSubmitTimestamp[startTime];
+        previousSSubmitTimestamp = s_previousSSubmitTimestamp[round][trialNum];
         packedRevealOrders = s_packedRevealOrders;
         requestedToSubmitSFromIndexK = s_requestedToSubmitSFromIndexK;
     }
 
-    function getDisputeTimestamps(uint256 startTime)
+    function getDisputeTimestamps(uint256 round, uint256 trialNum)
         external
         view
         returns (
@@ -340,8 +347,8 @@ contract CommitReveal2Storage {
             uint256 previousSSubmitTimestamp
         )
     {
-        requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[startTime];
-        requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[startTime];
-        previousSSubmitTimestamp = s_previousSSubmitTimestamp[startTime];
+        requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[round][trialNum];
+        requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[round][trialNum];
+        previousSSubmitTimestamp = s_previousSSubmitTimestamp[round][trialNum];
     }
 }

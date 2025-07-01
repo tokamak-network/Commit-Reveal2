@@ -99,7 +99,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_lastRequestId = s_consumerExample.lastRequestId();
         (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
         assertEq(s_fulfilled, true);
-        console2.log("\nRound", s_lastRequestId, "fulfilled");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("s_lastRequestId", s_lastRequestId);
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -138,7 +139,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_lastRequestId = s_consumerExample.lastRequestId();
         (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
         assertEq(s_fulfilled, true);
-        console2.log("\nRound", s_lastRequestId, "fulfilled");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("s_lastRequestId", s_lastRequestId);
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -183,7 +185,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_lastRequestId = s_consumerExample.lastRequestId();
         (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
         assertEq(s_fulfilled, true);
-        console2.log("\nRound", s_lastRequestId, "fulfilled");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("s_lastRequestId", s_lastRequestId);
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -253,7 +256,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_lastRequestId = s_consumerExample.lastRequestId();
         (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
         assertEq(s_fulfilled, true);
-        console2.log("\nRound", s_lastRequestId, "fulfilled");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("s_lastRequestId", s_lastRequestId);
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -304,7 +308,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_lastRequestId = s_consumerExample.lastRequestId();
         (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
         assertEq(s_fulfilled, true);
-        console2.log("\nRound", s_lastRequestId, "fulfilled");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("s_lastRequestId", s_lastRequestId);
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -366,7 +371,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_lastRequestId = s_consumerExample.lastRequestId();
         (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
         assertEq(s_fulfilled, true);
-        console2.log("\nRound", s_lastRequestId, "fulfilled");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("s_lastRequestId", s_lastRequestId);
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -448,7 +454,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_lastRequestId = s_consumerExample.lastRequestId();
         (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
         assertEq(s_fulfilled, true);
-        console2.log("\nRound", s_lastRequestId, "fulfilled");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("s_lastRequestId", s_lastRequestId);
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -536,14 +543,15 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_lastRequestId = s_consumerExample.lastRequestId();
         (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
         assertEq(s_fulfilled, true);
-        console2.log("\nRound", s_lastRequestId, "fulfilled");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("s_lastRequestId", s_lastRequestId);
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
 
         // * i. 1 -> 5, round: 8
         // ** 5.
-        s_currentRound = s_commitReveal2.s_currentRound();
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_currentRound);
         // ** s_offChainSubmissionPeriod passed
         mine(s_activeNetworkConfig.offChainSubmissionPeriod);
@@ -555,8 +563,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToRequestSubmitCvOrSubmitMerkleRoot();
         mine(1);
         // *** After the protocol halts, the round can be restarted or the consumer can refund the round.
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "Failed");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("Failed");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -565,18 +573,18 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_consumerExample.refund(8);
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "Refunded");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("Refunded");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
 
         vm.startPrank(LEADERNODE);
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "Resumed");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("Resumed");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -622,9 +630,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After 2, 6, 8 failToSubmitCv");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After 2, 6, 8 failToSubmitCv");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -650,9 +658,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitCv();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After 0 failToSubmitCv");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After 0 failToSubmitCv");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -687,9 +695,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitMerkleRootAfterDispute();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitMerkleRootAfterDispute");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After failToSubmitMerkleRootAfterDispute");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -699,9 +707,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After resume");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After resume");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -737,9 +745,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitCo");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After failToSubmitCo");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -786,9 +794,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitCo();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitCo");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After failToSubmitCo");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -848,9 +856,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitCo");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After failToSubmitCo");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -868,9 +876,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
         vm.stopPrank();
 
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After Some Withdraw");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After Some Withdraw");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -892,6 +900,12 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         vm.startPrank(LEADERNODE);
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
         mine(1);
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After resume");
+        consoleDepositsAndSlashRewardAccumulated(
+            s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
+        );
 
         // ** Off-chain: Cvi Submission
         revealOrders = _setSCoCvRevealOrders(s_privateKeys);
@@ -953,9 +967,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitCo();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After submitCo");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After failToSubmitCo");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -977,9 +991,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToRequestSorGenerateRandomNumber();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After failToRequestSOrGenerateRandomNumber");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After failToRequestSOrGenerateRandomNumber");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -989,9 +1003,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After resume");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After resume");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1035,9 +1049,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToRequestSorGenerateRandomNumber();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After failToRequestSOrGenerateRandomNumber");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After failToRequestSOrGenerateRandomNumber");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1047,9 +1061,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After resume");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After resume");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1113,9 +1127,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitS();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitS");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After failToSubmitS");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1171,9 +1185,9 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_commitReveal2.failToSubmitS();
         mine(1);
         vm.stopPrank();
-        s_currentRound = s_commitReveal2.s_currentRound();
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After failToSubmitS");
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After failToSubmitS");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );
@@ -1192,8 +1206,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_lastRequestId = s_consumerExample.lastRequestId();
         (s_fulfilled,) = s_consumerExample.s_requests(s_lastRequestId);
         assertEq(s_fulfilled, true);
-        console2.log("\nRound", s_currentRound);
-        console2.log("StartTimestamp", s_startTimestamp, "After generateRandomNumber");
+        console2.log("\nRound", s_currentRound, "trialNum", s_currentTrialNum);
+        console2.log("After generateRandomNumber");
         consoleDepositsAndSlashRewardAccumulated(
             s_commitReveal2, s_consumerExample, s_operatorAddresses, LEADERNODE, s_anyAddress
         );

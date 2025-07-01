@@ -62,6 +62,7 @@ contract CommitReveal2Helper is Test {
     uint256 public s_activatedOperatorsLength;
     uint256 public s_lastRequestId;
     uint256 public s_currentRound;
+    uint256 public s_currentTrialNum;
 
     function _packArrayIntoUint256(uint256[] storage arr) internal view returns (uint256 packed) {
         uint256 len = arr.length;
@@ -110,6 +111,7 @@ contract CommitReveal2Helper is Test {
     {
         s_startTimestamp = s_commitReveal2.getCurStartTime();
         s_activatedOperators = s_commitReveal2.getActivatedOperators();
+        (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
         // *** Generate S, Co, Cv, Signatures
         uint256[] memory privateKeys = new uint256[](s_activatedOperators.length);
         for (uint256 i; i < s_activatedOperators.length; i++) {
@@ -131,7 +133,8 @@ contract CommitReveal2Helper is Test {
 
         for (uint256 i; i < length; i++) {
             (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv(s_startTimestamp);
-            (s_vs[i], s_rs[i], s_ss[i]) = vm.sign(privatekeys[i], _getTypedDataHashV4(s_startTimestamp, s_cvs[i]));
+            (s_vs[i], s_rs[i], s_ss[i]) =
+                vm.sign(privatekeys[i], _getTypedDataHashV4(s_currentRound, s_currentTrialNum, s_cvs[i]));
             uint256 v = uint256(s_vs[i]);
             s_packedVs = s_packedVs | (v << (i * 8));
             s_secretSigRSs[i] = CommitReveal2Storage.SecretAndSigRS({
@@ -215,7 +218,11 @@ contract CommitReveal2Helper is Test {
         console2.log("--------------------");
     }
 
-    function _getTypedDataHashV4(uint256 timestamp, bytes32 cv) internal view returns (bytes32 typedDataHash) {
+    function _getTypedDataHashV4(uint256 round, uint256 trialNum, bytes32 cv)
+        internal
+        view
+        returns (bytes32 typedDataHash)
+    {
         typedDataHash = keccak256(
             abi.encodePacked(
                 hex"1901",
@@ -230,8 +237,8 @@ contract CommitReveal2Helper is Test {
                 ),
                 keccak256(
                     abi.encode(
-                        keccak256("Message(uint256 timestamp,bytes32 cv)"),
-                        CommitReveal2Storage.Message({timestamp: timestamp, cv: cv})
+                        keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)"),
+                        CommitReveal2Storage.Message({round: round, trialNum: trialNum, cv: cv})
                     )
                 )
             )

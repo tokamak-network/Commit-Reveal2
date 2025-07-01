@@ -10,17 +10,26 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
 
     function requestToSubmitCv(uint256 packedIndicesAscendingFromLSB) external onlyOwner {
         assembly ("memory-safe") {
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
-            mstore(0x20, s_requestedToSubmitCvTimestamp.slot)
-            let requestedToSubmitCvTimestampSlot := keccak256(0x00, 0x40)
+            // mstore(0x00, sload(s_currentRound.slot))
+            // mstore(0x20, s_requestInfo.slot)
+            // mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
+
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x60, curRound)
+            mstore(0x80, s_trialNum.slot)
+            mstore(0x20, sload(keccak256(0x60, 0x40))) // trialNum
+            // * get requestedToSubmitCvTimestamp
+            mstore(0x80, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x40, keccak256(0x60, 0x40))
+            let requestedToSubmitCvTimestampSlot := keccak256(0x20, 0x40)
             if gt(sload(requestedToSubmitCvTimestampSlot), 0) {
                 mstore(0, 0x899a05f2) // AlreadyRequestedToSubmitCv()
                 revert(0x1c, 0x04)
             }
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
-            if gt(sload(keccak256(0x00, 0x40)), 0) {
+            // * get merkleRootSubmittedTimestamp
+            mstore(0x80, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x40, keccak256(0x60, 0x40))
+            if gt(sload(keccak256(0x20, 0x40)), 0) {
                 mstore(0, 0xf6b442ac) // MerkleRootIsSubmitted()
                 revert(0x1c, 0x04)
             }
@@ -32,9 +41,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             bitSetIfRequestedToSubmitCv := or(bitSetIfRequestedToSubmitCv, shl(previousIndex, 1))
-            mstore(0x20, packedIndicesAscendingFromLSB)
+            mstore(0x40, packedIndicesAscendingFromLSB)
             for { let i := 1 } true { i := add(i, 1) } {
-                let currentIndex := and(mload(sub(0x20, i)), 0xff)
+                let currentIndex := and(mload(sub(0x40, i)), 0xff)
                 if gt(currentIndex, maxIndex) {
                     mstore(0, 0x63df8171) // InvalidIndex()
                     revert(0x1c, 0x04)
@@ -49,7 +58,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot,
                 or(shl(128, bitSetIfRequestedToSubmitCv), 0xffffffff)
             ) // set zeroBitIfSubmittedCvBitmap all bits to 1
-            log1(0x00, 0x40, 0x18d0e75c02ebf9429b0b69ace609256eb9c9e12d5c9301a2d4a04fd7599b5cfc) // emit RequestedToSubmitCv(uint256 startTime, uint256 packedIndices)
+            mstore(0x00, curRound) // 0x20 already has trialNum, 0x40 already has packedIndicesAscendingFromLSB
+            log1(0x00, 0x60, 0x16759d80d11394de93184cfeb4e91cf57282cef239f68ed141c496600454f757) // event RequestedToSubmitCv(uint256 round, uint256 trialNum, uint256 packedIndicesAscendingFromLSB)
         }
     }
 
@@ -73,12 +83,15 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0x998cf22e) // CvNotRequestedForThisOperator()
                 revert(0x1c, 0x04)
             }
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            mstore(0x20, sload(keccak256(0x40, 0x40))) // trialNum
+            // * get merkleRootSubmittedTimestamp
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x40, keccak256(0x40, 0x40))
             // ** can only submit cv if merkleRoot is not submitted
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
-            if gt(sload(keccak256(0x00, 0x40)), 0) {
+            if gt(sload(keccak256(0x20, 0x40)), 0) {
                 mstore(0, 0xf6b442ac) // MerkleRootIsSubmitted()
                 revert(0x1c, 0x04)
             }
@@ -87,10 +100,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot,
                 and(bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2, not(shl(activatedOperatorIndex, 1)))
             ) // set to zero
-
-            mstore(0x20, cv)
-            mstore(0x40, activatedOperatorIndex)
-            log1(0x00, 0x60, 0x689880904ca6a1080ab52c3fd53043e57fddaa2af740366f4fd4275e91512438) // emit CvSubmitted(uint256 startTime, bytes32 cv, uint256 index)
+            mstore(0x00, curRound) // 0x20 already has trialNum
+            mstore(0x40, cv)
+            mstore(0x60, activatedOperatorIndex)
+            log1(0x00, 0x80, 0x6a6385c5eaed19d346ec4f9bd0010cfba4ac1d0407e2e55f959cb8fcac30f873) // event CvSubmitted(uint256 round, uint256 trialNum, bytes32 cv, uint256 index)
         }
     }
 
@@ -111,19 +124,23 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
 
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            let startTime := sload(add(keccak256(0x00, 0x40), 1))
-            mstore(0x00, startTime)
-            // ** can only request to submit co if merkleRoot is submitted
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNum := sload(keccak256(0x40, 0x40))
+            mstore(0x00, trialNum)
+            // * get merkleRootSubmittedTimestamp
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let merkleRootSubmittedTimestamp := sload(keccak256(0x00, 0x40))
+            // ** can only request to submit co if merkleRoot is submitted
             if iszero(merkleRootSubmittedTimestamp) {
                 mstore(0, 0x8e56b845) // MerkleRootNotSubmitted()
                 revert(0x1c, 0x04)
             }
             // ** check if already requested to submit co
-            mstore(0x20, s_requestedToSubmitCoTimestamp.slot)
+            mstore(0x60, s_requestedToSubmitCoTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let requestedToSubmitCoTimestampSlot := keccak256(0x00, 0x40)
             if gt(sload(requestedToSubmitCoTimestampSlot), 0) {
                 mstore(0, 0x13efcda2) // AlreadyRequestedToSubmitCo()
@@ -143,7 +160,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
 
             // ** check cv status
             let operatorsLength := sload(s_activatedOperators.slot)
-            mstore(0x20, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x60, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let requestedToSubmitCvTimestampSlot := keccak256(0x00, 0x40)
             // if not requested to submit cv, it means no cvs are on-chain
             let zeroBitIfSubmittedCvBitmap
@@ -159,16 +177,15 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             default {
                 zeroBitIfSubmittedCvBitmap := sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
             }
-
-            // **
             let maxIndex := sub(operatorsLength, 1) // max index
             let checkDuplicate
 
-            let fmp := mload(0x40) // fmp
+            let fmp := 0x80 // fmp
             mstore(fmp, MESSAGE_TYPEHASH_DIRECT)
-            mstore(add(fmp, 0x20), startTime) // startTime
-            mstore(add(fmp, 0x60), hex"1901") // prefix and version
-            mstore(add(fmp, 0x62), domainSeparator)
+            mstore(add(fmp, 0x20), curRound)
+            mstore(add(fmp, 0x40), trialNum)
+            mstore(add(fmp, 0x80), hex"1901") // prefix and version
+            mstore(add(fmp, 0x82), domainSeparator)
 
             for { let i } lt(i, cvRSsForCvsNotOnChainAndReqToSubmitCo.length) { i := add(i, 1) } {
                 // ** check duplicate
@@ -193,9 +210,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                     mstore(0, 0xbf4bf5b8) // InvalidSignatureS()
                     revert(0x1c, 0x04)
                 }
-                mstore(add(fmp, 0x40), calldataload(cvsRSsOffset)) // cv
-                mstore(add(fmp, 0x82), keccak256(fmp, 0x60)) // structHash
-                mstore(0x00, keccak256(add(fmp, 0x60), 0x42)) // digest hash
+                mstore(add(fmp, 0x60), calldataload(cvsRSsOffset)) // cv
+                mstore(add(fmp, 0xa2), keccak256(fmp, 0x80)) // structHash
+                mstore(0x00, keccak256(add(fmp, 0x80), 0x42)) // digest hash
                 mstore(0x20, and(calldataload(sub(0x24, i)), 0xff)) // v, 0x24: packedVsForCvsNotOnChainAndReqToSubmitCo offset
                 mstore(0x40, calldataload(add(cvsRSsOffset, 0x20))) // r
                 mstore(0x60, s)
@@ -248,28 +265,31 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             sstore(s_zeroBitIfSubmittedCoBitmap.slot, 0xffffffff) // set all bits to 1
 
             // ** event
-            mstore(0x00, startTime)
-            mstore(0x20, indicesLength)
-            mstore(0x40, packedIndicesFirstCvNotOnChainRestCvOnChain)
-            log1(0x00, 0x60, 0x3a1aae8ec96f949b8b598464ca094f2ba50e8826b0bd3245fd24ec868a27ab57) // emit RequestedToSubmitCo(uint256 startTime, uint256 indicesLength, uint256 packedIndices);
+            mstore(0x00, curRound)
+            mstore(0x20, trialNum)
+            mstore(0x40, indicesLength)
+            mstore(0x60, packedIndicesFirstCvNotOnChainRestCvOnChain)
+            log1(0x00, 0x80, 0xd4cc5cd95f180f10aaacba0729abc069b8080ec3a7e8e41856decb17bdc28ece) // event RequestedToSubmitCo(uint256 round, uint256 trialNum, uint256 indicesLength, uint256 packedIndices);
         }
     }
 
     function submitCo(bytes32 co) external {
         assembly ("memory-safe") {
             // ** check co status
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
-            mstore(0x20, s_requestedToSubmitCoTimestamp.slot)
-            if iszero(sload(keccak256(0x00, 0x40))) {
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            mstore(0x20, sload(keccak256(0x40, 0x40))) // trialNum
+            mstore(0x60, s_requestedToSubmitCoTimestamp.slot)
+            mstore(0x40, keccak256(0x40, 0x40))
+            if iszero(sload(keccak256(0x20, 0x40))) {
                 mstore(0, 0x11974969) // CoNotRequested()
                 revert(0x1c, 0x04)
             }
             // ** check cv == hash(co)
-            mstore(0x20, caller())
-            mstore(0x40, s_activatedOperatorIndex1Based.slot)
-            let activatedOperatorIndex := sub(sload(keccak256(0x20, 0x40)), 1) // underflows when s_activatedOperatorIndex1Based is 0
+            mstore(0x40, caller())
+            mstore(0x60, s_activatedOperatorIndex1Based.slot)
+            let activatedOperatorIndex := sub(sload(keccak256(0x40, 0x40)), 1) // underflows when s_activatedOperatorIndex1Based is 0
             if gt(activatedOperatorIndex, MAX_OPERATOR_INDEX) {
                 mstore(0, 0x1b256530) // NotActivatedOperator()
                 revert(0x1c, 0x04)
@@ -281,8 +301,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0x03798920) // CvNotSubmitted()
                 revert(0x1c, 0x04)
             }
-            mstore(0x20, co)
-            if iszero(eq(sload(add(s_cvs.slot, activatedOperatorIndex)), keccak256(0x20, 0x20))) {
+            mstore(0x40, co)
+            if iszero(eq(sload(add(s_cvs.slot, activatedOperatorIndex)), keccak256(0x40, 0x20))) {
                 mstore(0, 0x67b3c693) // CvNotEqualHashCo()
                 revert(0x1c, 0x04)
             }
@@ -293,8 +313,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             ) // set to zero bit
             sstore(add(s_cos.slot, activatedOperatorIndex), co)
             // ** event
-            mstore(0x40, activatedOperatorIndex)
-            log1(0x00, 0x60, 0x881e94fac6a4a0f5fbeeb59a652c0f4179a070b4e73db759ec4ef38e080eb4a8) // emit CoSubmitted(uint256 startTime, bytes32 co, uint256 index)
+            mstore(0x00, curRound) // 0x20 already has trialNum, 0x40 already has co
+            mstore(0x60, activatedOperatorIndex)
+            log1(0x00, 0x80, 0xc294138987faa6e0ebef350caeac5cf5e1eff8dbbe8a158e421601f48674babd) // event CoSubmitted(uint256 round, uint256 trialNum, bytes32 co, uint256 index)
         }
     }
 
@@ -307,18 +328,21 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
     ) external {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            let startTime := sload(add(keccak256(0x00, 0x40), 1))
-            mstore(0x00, startTime)
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNum := sload(keccak256(0x40, 0x40))
+            mstore(0x00, trialNum)
             // ** can only request to submit S if merkleRoot is submitted
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             if iszero(sload(keccak256(0x00, 0x40))) {
                 mstore(0, 0x8e56b845) // MerkleRootNotSubmitted()
                 revert(0x1c, 0x04)
             }
             // ** check if already requested to submit S
-            mstore(0x20, s_previousSSubmitTimestamp.slot)
+            mstore(0x60, s_previousSSubmitTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let previousSSubmitTimestampSlot := keccak256(0x00, 0x40)
             if gt(sload(previousSSubmitTimestampSlot), 0) {
                 mstore(0, 0x0d934196) // AlreadyRequestedToSubmitS()
@@ -331,7 +355,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             // ** check cv status
-            mstore(0x20, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x60, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let requestedToSubmitCvTimestampSlot := keccak256(0x00, 0x40)
             let zeroBitIfSubmittedCvBitmap
             switch sload(requestedToSubmitCvTimestampSlot)
@@ -344,7 +369,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             }
 
             // ****
-            let cos := mload(0x40) // fmp
+            let cos := 0x80 // fmp
             let operatorLengthInBytes := mul(activatedOperatorsLength, 0x20)
             calldatacopy(cos, allCos.offset, operatorLengthInBytes) // allCos
             let rv := keccak256(cos, operatorLengthInBytes) // hash of all cos
@@ -357,9 +382,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             }
             let fmp := add(diffs, operatorLengthInBytes) // fmp
             mstore(fmp, MESSAGE_TYPEHASH_DIRECT)
-            mstore(add(fmp, 0x20), startTime) // startTime
-            mstore(add(fmp, 0x60), hex"1901") // prefix and version
-            mstore(add(fmp, 0x62), domainSeparator)
+            mstore(add(fmp, 0x20), curRound)
+            mstore(add(fmp, 0x40), trialNum)
+            mstore(add(fmp, 0x80), hex"1901") // prefix and version
+            mstore(add(fmp, 0x82), domainSeparator)
             let sigCounter
             for { let i } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
                 let cv := keccak256(add(cos, shl(5, i)), 0x20)
@@ -382,9 +408,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                         mstore(0, 0xbf4bf5b8) // InvalidSignatureS()
                         revert(0x1c, 0x04)
                     }
-                    mstore(add(fmp, 0x40), cv)
-                    mstore(add(fmp, 0x82), keccak256(fmp, 0x60)) // structHash
-                    mstore(0x00, keccak256(add(fmp, 0x60), 0x42)) // digest hash
+                    mstore(add(fmp, 0x60), cv)
+                    mstore(add(fmp, 0xa2), keccak256(fmp, 0x80)) // structHash
+                    mstore(0x00, keccak256(add(fmp, 0x80), 0x42)) // digest hash
                     mstore(0x20, and(calldataload(sub(0x44, sigCounter)), 0xff)) // v, 0x44: packedVsForAllCvsNotOnChain offset
                     sigCounter := add(sigCounter, 1)
                     mstore(0x40, calldataload(rSOffset)) // r
@@ -427,9 +453,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             // skip updating zeroBitIfSubmittedCvBitmap because it is not used anymore
             sstore(s_packedRevealOrders.slot, packedRevealOrders) // update packedRevealOrders
             sstore(s_requestedToSubmitSFromIndexK.slot, secretsReceivedOffchainInRevealOrder.length)
-            mstore(0x00, startTime)
-            mstore(0x20, secretsReceivedOffchainInRevealOrder.length)
-            log1(0x00, 0x40, 0x6f5c0fbf1eb0f90db5f97e1e5b4c0bc94060698d6f59c07e07695ddea198b778) // emit RequestedToSubmitSFromIndexK(uint256 startTime, uint256 indexK)
+            mstore(0x00, curRound)
+            mstore(0x20, trialNum)
+            mstore(0x40, secretsReceivedOffchainInRevealOrder.length)
+            log1(0x00, 0x60, 0x583f939e9612a50da8a140b5e7247ff7c3c899c45e4051a5ba045abea6177f08) // event RequestedToSubmitSFromIndexK(uint256 round, uint256 trialNum, uint256 indexK)
             // ** store secrets
             for { let i } lt(i, secretsReceivedOffchainInRevealOrder.length) { i := add(i, 1) } {
                 index := and(calldataload(sub(0x84, i)), 0xff) // 0x84: packedRevealOrders offset
@@ -449,25 +476,24 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
 
     function submitS(bytes32 s) external {
         assembly ("memory-safe") {
-            let round := sload(s_currentRound.slot)
-            mstore(0x00, round)
-            mstore(0x20, s_requestInfo.slot)
-            let currentRequestInfoSlot := keccak256(0x00, 0x40)
-            let startTime := sload(add(currentRequestInfoSlot, 1))
-            mstore(0x00, startTime) // startTime
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNum := sload(keccak256(0x40, 0x40))
+            mstore(0x20, trialNum) // trialNum)
             // ** check if S was requested
-            mstore(0x20, s_previousSSubmitTimestamp.slot)
-            let previousSSubmitTimestampSlot := keccak256(0x00, 0x40)
+            mstore(0x60, s_previousSSubmitTimestamp.slot)
+            mstore(0x40, keccak256(0x40, 0x40))
+            let previousSSubmitTimestampSlot := keccak256(0x20, 0x40)
             if iszero(sload(previousSSubmitTimestampSlot)) {
                 mstore(0, 0x2d37f8d3) // SNotRequested()
                 revert(0x1c, 0x04)
             }
-
             // ** check reveal order
-            let fmp := mload(0x40) // cache fmp
-            mstore(0x20, caller())
-            mstore(0x40, s_activatedOperatorIndex1Based.slot)
-            let activatedOperatorIndex := sub(sload(keccak256(0x20, 0x40)), 1) // underflows when s_activatedOperatorIndex1Based is 0
+            let fmp := 0x80 // cache fmp
+            mstore(0x40, caller())
+            mstore(0x60, s_activatedOperatorIndex1Based.slot)
+            let activatedOperatorIndex := sub(sload(keccak256(0x40, 0x40)), 1) // underflows when s_activatedOperatorIndex1Based is 0
             if gt(activatedOperatorIndex, MAX_OPERATOR_INDEX) {
                 mstore(0, 0x1b256530) // NotActivatedOperator()
                 revert(0x1c, 0x04)
@@ -479,15 +505,16 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             // ** check cv = doubleHashS
-            mstore(0x20, s)
-            mstore(0x40, keccak256(0x20, 0x20)) // co
-            if iszero(eq(sload(add(s_cvs.slot, activatedOperatorIndex)), keccak256(0x40, 0x20))) {
+            mstore(0x40, s)
+            mstore(0x60, keccak256(0x40, 0x20)) // co
+            if iszero(eq(sload(add(s_cvs.slot, activatedOperatorIndex)), keccak256(0x60, 0x20))) {
                 mstore(0, 0x5bcc2334) // CvNotEqualDoubleHashS()
                 revert(0x1c, 0x04)
             }
             // ** store S and emit event
-            mstore(0x40, activatedOperatorIndex)
-            log1(0x00, 0x60, 0x1f2f0bf333e80ee899084dda13e87c0b04096ba331a8d993487a116d166947ec) // emit SSubmitted(uint256 startTime, bytes32 s, uint256 index)
+            mstore(0x00, curRound) // 0x20 already has trialNum, 0x40 already has s
+            mstore(0x60, activatedOperatorIndex)
+            log1(0x00, 0x80, 0xfa070a58e2c77080acd5c2b1819669eb194bbeeca6f680a31a2076510be5a7b1) // event SSubmitted(uint256 round, uint256 trialNum, bytes32 s, uint256 index)
 
             // ** If msg.sender is the last revealer, finalize the random number
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
@@ -499,7 +526,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 }
                 mstore(add(fmp, shl(5, storedSLength)), s) // last secret
                 let randomNumber := keccak256(fmp, shl(5, activatedOperatorsLength))
-                let nextRound := add(round, 1)
+                let nextRound := add(curRound, 1)
                 let requestCount := sload(s_requestCount.slot)
                 switch eq(nextRound, requestCount)
                 case 1 {
@@ -508,9 +535,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                         revert(0x1c, 0x04)
                     }
                     sstore(s_isInProcess.slot, COMPLETED)
-                    mstore(0x00, startTime)
-                    mstore(0x20, COMPLETED)
-                    log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                    // 0x00 already has curRound, 0x20 already has trialNum
+                    mstore(0x40, COMPLETED)
+                    log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                 }
                 default {
                     // get next round
@@ -560,11 +587,11 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                         if requested {
                             mstore(0x00, nextRound) // round
                             mstore(0x20, s_requestInfo.slot)
-                            sstore(add(keccak256(0x00, 0x40), 1), timestamp())
+                            sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
                             sstore(s_currentRound.slot, nextRound)
-                            mstore(0x00, timestamp())
-                            mstore(0x20, IN_PROGRESS)
-                            log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                            mstore(0x20, 0) // trialNum is 0 for the first trial
+                            mstore(0x40, IN_PROGRESS)
+                            log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                             break
                         }
                         if iszero(lt(nextRound, requestCount)) {
@@ -573,10 +600,12 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                                 revert(0x1c, 0x04)
                             }
                             sstore(s_isInProcess.slot, COMPLETED)
-                            sstore(s_currentRound.slot, sub(requestCount, 1))
-                            mstore(0x00, startTime)
-                            mstore(0x20, COMPLETED)
-                            log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                            let lastRound := sub(requestCount, 1)
+                            sstore(s_currentRound.slot, lastRound)
+                            mstore(0x00, lastRound)
+                            mstore(0x20, 0) // trialNum is 0 for the first trial
+                            mstore(0x40, COMPLETED)
+                            log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                             break
                         }
                         nextRound := add(nextRound, 1)
@@ -593,10 +622,13 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 // reward sload(add(currentRequestInfoSlot, 2)) - flatFee to the leader
                 mstore(0x00, sload(_OWNER_SLOT))
                 depositSlot := keccak256(0x00, 0x40) // leader
-                sstore(depositSlot, add(sload(depositSlot), sub(sload(add(currentRequestInfoSlot, 2)), flatFee)))
 
                 mstore(0x00, 0x00fc98b8) // rawFulfillRandomNumber(uint256,uint256) selector
-                mstore(0x20, round)
+                mstore(0x20, curRound)
+                mstore(0x40, s_requestInfo.slot)
+                let currentRequestInfoSlot := keccak256(0x20, 0x40)
+                // * update the leader's deposit
+                sstore(depositSlot, add(sload(depositSlot), sub(sload(add(currentRequestInfoSlot, 2)), flatFee)))
                 mstore(0x40, randomNumber)
 
                 let g := gas()
@@ -637,19 +669,28 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             // ** check if some cvs are on-chain
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
-            mstore(0x20, s_requestedToSubmitCvTimestamp.slot)
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNum := sload(keccak256(0x40, 0x40))
+            mstore(0x00, trialNum) // trialNum)
+            mstore(0x60, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
             let requestedToSubmitCvTimestampSlot := keccak256(0x00, 0x40)
             if iszero(sload(requestedToSubmitCvTimestampSlot)) {
                 mstore(0, 0x96fbee7b) // NoCvsOnChain()
                 revert(0x1c, 0x04)
             }
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
+            if iszero(sload(keccak256(0x00, 0x40))) {
+                mstore(0, 0x8e56b845) // MerkleRootNotSubmitted()
+                revert(0x1c, 0x04)
+            }
             // ** initialize cos and cvs arrays memory, without length data
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
             let activatedOperatorsLengthInBytes := shl(5, activatedOperatorsLength)
-            let cos := mload(0x40)
+            let cos := 0x80
             let cvs := add(cos, activatedOperatorsLengthInBytes)
             let secrets := add(cvs, activatedOperatorsLengthInBytes)
             mstore(0x40, add(secrets, activatedOperatorsLengthInBytes)) // update the free memory pointer
@@ -713,17 +754,6 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 }
                 mstore(add(fmp, i), keccak256(0x00, 0x40))
             }
-            // ** check if the merkle root is submitted
-            let round := sload(s_currentRound.slot)
-            mstore(0x00, round)
-            mstore(0x20, s_requestInfo.slot)
-            let currentRequestInfoSlot := keccak256(0x00, 0x40)
-            mstore(0x00, sload(add(currentRequestInfoSlot, 1)))
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
-            if iszero(sload(keccak256(0x00, 0x40))) {
-                mstore(0, 0x8e56b845) // selector for MerkleRootNotSubmitted()
-                revert(0x1c, 0x04)
-            }
             // ** verify the merkle root
             if iszero(eq(mload(add(fmp, sub(hashCountInBytes, 0x20))), sload(s_merkleRoot.slot))) {
                 mstore(0, 0x624dc351) // selector for MerkleVerificationFailed()
@@ -732,10 +762,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
 
             // ** verify signatures or cvs on-chain
             mstore(fmp, MESSAGE_TYPEHASH_DIRECT) // typehash, overwrite the previous value, which is not used anymore
-            let startTime := sload(add(currentRequestInfoSlot, 1))
-            mstore(add(fmp, 0x20), startTime)
-            mstore(add(fmp, 0x60), hex"1901") // prefix and version
-            mstore(add(fmp, 0x62), domainSeparator)
+            mstore(add(fmp, 0x20), curRound)
+            mstore(add(fmp, 0x40), trialNum)
+            mstore(add(fmp, 0x80), hex"1901") // prefix and version
+            mstore(add(fmp, 0x82), domainSeparator)
             let zeroBitIfSubmittedCvBitmap := sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
             let sigCounter
             for { let i } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
@@ -756,9 +786,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                         mstore(0, 0xbf4bf5b8) // selector for InvalidSignatureS()
                         revert(0x1c, 0x04)
                     }
-                    mstore(add(fmp, 0x40), mload(add(cvs, i))) // cv
-                    mstore(add(fmp, 0x82), keccak256(fmp, 0x60)) // structHash
-                    mstore(0x00, keccak256(add(fmp, 0x60), 0x42)) // digest hash
+                    mstore(add(fmp, 0x60), mload(add(cvs, i))) // cv
+                    mstore(add(fmp, 0xa2), keccak256(fmp, 0x80)) // structHash
+                    mstore(0x00, keccak256(add(fmp, 0x80), 0x42)) // digest hash
                     mstore(0x20, and(calldataload(sub(0x44, sigCounter)), 0xff)) // v, 0x44: packedVsOffset
                     sigCounter := add(sigCounter, 1)
                     mstore(0x40, calldataload(rOffset)) // r
@@ -780,7 +810,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
 
             // ** create random number
             let randomNumber := keccak256(secrets, activatedOperatorsLengthInBytes)
-            let nextRound := add(round, 1)
+            let nextRound := add(curRound, 1)
             let requestCount := sload(s_requestCount.slot)
             switch eq(nextRound, requestCount)
             case 1 {
@@ -790,9 +820,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                     revert(0x1c, 0x04)
                 }
                 sstore(s_isInProcess.slot, COMPLETED)
-                mstore(0x00, startTime)
-                mstore(0x20, COMPLETED)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                mstore(0x00, curRound)
+                mstore(0x20, trialNum)
+                mstore(0x40, COMPLETED)
+                log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
             default {
                 // get next round
@@ -839,11 +870,11 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                     if requested {
                         mstore(0x00, nextRound) // round
                         mstore(0x20, s_requestInfo.slot)
-                        sstore(add(keccak256(0x00, 0x40), 1), timestamp())
+                        sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
                         sstore(s_currentRound.slot, nextRound)
-                        mstore(0x00, timestamp())
-                        mstore(0x20, IN_PROGRESS)
-                        log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                        mstore(0x20, 0) // trialNum is 0 for the first trial
+                        mstore(0x40, IN_PROGRESS)
+                        log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                         break
                     }
                     if iszero(lt(nextRound, requestCount)) {
@@ -852,10 +883,12 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                             revert(0x1c, 0x04)
                         }
                         sstore(s_isInProcess.slot, COMPLETED)
-                        sstore(s_currentRound.slot, sub(requestCount, 1))
-                        mstore(0x00, startTime)
-                        mstore(0x20, COMPLETED)
-                        log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                        let lastRound := sub(requestCount, 1)
+                        sstore(s_currentRound.slot, lastRound)
+                        mstore(0x00, lastRound)
+                        mstore(0x20, 0) // trialNum is 0 for the first trial
+                        mstore(0x40, COMPLETED)
+                        log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                         break
                     }
                     nextRound := add(nextRound, 1)
@@ -880,10 +913,12 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             // reward sload(add(currentRequestInfoSlot, 2)) - flatFee to the leader
             mstore(0x00, sload(_OWNER_SLOT))
             depositSlot := keccak256(0x00, 0x40) // leader
-            sstore(depositSlot, add(sload(depositSlot), sub(sload(add(currentRequestInfoSlot, 2)), flatFee)))
 
             mstore(0x00, 0x00fc98b8) // rawFulfillRandomNumber(uint256,uint256) selector
-            mstore(0x20, round)
+            mstore(0x20, curRound)
+            mstore(0x40, s_requestInfo.slot)
+            let currentRequestInfoSlot := keccak256(0x20, 0x40)
+            sstore(depositSlot, add(sload(depositSlot), sub(sload(add(currentRequestInfoSlot, 2)), flatFee)))
             mstore(0x40, randomNumber)
 
             let g := gas()

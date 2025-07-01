@@ -133,13 +133,13 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 revert(0x1c, 0x04)
             }
             let newRound := sload(s_requestCount.slot)
-            sstore(s_requestCount.slot, add(newRound, 1))
+            sstore(s_requestCount.slot, add(newRound, 1)) // update the request count
             if gt(sub(newRound, sload(s_currentRound.slot)), 2000) {
                 mstore(0, 0x02cd147b) // selector for TooManyRequestsQueued()
                 revert(0x1c, 0x04)
             }
 
-            // ** set the bit
+            // ** set the round bit
             // calculate the storage slot corresponding to the round
             // wordPos = round >> 8
             mstore(0, shr(8, newRound))
@@ -160,10 +160,10 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             if eq(currentState, COMPLETED) {
                 sstore(s_currentRound.slot, newRound)
                 sstore(s_isInProcess.slot, IN_PROGRESS)
-                startTime := timestamp() // Just in case of timestamp collision
-                mstore(0, startTime)
-                mstore(0x20, IN_PROGRESS)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                mstore(0, newRound)
+                mstore(0x20, 0) // trialNum is 0 for the first trial
+                mstore(0x40, IN_PROGRESS)
+                log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
             // *** store the request info
             mstore(0x00, newRound)
@@ -234,24 +234,26 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
 
     function submitMerkleRoot(bytes32 merkleRoot) external onlyOwner {
         assembly ("memory-safe") {
-            mstore(0x00, sload(s_currentRound.slot))
-            mstore(0x20, s_requestInfo.slot)
-            mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
-            // ** To prevent the future signature replay attack, we check if the submitMerkleRoot is called after the startTime
-            if eq(mload(0x00), timestamp()) {
-                mstore(0, 0xc2794058) // selector for SubmitAfterStartTime()
-                revert(0x1c, 0x04)
-            }
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
-            let merkleRootSubmittedTimestampSlot := keccak256(0x00, 0x40)
+            // * get trialNum
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            mstore(0x20, sload(keccak256(0x40, 0x40))) // trialNum
+            // * get merkleRootSubmittedTimestamp
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x40, keccak256(0x40, 0x40))
+            let merkleRootSubmittedTimestampSlot := keccak256(0x20, 0x40)
             if gt(sload(merkleRootSubmittedTimestampSlot), 0) {
                 mstore(0, 0xa34402b2) // selector for MerkleRootAlreadySubmitted()
                 revert(0x1c, 0x04)
             }
             sstore(s_merkleRoot.slot, merkleRoot)
             sstore(merkleRootSubmittedTimestampSlot, timestamp())
-            mstore(0x20, merkleRoot)
-            log1(0x00, 0x40, 0xb3a8f3e59050d3f97f1bf1b668c8216c654869aa24e3e03cd8891dc68b7db097) // emit MerkleRootSubmitted(uint256 startTime, bytes32 merkleRoot)
+            // * emit event MerkleRootSubmitted
+            mstore(0x00, curRound)
+            // 0x20 already has trialNum
+            mstore(0x40, merkleRoot)
+            log1(0x00, 0x60, 0x45b19880b523c6750f7f39fca8d77d51101b315495adc482994a4fa2a8294466) // emit event MerkleRootSubmitted(uint256 round, uint256 trialNum, bytes32 merkleRoot)
         }
     }
 
@@ -336,11 +338,12 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             }
             // ** check if the merkle root is submitted
             let round := sload(s_currentRound.slot)
-            mstore(0x00, round)
-            mstore(0x20, s_requestInfo.slot)
-            let currentRequestInfoSlot := keccak256(0x00, 0x40)
-            mstore(0x00, sload(add(currentRequestInfoSlot, 1)))
-            mstore(0x20, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, round)
+            mstore(0x40, s_trialNum.slot)
+            let trialNum := sload(keccak256(0x20, 0x40))
+            mstore(0x00, trialNum)
+            mstore(0x40, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, keccak256(0x20, 0x40))
             if iszero(sload(keccak256(0x00, 0x40))) {
                 mstore(0, 0x8e56b845) // selector for MerkleRootNotSubmitted()
                 revert(0x1c, 0x04)
@@ -350,13 +353,12 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 mstore(0, 0x624dc351) // selector for MerkleVerificationFailed()
                 revert(0x1c, 0x04)
             }
-
             // ** verify signatures
             mstore(fmp, MESSAGE_TYPEHASH_DIRECT) // typehash, overwrite the previous value, which is not used anymore
-            let startTime := sload(add(currentRequestInfoSlot, 1))
-            mstore(add(fmp, 0x20), startTime)
-            mstore(add(fmp, 0x60), hex"1901") // prefix and version
-            mstore(add(fmp, 0x62), domainSeparator)
+            mstore(add(fmp, 0x20), round)
+            mstore(add(fmp, 0x40), trialNum)
+            mstore(add(fmp, 0x80), hex"1901") // prefix and version
+            mstore(add(fmp, 0x82), domainSeparator)
             for { let i } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
                 // signature malleability prevention
                 let rSOffset := add(secretSigRSs.offset, add(mul(i, 3), 0x20))
@@ -365,9 +367,9 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                     mstore(0, 0xbf4bf5b8) // selector for InvalidSignatureS()
                     revert(0x1c, 0x04)
                 }
-                mstore(add(fmp, 0x40), mload(add(cvs, i))) // cv
-                mstore(add(fmp, 0x82), keccak256(fmp, 0x60)) // structHash
-                mstore(0x00, keccak256(add(fmp, 0x60), 0x42)) // digest hash
+                mstore(add(fmp, 0x60), mload(add(cvs, i))) // cv
+                mstore(add(fmp, 0xa2), keccak256(fmp, 0x80)) // structHash
+                mstore(0x00, keccak256(add(fmp, 0x80), 0x42)) // digest hash
                 mstore(0x20, and(calldataload(sub(0x24, shr(5, i))), 0xff)) // v, 0x24: packedVsOffset
                 mstore(0x40, calldataload(rSOffset)) // r
                 mstore(0x60, s) // s
@@ -397,12 +399,14 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                     revert(0x1c, 0x04)
                 }
                 sstore(s_isInProcess.slot, COMPLETED)
-                mstore(0x00, startTime)
-                mstore(0x20, COMPLETED)
-                log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                mstore(0x00, round)
+                mstore(0x20, trialNum)
+                mstore(0x40, COMPLETED)
+                log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
             default {
                 // get next round
+                // https://github.com/Uniswap/v4-core/blob/59d3ecf53afa9264a16bba0e38f4c5d2231f80bc/src/libraries/BitMath.sol#L31
                 function leastSignificantBit(x) -> r {
                     x := and(x, sub(0, x))
                     r :=
@@ -446,11 +450,11 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                     if requested {
                         mstore(0x00, nextRound) // round
                         mstore(0x20, s_requestInfo.slot)
-                        sstore(add(keccak256(0x00, 0x40), 1), timestamp())
+                        sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
                         sstore(s_currentRound.slot, nextRound)
-                        mstore(0x00, timestamp())
-                        mstore(0x20, IN_PROGRESS)
-                        log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                        mstore(0x20, 0) // trialNum is 0 for the first trial
+                        mstore(0x40, IN_PROGRESS)
+                        log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                         break
                     }
                     if iszero(lt(nextRound, requestCount)) {
@@ -459,10 +463,12 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                             revert(0x1c, 0x04)
                         }
                         sstore(s_isInProcess.slot, COMPLETED)
-                        sstore(s_currentRound.slot, sub(requestCount, 1))
-                        mstore(0x00, startTime)
-                        mstore(0x20, COMPLETED)
-                        log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                        let lastRound := sub(requestCount, 1)
+                        sstore(s_currentRound.slot, lastRound)
+                        mstore(0x00, lastRound)
+                        mstore(0x20, 0) // trialNum is 0 for the first trial
+                        mstore(0x40, COMPLETED)
+                        log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                         break
                     }
                     nextRound := add(nextRound, 1)
@@ -487,10 +493,13 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             // reward sload(add(currentRequestInfoSlot, 2)) - flatFee to the leader
             mstore(0x00, sload(_OWNER_SLOT))
             depositSlot := keccak256(0x00, 0x40) // leader
-            sstore(depositSlot, add(sload(depositSlot), sub(sload(add(currentRequestInfoSlot, 2)), flatFee)))
 
             mstore(0x00, 0x00fc98b8) // rawFulfillRandomNumber(uint256,uint256) selector
             mstore(0x20, round)
+            mstore(0x40, s_requestInfo.slot)
+            let currentRequestInfoSlot := keccak256(0x20, 0x40)
+            // * update the leader's deposit
+            sstore(depositSlot, add(sload(depositSlot), sub(sload(add(currentRequestInfoSlot, 2)), flatFee)))
             mstore(0x40, randomNumber)
 
             let g := gas()
@@ -573,6 +582,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
         uint256 nextRequestedRound;
         bool requested;
         uint256 requestCountMinusOne;
+        uint256 curRound;
         assembly ("memory-safe") {
             if iszero(eq(sload(s_isInProcess.slot), HALTED)) {
                 mstore(0, 0x78b19eb2) // selector for NotHalted()
@@ -596,6 +606,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             }
             nextRequestedRound := sload(s_currentRound.slot)
             requestCountMinusOne := sub(sload(s_requestCount.slot), 1)
+            curRound := nextRequestedRound
         }
         for (uint256 i; i < 10; i++) {
             (nextRequestedRound, requested) = s_roundBitmap.nextRequestedRound(nextRequestedRound);
@@ -605,17 +616,28 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                     mstore(0x00, nextRequestedRound)
                     mstore(0x20, s_requestInfo.slot)
                     sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
-                    sstore(s_currentRound.slot, nextRequestedRound)
                     sstore(s_isInProcess.slot, IN_PROGRESS)
-                    mstore(0x00, timestamp())
-                    mstore(0x20, IN_PROGRESS)
-                    log1(0x00, 0x40, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                    mstore(0x40, IN_PROGRESS)
+                    switch eq(nextRequestedRound, curRound)
+                    case 1 {
+                        mstore(0x20, s_trialNum.slot)
+                        let trialNumSlot := keccak256(0x00, 0x40)
+                        let newTrialNum := add(sload(trialNumSlot), 1)
+                        sstore(trialNumSlot, newTrialNum)
+                        mstore(0x20, newTrialNum)
+                        log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
+                    }
+                    default {
+                        sstore(s_currentRound.slot, nextRequestedRound)
+                        mstore(0x20, 0) // trialNum is 0 for the first trial
+                        log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
+                    }
                     return(0, 0)
                 }
                 // If we reach or pass the last round without finding any requested round,
                 // mark as COMPLETED and set the current round to the last possible index.
                 if iszero(lt(nextRequestedRound, requestCountMinusOne)) {
-                    sstore(s_isInProcess.slot, COMPLETED) // q I don't think this is necessary
+                    sstore(s_isInProcess.slot, COMPLETED)
                     sstore(s_currentRound.slot, requestCountMinusOne)
                     return(0, 0)
                 }
