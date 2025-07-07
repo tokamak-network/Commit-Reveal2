@@ -64,6 +64,8 @@ contract CommitReveal2Storage {
     error OnChainCvNotEqualDoubleHashS(); // 0xa39ecadf
     error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
+    error RoundAlreadyProcessed(); // 0x5cafea8c
+    error NonExistentRound(); // 0x905deff6
     error TooManyRequestsQueued(); // 0x02cd147b
     error AlreadyHalted(); // 0xd6c912e6
     error NoCvsOnChain(); // 0x96fbee7b
@@ -77,7 +79,6 @@ contract CommitReveal2Storage {
     error InvalidSecretLength(); // 0xe0767fa4
     error NotConsumer(); // 0x8c7dc13d
     error SRequested(); // 0x53489cf9
-    error InvalidRound(); // 0xa2b52a54
     error AlreadyRefunded(); // 0xa85e6f1a
     error AlreadyCompleted(); // 0x195332a5
     error RandomNumGenerated(); // 0xd51a29b7

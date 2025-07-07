@@ -535,11 +535,11 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             }
             // ** check if the round is valid
             if iszero(lt(round, sload(s_requestCount.slot))) {
-                mstore(0, 0xa2b52a54) // selector for InvalidRound()
+                mstore(0, 0x905deff6) // selector for NonExistentRound()
                 revert(0x1c, 0x04)
             }
             if lt(round, sload(s_currentRound.slot)) {
-                mstore(0, 0xa2b52a54) // selector for InvalidRound()
+                mstore(0, 0x5cafea8c) // selector for RoundAlreadyProcessed()
                 revert(0x1c, 0x04)
             }
             mstore(0x00, round)
