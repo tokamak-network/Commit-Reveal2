@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.28;
+pragma solidity 0.8.30;
 
 import {BaseScript, console2} from "./shared/BaseScript.s.sol";
 import {CommitReveal2} from "./../src/CommitReveal2.sol";

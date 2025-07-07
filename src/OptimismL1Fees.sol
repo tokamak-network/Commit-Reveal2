@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.30;
 
 import {IOVM_GasPriceOracle} from "./IOVM_GasPriceOracle.sol";
 import {Ownable} from "@solady/src/auth/Ownable.sol";

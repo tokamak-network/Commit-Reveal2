@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.28;
+pragma solidity 0.8.30;
 
 import {CreateMerkleRootSolidity, CreateMerkleRootInlineAssembly} from "./../../src/test/CreateMerkleRoot.sol";
 import {Test, console2} from "forge-std/Test.sol";

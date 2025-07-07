@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.30;
 
 import {MockL1Block} from "../mocks/MockL1Block.sol";
 import {MockGasPriceOracle} from "../mocks/MockGasPriceOracle.sol";

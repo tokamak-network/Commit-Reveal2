@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.28;
+pragma solidity ^0.8.30;
 
 // The initial L1 context values
 // https://github.com/ethereum-optimism/optimism/blob/14671690cd1fe79c5dc14127f80158d1d9ed301a/packages/contracts-bedrock/test/L2/GasPriceOracle.t.sol#L18-L31
