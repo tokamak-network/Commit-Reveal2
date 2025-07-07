@@ -266,7 +266,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
         assembly ("memory-safe") {
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
             // ** check if all secrets are submitted
-            if gt(activatedOperatorsLength, secretSigRSs.length) {
+            if iszero(eq(activatedOperatorsLength, secretSigRSs.length)) {
                 mstore(0, 0xe0767fa4) // selector for InvalidSecretLength()
                 revert(0x1c, 0x04)
             }
