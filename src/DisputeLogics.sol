@@ -432,6 +432,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                     zeroBitIfSubmittedCvBitmap := and(zeroBitIfSubmittedCvBitmap, not(shl(i, 1))) // set to zero
                 }
             }
+
             // ** verify reveal orders
             let index := and(packedRevealOrders, 0xff) // first reveal index
             let revealBitmap := shl(index, 1)
@@ -450,6 +451,37 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0x06efcba4) // selector for RevealOrderHasDuplicates()
                 revert(0x1c, 0x04)
             }
+            // ** Create Merkle Root and verify it
+            let hashCountInBytes := sub(operatorLengthInBytes, 0x20)
+            let cvsPosInBytes
+            let hashPosInBytes
+            for { let i } lt(i, hashCountInBytes) { i := add(i, 0x20) } {
+                switch lt(cvsPosInBytes, operatorLengthInBytes)
+                case 1 {
+                    mstore(0x00, mload(add(cvs, cvsPosInBytes)))
+                    cvsPosInBytes := add(cvsPosInBytes, 0x20)
+                }
+                default {
+                    mstore(0x00, mload(add(fmp, hashPosInBytes)))
+                    hashPosInBytes := add(hashPosInBytes, 0x20)
+                }
+                switch lt(cvsPosInBytes, operatorLengthInBytes)
+                case 1 {
+                    mstore(0x20, mload(add(cvs, cvsPosInBytes)))
+                    cvsPosInBytes := add(cvsPosInBytes, 0x20)
+                }
+                default {
+                    mstore(0x20, mload(add(fmp, hashPosInBytes)))
+                    hashPosInBytes := add(hashPosInBytes, 0x20)
+                }
+                mstore(add(fmp, i), keccak256(0x00, 0x40))
+            }
+            // ** verify the merkle root
+            if iszero(eq(mload(add(fmp, sub(hashCountInBytes, 0x20))), sload(s_merkleRoot.slot))) {
+                mstore(0, 0x624dc351) // selector for MerkleVerificationFailed()
+                revert(0x1c, 0x04)
+            }
+
             // skip updating zeroBitIfSubmittedCvBitmap because it is not used anymore
             sstore(s_packedRevealOrders.slot, packedRevealOrders) // update packedRevealOrders
             sstore(s_requestedToSubmitSFromIndexK.slot, secretsReceivedOffchainInRevealOrder.length)
