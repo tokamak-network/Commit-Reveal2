@@ -72,6 +72,7 @@ contract CommitReveal2Storage {
     error LengthExceedsMax(); // 0x12466af8
     error SignatureAndIndexDoNotMatch(); // 0x980c4296
     error InvalidIndex(); // 0x63df8171
+    error NewOwnerCannotBeActivatedOperator(); // 0x9279dd8e
     error DuplicateIndices(); // 0x7a69f8d3
     error WrongRevealOrder(); // 0xe3ae7cc0
     error RevealOrderHasDuplicates(); // 0x06efcba4
