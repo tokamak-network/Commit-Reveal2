@@ -255,8 +255,9 @@ contract CommitReveal2Storage {
         0x7c90823f4ccd06a00814473b1ad932d6313680c6d946963ecf1d30094346c24e; // keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)");
 
     // *** functions gasUsed;
-    uint256 internal constant FAILTOSUBMITCVORSUBMITMERKLEROOT_GASUSED = 123;
+    uint256 internal constant FAILTOREQUESTSUBMITCVORSUBMITMERKLEROOT_GASUSED = 123;
     uint256 internal constant FAILTOSUBMITMERKLEROOTAFTERDISPUTE_GASUSED = 123;
+    uint256 internal constant FAILTOREQUESTSORGENERATERANDOMNUMBER_GASUSED = 123;
     uint256 internal constant FAILTOSUBMITCV_GASUSED = 123;
     uint256 internal constant FAILTOSUBMITCO_GASUSED = 123;
     uint256 internal constant FAILTOSUBMITS_GASUSED = 123;
