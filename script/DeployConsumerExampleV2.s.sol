@@ -11,7 +11,7 @@ contract DeployConsumerExampleV2 is Script {
 
     function deployUsingDevOpsTools() public returns (ConsumerExampleV2 consumer) {
         string memory contractName =
-            (block.chainid == 31337 || block.chainid == 11155111) ? "CommitReveal2L1" : "CommitReveal2";
+            (block.chainid == 31337 || block.chainid == 11155111) ? "CommitReveal2" : "CommitReveal2L2";
         address commitReveal2 = DevOpsTools.get_most_recent_deployment(contractName, block.chainid);
         if (commitReveal2 == address(0)) revert CommitReveal2NotDeployed();
         consumer = deployConsumerExampleV2UsingConfig(commitReveal2);

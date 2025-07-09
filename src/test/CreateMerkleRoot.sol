@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.30;
 
-import {Bitmap} from "./../../src/libraries/Bitmap.sol";
-
 contract CreateMerkleRootSolidity {
     function createMR(bytes32[] memory leaves) external pure returns (bytes32) {
         return createMerkleRoot(leaves);

@@ -20,7 +20,7 @@ contract BaseScript is Script, CommitReveal2Helper {
         // *** Get the most recent deployment of CommitReveal2 ***
         // ** //////////////////////////////////////////////// **
         string memory contractName =
-            (block.chainid == 31337 || block.chainid == 11155111) ? "CommitReveal2L1" : "CommitReveal2";
+            (block.chainid == 31337 || block.chainid == 11155111) ? "CommitReveal2" : "CommitReveal2L2";
         s_commitReveal2 = CommitReveal2(DevOpsTools.get_most_recent_deployment(contractName, block.chainid));
 
         // *** Get most recent deployment of ConsumerExample **
@@ -34,7 +34,7 @@ contract BaseScript is Script, CommitReveal2Helper {
         // *** Get the most recent deployment of CommitReveal2 ***
         // ** //////////////////////////////////////////////// **
         string memory contractName =
-            (block.chainid == 31337 || block.chainid == 11155111) ? "CommitReveal2L1" : "CommitReveal2";
+            (block.chainid == 31337 || block.chainid == 11155111) ? "CommitReveal2" : "CommitReveal2L2";
         s_commitReveal2 = CommitReveal2(DevOpsTools.get_most_recent_deployment(contractName, block.chainid));
         console2.log("commitReveal2", address(s_commitReveal2));
 

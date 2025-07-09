@@ -2,9 +2,8 @@
 pragma solidity ^0.8.30;
 
 import {FailLogics} from "./FailLogics.sol";
-import {OptimismL1Fees} from "./OptimismL1Fees.sol";
 
-contract CommitReveal2 is FailLogics, OptimismL1Fees {
+contract CommitReveal2 is FailLogics {
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
@@ -102,6 +101,12 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
     }
 
     function requestRandomNumber(uint32 callbackGasLimit) external payable virtual returns (uint256) {
+        uint256 activatedOperatorsLength = s_activatedOperators.length;
+        // ** check if the fee amount is enough
+        require(
+            msg.value >= _calculateRequestPrice(callbackGasLimit, tx.gasprice, activatedOperatorsLength),
+            InsufficientAmount()
+        );
         assembly ("memory-safe") {
             // ** check if the callbackGasLimit is within the limit
             if gt(callbackGasLimit, MAX_CALLBACK_GAS_LIMIT) {
@@ -109,7 +114,6 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 revert(0x1c, 0x04)
             }
             // ** check if there are enough activated operators
-            let activatedOperatorsLength := sload(s_activatedOperators.slot)
             if lt(activatedOperatorsLength, 2) {
                 mstore(0, 0x77599fd9) // selector for NotEnoughActivatedOperators()
                 revert(0x1c, 0x04)
@@ -119,52 +123,6 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
             mstore(0x20, s_depositAmount.slot)
             if lt(sload(keccak256(0x00, 0x40)), sload(s_activationThreshold.slot)) {
                 mstore(0, 0xc0013a5a) // selector for LeaderLowDeposit()
-                revert(0x1c, 0x04)
-            }
-            // ** check if the fee amount is enough
-            // l2GasUsed(SubmitMerkleRoot+GenerateRandomNumber):3931.70 × numOfOperators + 131,508.96
-            // l1GasFee: l1GasFee(submitMerkleRoot callDataSize) + l1GasFee(generateRandomNumber calDataSize)
-            // = l1GasFee(36) + l1GasFee(132 + (96 * numOfOperators))
-            mstore(0x00, 0xf1c7a58b) // selector for "getL1FeeUpperBound(uint256 _unsignedTxSize) external view returns (uint256)"
-            mstore(0x20, add(MERKLEROOTSUB_CALLDATA_BYTES_SIZE, L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
-            if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x40, 0x20)) {
-                mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
-                revert(0x1c, 0x04)
-            }
-            mstore(
-                0x20,
-                add(
-                    add(
-                        mul(GENRANDNUM_CALLDATA_BYTES_SIZE_A, activatedOperatorsLength),
-                        GENRANDNUM_CALLDATA_BYTES_SIZE_B
-                    ),
-                    L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE
-                )
-            )
-            if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x20, 0x20)) {
-                mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
-                revert(0x1c, 0x04)
-            }
-            if lt(
-                callvalue(),
-                add(
-                    add(
-                        mul(
-                            gasprice(),
-                            add(
-                                callbackGasLimit,
-                                add(
-                                    mul(GASUSED_MERKLEROOTSUB_GENRANDNUM_A, activatedOperatorsLength),
-                                    GASUSED_MERKLEROOTSUB_GENRANDNUM_B
-                                )
-                            )
-                        ),
-                        sload(s_flatFee.slot)
-                    ), // l2GasFee
-                    div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x40))), 100) // L1GasFee
-                )
-            ) {
-                mstore(0, 0x5945ea56) // selector for InsufficientAmount()
                 revert(0x1c, 0x04)
             }
             let newRound := sload(s_requestCount.slot)
@@ -213,59 +171,25 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
         }
     }
 
-    /**
-     * @notice Calculates the total fee required for requesting a random number, factoring in:
-     *         1. L2 execution costs (based on the callback gas limit and the number of operators).
-     *         2. A flat fee (s_flatFee).
-     *         3. L1 data costs for sending required transaction calldata.
-     * @dev
-     *      - The internal gas usage estimation is derived from two operations:
-     *        (i) "submitMerkleRoot" (~47,216 L2 gas).
-     *        (ii) "generateRandomNumber" (~21,119 × numOfOperators + 134,334 L2 gas).
-     *      - The final fee also includes `_getL1CostWeiForcalldataSize2(...)` to account for the
-     *        cost of posting data to the L1 chain.
-     * @param callbackGasLimit The gas required by the consumer’s callback execution.
-     * @param gasPrice The L2 gas price to be used for cost estimation.
-     * @param numOfOperators The number of active operators factored into the total gas cost.
-     * @return totalPrice The calculated total fee (in wei) needed to cover the request.
-     */
     function _calculateRequestPrice(uint256 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
         internal
         view
         virtual
-        returns (uint256)
+        returns (uint256 requestFee)
     {
-        // submitRoot l2GasUsed = 47216
-        // generateRandomNumber l2GasUsed = 21118.97⋅N + 87117.53
-        return (
-            gasPrice
-                * (
-                    callbackGasLimit
-                        + (GASUSED_MERKLEROOTSUB_GENRANDNUM_A * numOfOperators + GASUSED_MERKLEROOTSUB_GENRANDNUM_B)
+        assembly ("memory-safe") {
+            requestFee :=
+                add(
+                    mul(
+                        gasPrice,
+                        add(
+                            callbackGasLimit,
+                            add(mul(GASUSED_MERKLEROOTSUB_GENRANDNUM_A, numOfOperators), GASUSED_MERKLEROOTSUB_GENRANDNUM_B)
+                        )
+                    ),
+                    sload(s_flatFee.slot)
                 )
-        ) + s_flatFee
-            + _getL1CostWeiForcalldataSize2(
-                MERKLEROOTSUB_CALLDATA_BYTES_SIZE,
-                (GENRANDNUM_CALLDATA_BYTES_SIZE_A * numOfOperators) + GENRANDNUM_CALLDATA_BYTES_SIZE_B
-            );
-    }
-
-    /**
-     * @notice Computes the total L1 cost (in wei) for two separate calldata payload sizes.
-     * @dev This is a helper function that sums the cost of submitting data of two different lengths
-     *      to L1. Each call to `_getL1CostWeiForCalldataSize(...)` accounts for the overhead of
-     *      RLP-encoding and L1 gas price adjustments in Optimism.
-     * @param calldataSizeBytes1 The size (in bytes) of the first calldata payload.
-     * @param calldataSizeBytes2 The size (in bytes) of the second calldata payload.
-     * @return l1Cost The total cost (in wei) for posting both payloads to L1.
-     */
-    function _getL1CostWeiForcalldataSize2(uint256 calldataSizeBytes1, uint256 calldataSizeBytes2)
-        private
-        view
-        returns (uint256)
-    {
-        // getL1FeeUpperBound expects unsigned fully RLP-encoded transaction size so we have to account for paddding bytes as well
-        return _getL1CostWeiForCalldataSize(calldataSizeBytes1) + _getL1CostWeiForCalldataSize(calldataSizeBytes2);
+        }
     }
 
     function submitMerkleRoot(bytes32 merkleRoot) external onlyOwner {
