@@ -3,11 +3,8 @@ pragma solidity ^0.8.30;
 
 import {FailLogics} from "./FailLogics.sol";
 import {OptimismL1Fees} from "./OptimismL1Fees.sol";
-import {Bitmap} from "./libraries/Bitmap.sol";
 
 contract CommitReveal2 is FailLogics, OptimismL1Fees {
-    using Bitmap for mapping(uint248 => uint256);
-
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
@@ -618,10 +615,6 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
     }
 
     function resume() external payable onlyOwner {
-        uint256 nextRequestedRound;
-        bool requested;
-        uint256 requestCountMinusOne;
-        uint256 curRound;
         assembly ("memory-safe") {
             if iszero(eq(sload(s_isInProcess.slot), HALTED)) {
                 mstore(0, 0x78b19eb2) // selector for NotHalted()
@@ -643,21 +636,57 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 mstore(0, 0xc0013a5a) // selector for LeaderLowDeposit()
                 revert(0x1c, 0x04)
             }
-            nextRequestedRound := sload(s_currentRound.slot)
-            requestCountMinusOne := sub(sload(s_requestCount.slot), 1)
-            curRound := nextRequestedRound
-        }
-        for (uint256 i; i < 10; i++) {
-            (nextRequestedRound, requested) = s_roundBitmap.nextRequestedRound(nextRequestedRound);
-            assembly ("memory-safe") {
+            let nextRound := sload(s_currentRound.slot)
+            let requestCountMinusOne := sub(sload(s_requestCount.slot), 1)
+            let curRound := nextRound
+            let requested
+
+            // get next round
+            // https://github.com/Uniswap/v4-core/blob/59d3ecf53afa9264a16bba0e38f4c5d2231f80bc/src/libraries/BitMath.sol#L31
+            function leastSignificantBit(x) -> r {
+                x := and(x, sub(0, x))
+                r :=
+                    shl(
+                        5,
+                        shr(
+                            252,
+                            shl(
+                                shl(2, shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))),
+                                0x8040405543005266443200005020610674053026020000107506200176117077
+                            )
+                        )
+                    )
+                r :=
+                    or(
+                        r,
+                        byte(
+                            and(div(0xd76453e0, shr(r, x)), 0x1f),
+                            0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                        )
+                    )
+            }
+            function nextRequestedRound(_round) -> _next, _requested {
+                let wordPos := shr(8, _round)
+                let bitPos := and(_round, 0xff)
+                let mask := not(sub(shl(bitPos, 1), 1))
+                mstore(0x00, wordPos)
+                mstore(0x20, s_roundBitmap.slot)
+                let masked := and(sload(keccak256(0x00, 0x40)), mask)
+                _requested := gt(masked, 0)
+                switch _requested
+                case 1 { _next := sub(add(_round, leastSignificantBit(masked)), bitPos) }
+                default { _next := sub(add(_round, 255), bitPos) }
+            }
+            for { let i } lt(i, 10) { i := add(i, 1) } {
+                nextRound, requested := nextRequestedRound(nextRound)
                 if requested {
                     // Start this requested round
-                    mstore(0x00, nextRequestedRound)
+                    mstore(0x00, nextRound)
                     mstore(0x20, s_requestInfo.slot)
                     sstore(add(keccak256(0x00, 0x40), 1), timestamp()) // startTime
                     sstore(s_isInProcess.slot, IN_PROGRESS)
                     mstore(0x40, IN_PROGRESS)
-                    switch eq(nextRequestedRound, curRound)
+                    switch eq(nextRound, curRound)
                     case 1 {
                         mstore(0x20, s_trialNum.slot)
                         let trialNumSlot := keccak256(0x00, 0x40)
@@ -667,7 +696,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                         log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                     }
                     default {
-                        sstore(s_currentRound.slot, nextRequestedRound)
+                        sstore(s_currentRound.slot, nextRound)
                         mstore(0x20, 0) // trialNum is 0 for the first trial
                         log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                     }
@@ -675,16 +704,14 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 }
                 // If we reach or pass the last round without finding any requested round,
                 // mark as COMPLETED and set the current round to the last possible index.
-                if iszero(lt(nextRequestedRound, requestCountMinusOne)) {
+                if iszero(lt(nextRound, requestCountMinusOne)) {
                     sstore(s_isInProcess.slot, COMPLETED)
                     sstore(s_currentRound.slot, requestCountMinusOne)
                     return(0, 0)
                 }
-                nextRequestedRound := add(nextRequestedRound, 1)
+                nextRound := add(nextRound, 1)
             }
-        }
-        assembly ("memory-safe") {
-            sstore(s_currentRound.slot, nextRequestedRound)
+            sstore(s_currentRound.slot, nextRound)
         }
     }
 }
