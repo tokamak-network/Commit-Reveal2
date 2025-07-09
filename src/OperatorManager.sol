@@ -51,44 +51,6 @@ contract OperatorManager is Ownable {
         _initializeOwner(msg.sender);
     }
 
-    // ** Override Ownable Functions
-    function transferOwnership(address newOwner) public payable override onlyOwner {
-        assembly ("memory-safe") {
-            mstore(0x00, newOwner)
-            mstore(0x20, s_activatedOperatorIndex1Based.slot)
-            if gt(sload(keccak256(0x00, 0x40)), 0) {
-                mstore(0x00, 0x9279dd8e) // NewOwnerCannotBeActivatedOperator()
-                revert(0x1c, 0x04)
-            }
-            if iszero(shl(96, newOwner)) {
-                mstore(0x00, 0x7448fbae) // `NewOwnerIsZeroAddress()`.
-                revert(0x1c, 0x04)
-            }
-        }
-        _setOwner(newOwner);
-    }
-
-    function requestOwnershipHandover() public payable override {
-        unchecked {
-            uint256 expires = block.timestamp + _ownershipHandoverValidFor();
-            /// @solidity memory-safe-assembly
-            assembly {
-                mstore(0x00, caller())
-                mstore(0x20, s_activatedOperatorIndex1Based.slot)
-                if gt(sload(keccak256(0x00, 0x40)), 0) {
-                    mstore(0x00, 0x9279dd8e) // NewOwnerCannotBeActivatedOperator()
-                    revert(0x1c, 0x04)
-                }
-                // Compute and set the handover slot to `expires`.
-                mstore(0x0c, 0x389a75e1) // _HANDOVER_SLOT_SEED
-                mstore(0x00, caller())
-                sstore(keccak256(0x0c, 0x20), expires)
-                // Emit the {OwnershipHandoverRequested} event.
-                log2(0, 0, 0xdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d, caller()) // _OWNERSHIP_HANDOVER_REQUESTED_EVENT_SIGNATURE
-            }
-        }
-    }
-
     /**
      * @notice Ensures that no actions can be taken while the contract is in an ongoing process.
      * @dev
