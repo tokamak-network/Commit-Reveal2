@@ -196,6 +196,7 @@ contract CommitReveal2 is FailLogics, OptimismL1Fees {
                 revert(0x1c, 0x04)
             }
             if eq(currentState, COMPLETED) {
+                startTime := timestamp()
                 sstore(s_currentRound.slot, newRound)
                 sstore(s_isInProcess.slot, IN_PROGRESS)
                 mstore(0, newRound)
