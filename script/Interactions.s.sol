@@ -41,7 +41,8 @@ contract FundMyAccounts is BaseScript {
         BaseScript.scriptSetUp();
         for (uint256 i; i < s_numOfOperators; i++) {
             vm.startBroadcast(0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e01628897);
-            s_operators[i].call{value: 1000 ether}("");
+            (bool success,) = s_operators[i].call{value: 1000 ether}("");
+            require(success, "Failed to send Ether");
             vm.stopBroadcast();
         }
     }
