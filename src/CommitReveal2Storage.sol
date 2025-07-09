@@ -266,6 +266,26 @@ contract CommitReveal2Storage {
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
 
+    function getPeriods()
+        external
+        view
+        returns (
+            uint256 offChainSubmissionPeriod,
+            uint256 requestOrSubmitOrFailDecisionPeriod,
+            uint256 onChainSubmissionPeriod,
+            uint256 offChainSubmissionPeriodPerOperator,
+            uint256 onChainSubmissionPeriodPerOperator
+        )
+    {
+        return (
+            s_offChainSubmissionPeriod,
+            s_requestOrSubmitOrFailDecisionPeriod,
+            s_onChainSubmissionPeriod,
+            s_offChainSubmissionPeriodPerOperator,
+            s_onChainSubmissionPeriodPerOperator
+        );
+    }
+
     function getMerkleRoot(uint256 round, uint256 trialNum) external view returns (bytes32, bool) {
         if (s_merkleRootSubmittedTimestamp[round][trialNum] == 0) {
             return (bytes32(0), false);
