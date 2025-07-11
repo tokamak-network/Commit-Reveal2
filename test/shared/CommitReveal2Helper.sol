@@ -147,7 +147,7 @@ contract CommitReveal2Helper is Test {
         revealOrders = new uint256[](length);
         s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
         for (uint256 i; i < length; i++) {
-            diffs[i] = _diff(s_rv, uint256(s_cvs[i]));
+            diffs[i] = uint256(keccak256(abi.encodePacked(_diff(s_rv, uint256(s_cvs[i])))));
             revealOrders[i] = i;
         }
         Sort.sort(diffs, revealOrders);

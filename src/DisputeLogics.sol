@@ -436,11 +436,13 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             // ** verify reveal orders
             let index := and(packedRevealOrders, 0xff) // first reveal index
             let revealBitmap := shl(index, 1)
-            let before := mload(add(diffs, shl(5, index)))
+            mstore(0x00, mload(add(diffs, shl(5, index))))
+            let before := keccak256(0x00, 0x20)
             for { let i := 1 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
                 index := and(calldataload(sub(0x84, i)), 0xff) // 0x84: packedRevealOrders offset
                 revealBitmap := or(revealBitmap, shl(index, 1))
-                let after := mload(add(diffs, shl(5, index)))
+                mstore(0x00, mload(add(diffs, shl(5, index))))
+                let after := keccak256(0x00, 0x20)
                 if lt(before, after) {
                     mstore(0, 0x24f1948e) // RevealNotInDescendingOrder()
                     revert(0x1c, 0x04)
@@ -744,12 +746,14 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             let rv := keccak256(cos, activatedOperatorsLengthInBytes)
             let index := and(packedRevealOrders, 0xff) // first reveal index
             let revealBitmap := shl(index, 1)
-            let before := _diff(rv, mload(add(cvs, shl(5, index))))
+            mstore(0x00, _diff(rv, mload(add(cvs, shl(5, index)))))
+            let before := keccak256(0x00, 0x20)
             // revealOrdersOffset = 0x64
             for { let i := 1 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
                 index := and(calldataload(sub(0x64, i)), 0xff)
                 revealBitmap := or(revealBitmap, shl(index, 1))
-                let after := _diff(rv, mload(add(cvs, shl(5, index))))
+                mstore(0x00, _diff(rv, mload(add(cvs, shl(5, index)))))
+                let after := keccak256(0x00, 0x20)
                 if lt(before, after) {
                     mstore(0, 0x24f1948e) // selector for RevealNotInDescendingOrder()
                     revert(0x1c, 0x04)
