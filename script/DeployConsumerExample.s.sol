@@ -26,6 +26,14 @@ contract DeployConsumerExample is Script {
         vm.stopBroadcast();
     }
 
+    function run(address commitReveal2) public returns (ConsumerExample consumer) {
+        if (commitReveal2 != address(0)) {
+            consumer = deployConsumerExampleUsingConfig(commitReveal2);
+        } else {
+            consumer = deployUsingDevOpsTools();
+        }
+    }
+
     function run() public returns (ConsumerExample consumer) {
         consumer = deployUsingDevOpsTools();
     }

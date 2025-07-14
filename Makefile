@@ -74,6 +74,9 @@ anvil-deploy-commit-reveal2:
 deploy-consumer-example:
 	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS)
 
+deploy-consumer: 
+	@forge script script/DeployConsumerExample.s.sol:DeployConsumerExample $(NETWORK_ARGS) $(CR2) --sig "run(address)"
+
 deploy-consumer-example-v2:
 	@forge script script/DeployConsumerExampleV2.s.sol:DeployConsumerExampleV2 $(NETWORK_ARGS)
 
