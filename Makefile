@@ -37,6 +37,9 @@ NO_SIMULATION := --rpc-url 127.0.0.1:8545 --private-key $(DEFAULT_ANVIL_KEY) --b
 ifeq ($(findstring --network sepolia,$(ARGS)), --network sepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --retries 20 --etherscan-api-key $(ETHERSCAN_API_KEY) -vv
 endif
+ifeq ($(findstring --network sepolianoverify,$(ARGS)), --network sepolianoverify)
+	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast -vv
+endif
 ifeq ($(findstring --network scriptsepolia,$(ARGS)), --network scriptsepolia)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) -vvv --skip-simulation --broadcast
 endif
@@ -149,6 +152,9 @@ failToRequestSorGenerateRandomNumber:
 
 failToSubmitS:
 	@forge script script/AnvilDisputeLogicInteractions.s.sol:FailToSubmitS $(NETWORK_ARGS)
+
+failToSubmitMerkleRootAfterDispute:
+	@forge script script/AnvilDisputeLogicInteractions.s.sol:FailToSubmitMerkleRootAfterDispute $(NETWORK_ARGS)
 
 deploy-vrf:
 	@forge script script/ChainlinkConsumerTest.s.sol:DeployChainlinkConsumer $(NETWORK_ARGS)
