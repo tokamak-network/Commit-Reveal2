@@ -64,6 +64,21 @@ contract CommitReveal2Helper is Test {
     uint256 public s_currentRound;
     uint256 public s_currentTrialNum;
 
+    uint256 public s_offChainSubmissionPeriod;
+    uint256 public s_requestOrSubmitOrFailDecisionPeriod;
+    uint256 public s_onChainSubmissionPeriod;
+    uint256 public s_offChainSubmissionPeriodPerOperator;
+    uint256 public s_onChainSubmissionPeriodPerOperator;
+    uint256 public s_callbackGas;
+
+    function _depositAndActivateOperators(address[] storage operatorAddresses) internal {
+        for (uint256 i; i < s_numOfOperators; i++) {
+            vm.startPrank(operatorAddresses[i]);
+            s_commitReveal2.depositAndActivate{value: s_activeNetworkConfig.activationThreshold}();
+            vm.stopPrank();
+        }
+    }
+
     function _packArrayIntoUint256(uint256[] storage arr) internal view returns (uint256 packed) {
         uint256 len = arr.length;
         for (uint256 i = 0; i < len; i++) {

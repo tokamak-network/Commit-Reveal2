@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {Test} from "forge-std/Test.sol";
+import {Test, console2} from "forge-std/Test.sol";
 
 contract BaseTest is Test {
     bool private s_baseTestInitialized;
@@ -9,15 +9,19 @@ contract BaseTest is Test {
     address[] public s_operatorAddresses;
     uint256[] public s_operatorPrivateKeys;
     mapping(address => uint256) public s_privateKeys;
+    string public s_gasReportPath;
+    string public s_gasObject = "gas report";
 
     function setUp() public virtual {
         // BaseTest.setUp is often called multiple times from tests' setUp due to inheritance
         if (s_baseTestInitialized) return;
         s_baseTestInitialized = true;
-
-        // Set msg.sender to LEADERNODE until changePrank or stopPrank is called
-        vm.startPrank(LEADERNODE);
         vm.deal(LEADERNODE, 10000 ether);
+        string memory root = vm.projectRoot();
+        s_gasReportPath = string.concat(root, "/output/gasreport.json");
+        if (!vm.exists(s_gasReportPath)) {
+            vm.writeFile(s_gasReportPath, "{}");
+        }
     }
 
     function setOperatorAdresses(uint256 num) public {
@@ -33,5 +37,18 @@ contract BaseTest is Test {
     function mine(uint256 second) public {
         vm.warp(block.timestamp + second);
         vm.roll(block.number + 1);
+    }
+
+    function _getAverageExceptIndex0(uint256[] memory arr) internal pure returns (uint256) {
+        uint256 sum;
+        uint256 len = arr.length;
+        for (uint256 i = 1; i < len; i++) {
+            sum += arr[i];
+        }
+        return sum / (len - 1);
+    }
+
+    function _consoleAverageExceptIndex0(uint256[] memory arr, string memory msg1) internal pure {
+        console2.log(msg1, _getAverageExceptIndex0(arr));
     }
 }

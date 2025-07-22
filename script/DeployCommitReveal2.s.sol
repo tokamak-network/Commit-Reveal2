@@ -3,6 +3,7 @@ pragma solidity 0.8.30;
 
 import {Script, console2} from "forge-std/Script.sol";
 import {CommitReveal2} from "../src/CommitReveal2.sol";
+import {CommitReveal2ForGasTest} from "../src/test/CommitReveal2ForGasTest.sol";
 import {CommitReveal2L2} from "../src/CommitReveal2L2.sol";
 import {NetworkHelperConfig} from "./NetworkHelperConfig.s.sol";
 import {CommitReveal2Helper} from "./../test/shared/CommitReveal2Helper.sol";
@@ -52,7 +53,30 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
 
         vm.startBroadcast(activeNetworkConfig.deployer);
         commitReveal2 = address(
-            new CommitReveal2{value: activeNetworkConfig.activationThreshold}(
+            new CommitReveal2L2{value: activeNetworkConfig.activationThreshold}(
+                activeNetworkConfig.activationThreshold,
+                activeNetworkConfig.flatFee,
+                activeNetworkConfig.name,
+                activeNetworkConfig.version,
+                activeNetworkConfig.offChainSubmissionPeriod,
+                activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
+                activeNetworkConfig.onChainSubmissionPeriod,
+                activeNetworkConfig.offChainSubmissionPeriodPerOperator,
+                activeNetworkConfig.onChainSubmissionPeriodPerOperator
+            )
+        );
+        DeployMockGasPriceOracle mockGasPriceOracle = new DeployMockGasPriceOracle();
+        mockGasPriceOracle.deployMockGasPriceOracle();
+        vm.stopBroadcast();
+    }
+
+    function runForGasTest() public returns (address commitReveal2, NetworkHelperConfig networkHelperConfig) {
+        networkHelperConfig = new NetworkHelperConfig();
+        NetworkHelperConfig.NetworkConfig memory activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
+
+        vm.startBroadcast(activeNetworkConfig.deployer);
+        commitReveal2 = address(
+            new CommitReveal2ForGasTest{value: activeNetworkConfig.activationThreshold}(
                 activeNetworkConfig.activationThreshold,
                 activeNetworkConfig.flatFee,
                 activeNetworkConfig.name,
