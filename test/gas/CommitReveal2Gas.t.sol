@@ -3,9 +3,7 @@ pragma solidity ^0.8.30;
 
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 import {BaseTest} from "./../shared/BaseTest.t.sol";
-import {console2, Vm} from "forge-std/Test.sol";
-import {NetworkHelperConfig} from "./../../script/NetworkHelperConfig.s.sol";
-import {Sort} from "./../shared/Sort.sol";
+import {console2} from "forge-std/Test.sol";
 import {CommitReveal2Helper} from "./../shared/CommitReveal2Helper.sol";
 import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 import {DeployCommitReveal2} from "./../../script/DeployCommitReveal2.s.sol";
@@ -26,24 +24,10 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
     function setUp() public override {
         BaseTest.setUp();
         if (block.chainid == 31337) vm.txGasPrice(10 gwei);
-        vm.stopPrank();
         s_numOfTests = 10;
 
         s_anyAddress = makeAddr("any");
         vm.deal(s_anyAddress, 10000 ether);
-    }
-
-    function _getAverageExceptIndex0(uint256[] memory arr) internal pure returns (uint256) {
-        uint256 sum;
-        uint256 len = arr.length;
-        for (uint256 i = 1; i < len; i++) {
-            sum += arr[i];
-        }
-        return sum / (len - 1);
-    }
-
-    function _consoleAverageExceptIndex0(uint256[] memory arr, string memory msg1) internal pure {
-        console2.log(msg1, _getAverageExceptIndex0(arr));
     }
 
     function _deployContracts() internal {
