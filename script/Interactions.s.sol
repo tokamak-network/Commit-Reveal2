@@ -2,7 +2,6 @@
 pragma solidity 0.8.30;
 
 import {BaseScript, console2} from "./shared/BaseScript.s.sol";
-import {Sort} from "./../test/shared/Sort.sol";
 import {CommitReveal2} from "./../src/CommitReveal2.sol";
 import {ConsumerExample} from "./../src/ConsumerExample.sol";
 

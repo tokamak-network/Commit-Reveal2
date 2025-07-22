@@ -54,7 +54,6 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
     function setUp() public override {
         BaseTest.setUp();
         if (block.chainid == 31337) vm.txGasPrice(10 gwei);
-        vm.stopPrank();
 
         address commitReveal2Address;
         (commitReveal2Address, s_networkHelperConfig) = (new DeployCommitReveal2()).runForTest();

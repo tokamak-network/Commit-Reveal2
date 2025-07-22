@@ -128,7 +128,7 @@ contract OperatorManager is Ownable {
         _activate();
     }
 
-    function _activate() private {
+    function _activate() internal {
         assembly ("memory-safe") {
             // Check if the caller is the owner (leader node) and revert if true.
             if eq(caller(), sload(_OWNER_SLOT)) {
@@ -163,7 +163,7 @@ contract OperatorManager is Ownable {
         }
     }
 
-    function depositAndActivate() external payable notInProcess {
+    function depositAndActivate() external payable virtual notInProcess {
         assembly ("memory-safe") {
             mstore(0x00, caller())
             mstore(0x20, s_depositAmount.slot)
