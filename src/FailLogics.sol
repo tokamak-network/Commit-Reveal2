@@ -73,7 +73,7 @@ contract FailLogics is DisputeLogics {
             mstore(0x40, HALTED)
             log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
         }
-        _executeSlashAndDistribute(FAILTOREQUESTSUBMITCVORSUBMITMERKLEROOT_GASUSED);
+        _executeSlashLeaderAndDistribute(FAILTOREQUESTSUBMITCVORSUBMITMERKLEROOT_GASUSED);
     }
 
     function failToSubmitMerkleRootAfterDispute() external notHalted {
@@ -116,10 +116,12 @@ contract FailLogics is DisputeLogics {
             mstore(0x40, HALTED)
             log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
         }
-        _executeSlashAndDistribute(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_GASUSED);
+        _executeSlashLeaderAndDistribute(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_GASUSED);
     }
 
     function failToSubmitCv() external notHalted {
+        uint256 returnGasFee = _getL1FeeUpperBoundOfFailFunction();
+        uint256 getL1UpperBoundGasUsed = _getGetL1UpperBoundGasUsed();
         assembly ("memory-safe") {
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
@@ -166,10 +168,14 @@ contract FailLogics is DisputeLogics {
                 didntSubmitCvLength := add(didntSubmitCvLength, 1)
             }
             let previousIndex := operatorIndex
+            let requestedToSubmitLength
             // Continue with remaining iterations
             for { let i := 1 } true { i := add(i, 1) } {
                 operatorIndex := and(mload(sub(0x20, i)), 0xff)
-                if iszero(gt(operatorIndex, previousIndex)) { break }
+                if iszero(gt(operatorIndex, previousIndex)) {
+                    requestedToSubmitLength := i
+                    break
+                }
                 if gt(and(zeroBitIfSubmittedCvBitmap, shl(operatorIndex, 1)), 0) {
                     // if bit is still set, meaning no Cv submitted for this operator
                     mstore(
@@ -185,9 +191,39 @@ contract FailLogics is DisputeLogics {
                 mstore(0, 0x7d39a81b) // AllSubmittedCv()
                 revert(0x1c, 0x04)
             }
+            let activatedOperatorLength := sload(s_activatedOperators.slot)
 
             // ** return gas fee to the caller()
-            let returnGasFee := mul(gasprice(), FAILTOSUBMITCV_GASUSED)
+            switch eq(requestedToSubmitLength, activatedOperatorLength)
+            case 1 {
+                returnGasFee :=
+                    add(
+                        returnGasFee,
+                        add(
+                            sub(FAILTOSUBMITCV_GASUSED_BASE_A, getL1UpperBoundGasUsed),
+                            add(
+                                mul(PER_OPERATOR_INCREASE_GASUSED_A, activatedOperatorLength),
+                                mul(PER_ADDITIONAL_DIDNTSUBMIT_A, sub(didntSubmitCvLength, 1))
+                            )
+                        )
+                    )
+            }
+            default {
+                returnGasFee :=
+                    add(
+                        returnGasFee,
+                        add(
+                            sub(FAILTOSUBMIT_GASUSED_BASE_B, getL1UpperBoundGasUsed),
+                            add(
+                                mul(PER_OPERATOR_INCREASE_GASUSED_B, activatedOperatorLength),
+                                add(
+                                    mul(PER_REQUESTED_INCREASE_GASUSED, requestedToSubmitLength),
+                                    mul(PER_ADDITIONAL_DIDNTSUBMIT_B, sub(didntSubmitCvLength, 1))
+                                )
+                            )
+                        )
+                    )
+            }
             let activationThreshold := sload(s_activationThreshold.slot)
             if gt(returnGasFee, activationThreshold) { returnGasFee := activationThreshold } // if returnGasFee is greater than one operator's activationThreshold, set returnGasFee to activationThreshold
             mstore(0x20, caller())
@@ -196,7 +232,6 @@ contract FailLogics is DisputeLogics {
             sstore(depositSlot, add(sload(depositSlot), returnGasFee))
 
             // ** cache slash rewards
-            let activatedOperatorLength := sload(s_activatedOperators.slot)
             let slashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
             let distributeAmount := sub(mul(activationThreshold, didntSubmitCvLength), returnGasFee)
             let updatedSlashRewardPerOperatorX8 := slashRewardPerOperatorX8
@@ -275,6 +310,8 @@ contract FailLogics is DisputeLogics {
     }
 
     function failToSubmitCo() external inProgress {
+        uint256 returnGasFee = _getL1FeeUpperBoundOfFailFunction();
+        uint256 getL1UpperBoundGasUsed = _getGetL1UpperBoundGasUsed();
         assembly ("memory-safe") {
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
@@ -321,7 +358,37 @@ contract FailLogics is DisputeLogics {
             }
 
             // ** return gas fee to the caller()
-            let returnGasFee := mul(gasprice(), FAILTOSUBMITCO_GASUSED)
+            let activatedOperatorLength := sload(s_activatedOperators.slot)
+            switch eq(requestedToSubmitCoLength, activatedOperatorLength)
+            case 1 {
+                returnGasFee :=
+                    add(
+                        returnGasFee,
+                        add(
+                            sub(FAILTOSUBMITCO_GASUSED_BASE_A, getL1UpperBoundGasUsed),
+                            add(
+                                mul(PER_OPERATOR_INCREASE_GASUSED_A, activatedOperatorLength),
+                                mul(PER_ADDITIONAL_DIDNTSUBMIT_A, sub(didntSubmitCoLength, 1))
+                            )
+                        )
+                    )
+            }
+            default {
+                returnGasFee :=
+                    add(
+                        returnGasFee,
+                        add(
+                            sub(FAILTOSUBMIT_GASUSED_BASE_B, getL1UpperBoundGasUsed),
+                            add(
+                                mul(PER_OPERATOR_INCREASE_GASUSED_B, activatedOperatorLength),
+                                add(
+                                    mul(PER_REQUESTED_INCREASE_GASUSED, requestedToSubmitCoLength),
+                                    mul(PER_ADDITIONAL_DIDNTSUBMIT_B, sub(didntSubmitCoLength, 1))
+                                )
+                            )
+                        )
+                    )
+            }
             let activationThreshold := sload(s_activationThreshold.slot)
             if gt(returnGasFee, activationThreshold) { returnGasFee := activationThreshold } // if returnGasFee is greater than one operator's activationThreshold, set returnGasFee to activationThreshold
             mstore(0x20, caller())
@@ -330,7 +397,6 @@ contract FailLogics is DisputeLogics {
             sstore(depositSlot, add(sload(depositSlot), returnGasFee))
 
             // ** cache slash rewards
-            let activatedOperatorLength := sload(s_activatedOperators.slot)
             let slashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
             let distributeAmount := sub(mul(activationThreshold, didntSubmitCoLength), returnGasFee)
             let updatedSlashRewardPerOperatorX8 := slashRewardPerOperatorX8
@@ -408,6 +474,7 @@ contract FailLogics is DisputeLogics {
     }
 
     function failToSubmitS() external inProgress {
+        uint256 returnGasFee = _calculateFailGasFee(FAILTOSUBMITS_GASUSED);
         assembly ("memory-safe") {
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
@@ -430,7 +497,6 @@ contract FailLogics is DisputeLogics {
             }
 
             // ** Refund gas fee to the caller()
-            let returnGasFee := mul(gasprice(), FAILTOSUBMITS_GASUSED)
             let activationThreshold := sload(s_activationThreshold.slot)
             if gt(returnGasFee, activationThreshold) { returnGasFee := activationThreshold }
             mstore(0x20, caller())
@@ -578,13 +644,13 @@ contract FailLogics is DisputeLogics {
             mstore(0x40, HALTED)
             log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
         }
-        _executeSlashAndDistribute(FAILTOREQUESTSORGENERATERANDOMNUMBER_GASUSED);
+        _executeSlashLeaderAndDistribute(FAILTOREQUESTSORGENERATERANDOMNUMBER_GASUSED);
     }
 
-    function _executeSlashAndDistribute(uint256 gasUsed) internal {
+    function _executeSlashLeaderAndDistribute(uint256 gasUsed) internal {
+        uint256 returnGasFee = _calculateFailGasFee(gasUsed);
         assembly ("memory-safe") {
             let activationThreshold := sload(s_activationThreshold.slot)
-            let returnGasFee := mul(gasprice(), gasUsed)
             mstore(0x20, sload(_OWNER_SLOT))
             // ** Distribute remainder among operators
             if gt(activationThreshold, returnGasFee) {
@@ -604,5 +670,19 @@ contract FailLogics is DisputeLogics {
             depositSlot := keccak256(0x20, 0x40) // msg.sender
             sstore(depositSlot, add(sload(depositSlot), returnGasFee))
         }
+    }
+
+    function _calculateFailGasFee(uint256 gasUsed) internal view virtual returns (uint256 gasFee) {
+        assembly ("memory-safe") {
+            gasFee := mul(gasprice(), sub(gasUsed, GETL1UPPERBOUND_GASUSED_CALLDATASIZE4))
+        }
+    }
+
+    function _getL1FeeUpperBoundOfFailFunction() internal view virtual returns (uint256 l1GasFee) {
+        return 0;
+    }
+
+    function _getGetL1UpperBoundGasUsed() internal pure virtual returns (uint256) {
+        return GETL1UPPERBOUND_GASUSED_CALLDATASIZE4;
     }
 }

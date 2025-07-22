@@ -256,12 +256,41 @@ contract CommitReveal2Storage {
         0x7c90823f4ccd06a00814473b1ad932d6313680c6d946963ecf1d30094346c24e; // keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)");
 
     // *** functions gasUsed;
-    uint256 internal constant FAILTOREQUESTSUBMITCVORSUBMITMERKLEROOT_GASUSED = 123;
-    uint256 internal constant FAILTOSUBMITMERKLEROOTAFTERDISPUTE_GASUSED = 123;
-    uint256 internal constant FAILTOREQUESTSORGENERATERANDOMNUMBER_GASUSED = 123;
-    uint256 internal constant FAILTOSUBMITCV_GASUSED = 123;
-    uint256 internal constant FAILTOSUBMITCO_GASUSED = 123;
-    uint256 internal constant FAILTOSUBMITS_GASUSED = 123;
+    uint256 internal constant FAIL_FUNCTIONS_CALLDATA_BYTES_SIZE = 4;
+    // 21833 ~ 21934
+    uint256 internal constant GETL1UPPERBOUND_GASUSED_CALLDATASIZE4 = 21833;
+    uint256 internal constant FAILTOREQUESTSUBMITCVORSUBMITMERKLEROOT_GASUSED = 85386;
+    uint256 internal constant FAILTOSUBMITMERKLEROOTAFTERDISPUTE_GASUSED = 82746;
+    uint256 internal constant FAILTOREQUESTSORGENERATERANDOMNUMBER_GASUSED = 86242;
+
+    /**
+     * @dev  FailToSubmitCo GasUsed
+     * if (requestedToSubmitLength == operatorsLength):
+     * gasUsage = 95,000 + 500 × operatorsLength + 15,000 × (didntSubmitLength - 1)
+     * else:
+     * gasUsage = 110,000 + 200 × operatorsLength + 500 × requestedToSubmitLength +
+     *            24,000 × (didntSubmitLength - 1)
+     */
+    uint256 internal constant FAILTOSUBMITCO_GASUSED_BASE_A = 95000;
+
+    /**
+     * @dev  FailToSubmitCv GasUsed
+     * if (requestedToSubmitLength == operatorsLength):
+     * gasUsage = 95,500 + 500 × operatorsLength + 15,000 × (didntSubmitLength - 1)
+     * else:
+     * gasUsage = 110,000 + 200 × operatorsLength + 500 × requestedToSubmitLength +
+     *            24,000 × (didntSubmitLength - 1)
+     */
+    uint256 internal constant FAILTOSUBMITCV_GASUSED_BASE_A = 95500;
+
+    uint256 internal constant FAILTOSUBMIT_GASUSED_BASE_B = 110000;
+    uint256 internal constant PER_OPERATOR_INCREASE_GASUSED_A = 500;
+    uint256 internal constant PER_OPERATOR_INCREASE_GASUSED_B = 200;
+    uint256 internal constant PER_ADDITIONAL_DIDNTSUBMIT_A = 15000;
+    uint256 internal constant PER_ADDITIONAL_DIDNTSUBMIT_B = 24000;
+    uint256 internal constant PER_REQUESTED_INCREASE_GASUSED = 500;
+
+    uint256 internal constant FAILTOSUBMITS_GASUSED = 122282;
 
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
