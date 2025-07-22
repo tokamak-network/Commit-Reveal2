@@ -1,0 +1,2102 @@
+{
+  "failToRequestSubmitCvOrSubmitMerkleRootGas": {
+    "calldataSizeInBytes": 4,
+    "numOfOperators: gasUsed": {
+      "02": 85397,
+      "03": 85397,
+      "04": 85397,
+      "05": 85397,
+      "06": 85397,
+      "07": 85397,
+      "08": 85397,
+      "09": 85397,
+      "10": 85397,
+      "11": 85397,
+      "12": 85397,
+      "13": 85397,
+      "14": 85397,
+      "15": 85397,
+      "16": 85397,
+      "17": 85397,
+      "18": 85397,
+      "19": 85397,
+      "20": 85397,
+      "21": 85397,
+      "22": 85397,
+      "23": 85397,
+      "24": 85397,
+      "25": 85397,
+      "26": 85397,
+      "27": 85397,
+      "28": 85397,
+      "29": 85397,
+      "30": 85397,
+      "31": 85397,
+      "32": 85397
+    }
+  },
+  "failToSubmitMerkleRootAfterDisputeGas": {
+    "calldataSizeInBytes": 4,
+    "numOfOperators: gasUsed": {
+      "02": 82757,
+      "03": 82757,
+      "04": 82757,
+      "05": 82757,
+      "06": 82757,
+      "07": 82757,
+      "08": 82757,
+      "09": 82757,
+      "10": 82757,
+      "11": 82757,
+      "12": 82757,
+      "13": 82757,
+      "14": 82757,
+      "15": 82757,
+      "16": 82757,
+      "17": 82757,
+      "18": 82757,
+      "19": 82757,
+      "20": 82757,
+      "21": 82757,
+      "22": 82757,
+      "23": 82757,
+      "24": 82757,
+      "25": 82757,
+      "26": 82757,
+      "27": 82757,
+      "28": 82757,
+      "29": 82757,
+      "30": 82757,
+      "31": 82757,
+      "32": 82757
+    }
+  },
+  "failToRequestSorGenerateRandomNumberGas": {
+    "calldataSizeInBytes": 4,
+    "numOfOperators: gasUsed": {
+      "02": 86253,
+      "03": 86253,
+      "04": 86253,
+      "05": 86253,
+      "06": 86253,
+      "07": 86253,
+      "08": 86253,
+      "09": 86253,
+      "10": 86253,
+      "11": 86253,
+      "12": 86253,
+      "13": 86253,
+      "14": 86253,
+      "15": 86253,
+      "16": 86253,
+      "17": 86253,
+      "18": 86253,
+      "19": 86253,
+      "20": 86253,
+      "21": 86253,
+      "22": 86253,
+      "23": 86253,
+      "24": 86253,
+      "25": 86253,
+      "26": 86253,
+      "27": 86253,
+      "28": 86253,
+      "29": 86253,
+      "30": 86253,
+      "31": 86253,
+      "32": 86253
+    }
+  },
+  "failToSubmitCvGas": {
+    "calldataSizeInBytes": 4,
+    "description": "Gas usage for failToSubmitCv function by scenario: operators_XX -> requested_YY -> didntSubmit_ZZ",
+    "scenarios": {
+      "operators_02": {
+        "requested_01": {
+          "didntSubmit_01": 104594
+        },
+        "requested_02": {
+          "didntSubmit_01": 89931,
+          "didntSubmit_02": 94496
+        }
+      },
+      "operators_03": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 121588
+        },
+        "requested_03": {
+          "didntSubmit_01": 95105,
+          "didntSubmit_02": 99041,
+          "didntSubmit_03": 109464
+        }
+      },
+      "operators_04": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 126784,
+          "didntSubmit_03": 138582
+        },
+        "requested_04": {
+          "didntSubmit_01": 95204,
+          "didntSubmit_02": 104215,
+          "didntSubmit_03": 109561,
+          "didntSubmit_04": 124432
+        }
+      },
+      "operators_05": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 133684,
+          "didntSubmit_03": 150557
+        },
+        "requested_04": {
+          "didntSubmit_01": 109988,
+          "didntSubmit_02": 126883,
+          "didntSubmit_03": 143778,
+          "didntSubmit_04": 150776
+        },
+        "requested_05": {
+          "didntSubmit_01": 95303,
+          "didntSubmit_02": 104314,
+          "didntSubmit_03": 113700,
+          "didntSubmit_04": 124529,
+          "didntSubmit_05": 139400
+        }
+      },
+      "operators_06": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 133684,
+          "didntSubmit_03": 157457
+        },
+        "requested_04": {
+          "didntSubmit_01": 109988,
+          "didntSubmit_02": 133783,
+          "didntSubmit_03": 150678,
+          "didntSubmit_04": 167551
+        },
+        "requested_05": {
+          "didntSubmit_01": 110087,
+          "didntSubmit_02": 126982,
+          "didntSubmit_03": 143877,
+          "didntSubmit_04": 155972,
+          "didntSubmit_05": 162970
+        },
+        "requested_06": {
+          "didntSubmit_01": 95402,
+          "didntSubmit_02": 104413,
+          "didntSubmit_03": 113780,
+          "didntSubmit_04": 128668,
+          "didntSubmit_05": 139497,
+          "didntSubmit_06": 154368
+        }
+      },
+      "operators_07": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 133684,
+          "didntSubmit_03": 157457
+        },
+        "requested_04": {
+          "didntSubmit_01": 109988,
+          "didntSubmit_02": 133783,
+          "didntSubmit_03": 157578,
+          "didntSubmit_04": 174451
+        },
+        "requested_05": {
+          "didntSubmit_01": 110087,
+          "didntSubmit_02": 133882,
+          "didntSubmit_03": 150777,
+          "didntSubmit_04": 167672,
+          "didntSubmit_05": 184545
+        },
+        "requested_06": {
+          "didntSubmit_01": 110186,
+          "didntSubmit_02": 127081,
+          "didntSubmit_03": 143976,
+          "didntSubmit_04": 156071,
+          "didntSubmit_05": 168166,
+          "didntSubmit_06": 175164
+        },
+        "requested_07": {
+          "didntSubmit_01": 95501,
+          "didntSubmit_02": 104512,
+          "didntSubmit_03": 113859,
+          "didntSubmit_04": 128748,
+          "didntSubmit_05": 143636,
+          "didntSubmit_06": 154465,
+          "didntSubmit_07": 169336
+        }
+      },
+      "operators_08": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 133684,
+          "didntSubmit_03": 157457
+        },
+        "requested_04": {
+          "didntSubmit_01": 109988,
+          "didntSubmit_02": 133783,
+          "didntSubmit_03": 157578,
+          "didntSubmit_04": 181351
+        },
+        "requested_05": {
+          "didntSubmit_01": 110087,
+          "didntSubmit_02": 133882,
+          "didntSubmit_03": 157677,
+          "didntSubmit_04": 174572,
+          "didntSubmit_05": 191445
+        },
+        "requested_06": {
+          "didntSubmit_01": 110186,
+          "didntSubmit_02": 133981,
+          "didntSubmit_03": 150876,
+          "didntSubmit_04": 167771,
+          "didntSubmit_05": 184666,
+          "didntSubmit_06": 201539
+        },
+        "requested_07": {
+          "didntSubmit_01": 110285,
+          "didntSubmit_02": 127180,
+          "didntSubmit_03": 144075,
+          "didntSubmit_04": 156170,
+          "didntSubmit_05": 168265,
+          "didntSubmit_06": 180360,
+          "didntSubmit_07": 192127
+        },
+        "requested_08": {
+          "didntSubmit_01": 95600,
+          "didntSubmit_02": 104611,
+          "didntSubmit_03": 113938,
+          "didntSubmit_04": 128827,
+          "didntSubmit_05": 143716,
+          "didntSubmit_06": 158604,
+          "didntSubmit_07": 169433,
+          "didntSubmit_08": 184304
+        }
+      },
+      "operators_09": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 133684,
+          "didntSubmit_03": 157457
+        },
+        "requested_04": {
+          "didntSubmit_01": 109988,
+          "didntSubmit_02": 133783,
+          "didntSubmit_03": 157578,
+          "didntSubmit_04": 181351
+        },
+        "requested_05": {
+          "didntSubmit_01": 110087,
+          "didntSubmit_02": 133882,
+          "didntSubmit_03": 157677,
+          "didntSubmit_04": 181472,
+          "didntSubmit_05": 198345
+        },
+        "requested_06": {
+          "didntSubmit_01": 110186,
+          "didntSubmit_02": 133981,
+          "didntSubmit_03": 157776,
+          "didntSubmit_04": 174671,
+          "didntSubmit_05": 191566,
+          "didntSubmit_06": 208439
+        },
+        "requested_07": {
+          "didntSubmit_01": 110285,
+          "didntSubmit_02": 134080,
+          "didntSubmit_03": 150975,
+          "didntSubmit_04": 167870,
+          "didntSubmit_05": 184765,
+          "didntSubmit_06": 201660,
+          "didntSubmit_07": 213733
+        },
+        "requested_08": {
+          "didntSubmit_01": 110384,
+          "didntSubmit_02": 127279,
+          "didntSubmit_03": 144174,
+          "didntSubmit_04": 156269,
+          "didntSubmit_05": 168364,
+          "didntSubmit_06": 180459,
+          "didntSubmit_07": 196284,
+          "didntSubmit_08": 209562
+        },
+        "requested_09": {
+          "didntSubmit_01": 95699,
+          "didntSubmit_02": 104710,
+          "didntSubmit_03": 114017,
+          "didntSubmit_04": 128906,
+          "didntSubmit_05": 143795,
+          "didntSubmit_06": 158684,
+          "didntSubmit_07": 173572,
+          "didntSubmit_08": 184401,
+          "didntSubmit_09": 199272
+        }
+      },
+      "operators_10": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 133684,
+          "didntSubmit_03": 157457
+        },
+        "requested_04": {
+          "didntSubmit_01": 109988,
+          "didntSubmit_02": 133783,
+          "didntSubmit_03": 157578,
+          "didntSubmit_04": 181351
+        },
+        "requested_05": {
+          "didntSubmit_01": 110087,
+          "didntSubmit_02": 133882,
+          "didntSubmit_03": 157677,
+          "didntSubmit_04": 181472,
+          "didntSubmit_05": 205245
+        },
+        "requested_06": {
+          "didntSubmit_01": 110186,
+          "didntSubmit_02": 133981,
+          "didntSubmit_03": 157776,
+          "didntSubmit_04": 181571,
+          "didntSubmit_05": 198466,
+          "didntSubmit_06": 215339
+        },
+        "requested_07": {
+          "didntSubmit_01": 110285,
+          "didntSubmit_02": 134080,
+          "didntSubmit_03": 157875,
+          "didntSubmit_04": 174770,
+          "didntSubmit_05": 191665,
+          "didntSubmit_06": 208560,
+          "didntSubmit_07": 225433
+        },
+        "requested_08": {
+          "didntSubmit_01": 110384,
+          "didntSubmit_02": 134179,
+          "didntSubmit_03": 151074,
+          "didntSubmit_04": 167969,
+          "didntSubmit_05": 184864,
+          "didntSubmit_06": 201759,
+          "didntSubmit_07": 213854,
+          "didntSubmit_08": 225927
+        },
+        "requested_09": {
+          "didntSubmit_01": 110483,
+          "didntSubmit_02": 127378,
+          "didntSubmit_03": 144273,
+          "didntSubmit_04": 156368,
+          "didntSubmit_05": 168463,
+          "didntSubmit_06": 180558,
+          "didntSubmit_07": 196363,
+          "didntSubmit_08": 213719,
+          "didntSubmit_09": 226997
+        },
+        "requested_10": {
+          "didntSubmit_01": 95798,
+          "didntSubmit_02": 104809,
+          "didntSubmit_03": 114096,
+          "didntSubmit_04": 128985,
+          "didntSubmit_05": 143874,
+          "didntSubmit_06": 158763,
+          "didntSubmit_07": 173652,
+          "didntSubmit_08": 188540,
+          "didntSubmit_09": 199369,
+          "didntSubmit_10": 214240
+        }
+      },
+      "operators_11": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 133684,
+          "didntSubmit_03": 157457
+        },
+        "requested_04": {
+          "didntSubmit_01": 109988,
+          "didntSubmit_02": 133783,
+          "didntSubmit_03": 157578,
+          "didntSubmit_04": 181351
+        },
+        "requested_05": {
+          "didntSubmit_01": 110087,
+          "didntSubmit_02": 133882,
+          "didntSubmit_03": 157677,
+          "didntSubmit_04": 181472,
+          "didntSubmit_05": 205245
+        },
+        "requested_06": {
+          "didntSubmit_01": 110186,
+          "didntSubmit_02": 133981,
+          "didntSubmit_03": 157776,
+          "didntSubmit_04": 181571,
+          "didntSubmit_05": 205366,
+          "didntSubmit_06": 222239
+        },
+        "requested_07": {
+          "didntSubmit_01": 110285,
+          "didntSubmit_02": 134080,
+          "didntSubmit_03": 157875,
+          "didntSubmit_04": 181670,
+          "didntSubmit_05": 198565,
+          "didntSubmit_06": 215460,
+          "didntSubmit_07": 232333
+        },
+        "requested_08": {
+          "didntSubmit_01": 110384,
+          "didntSubmit_02": 134179,
+          "didntSubmit_03": 157974,
+          "didntSubmit_04": 174869,
+          "didntSubmit_05": 191764,
+          "didntSubmit_06": 208659,
+          "didntSubmit_07": 225554,
+          "didntSubmit_08": 242427
+        },
+        "requested_09": {
+          "didntSubmit_01": 110483,
+          "didntSubmit_02": 134278,
+          "didntSubmit_03": 151173,
+          "didntSubmit_04": 168068,
+          "didntSubmit_05": 184963,
+          "didntSubmit_06": 201858,
+          "didntSubmit_07": 213953,
+          "didntSubmit_08": 226048,
+          "didntSubmit_09": 238121
+        },
+        "requested_10": {
+          "didntSubmit_01": 110582,
+          "didntSubmit_02": 127477,
+          "didntSubmit_03": 144372,
+          "didntSubmit_04": 156467,
+          "didntSubmit_05": 168562,
+          "didntSubmit_06": 180657,
+          "didntSubmit_07": 196442,
+          "didntSubmit_08": 213798,
+          "didntSubmit_09": 231154,
+          "didntSubmit_10": 244432
+        },
+        "requested_11": {
+          "didntSubmit_01": 95897,
+          "didntSubmit_02": 104908,
+          "didntSubmit_03": 114176,
+          "didntSubmit_04": 129064,
+          "didntSubmit_05": 143953,
+          "didntSubmit_06": 158842,
+          "didntSubmit_07": 173731,
+          "didntSubmit_08": 188620,
+          "didntSubmit_09": 203508,
+          "didntSubmit_10": 214337,
+          "didntSubmit_11": 229208
+        }
+      },
+      "operators_12": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 133684,
+          "didntSubmit_03": 157457
+        },
+        "requested_04": {
+          "didntSubmit_01": 109988,
+          "didntSubmit_02": 133783,
+          "didntSubmit_03": 157578,
+          "didntSubmit_04": 181351
+        },
+        "requested_05": {
+          "didntSubmit_01": 110087,
+          "didntSubmit_02": 133882,
+          "didntSubmit_03": 157677,
+          "didntSubmit_04": 181472,
+          "didntSubmit_05": 205245
+        },
+        "requested_06": {
+          "didntSubmit_01": 110186,
+          "didntSubmit_02": 133981,
+          "didntSubmit_03": 157776,
+          "didntSubmit_04": 181571,
+          "didntSubmit_05": 205366,
+          "didntSubmit_06": 229139
+        },
+        "requested_07": {
+          "didntSubmit_01": 110285,
+          "didntSubmit_02": 134080,
+          "didntSubmit_03": 157875,
+          "didntSubmit_04": 181670,
+          "didntSubmit_05": 205465,
+          "didntSubmit_06": 222360,
+          "didntSubmit_07": 239233
+        },
+        "requested_08": {
+          "didntSubmit_01": 110384,
+          "didntSubmit_02": 134179,
+          "didntSubmit_03": 157974,
+          "didntSubmit_04": 181769,
+          "didntSubmit_05": 198664,
+          "didntSubmit_06": 215559,
+          "didntSubmit_07": 232454,
+          "didntSubmit_08": 249327
+        },
+        "requested_09": {
+          "didntSubmit_01": 110483,
+          "didntSubmit_02": 134278,
+          "didntSubmit_03": 158073,
+          "didntSubmit_04": 174968,
+          "didntSubmit_05": 191863,
+          "didntSubmit_06": 208758,
+          "didntSubmit_07": 225653,
+          "didntSubmit_08": 242548,
+          "didntSubmit_09": 259421
+        },
+        "requested_10": {
+          "didntSubmit_01": 110582,
+          "didntSubmit_02": 134377,
+          "didntSubmit_03": 151272,
+          "didntSubmit_04": 168167,
+          "didntSubmit_05": 185062,
+          "didntSubmit_06": 201957,
+          "didntSubmit_07": 214052,
+          "didntSubmit_08": 226147,
+          "didntSubmit_09": 238242,
+          "didntSubmit_10": 254012
+        },
+        "requested_11": {
+          "didntSubmit_01": 110681,
+          "didntSubmit_02": 127576,
+          "didntSubmit_03": 144471,
+          "didntSubmit_04": 156566,
+          "didntSubmit_05": 168661,
+          "didntSubmit_06": 180756,
+          "didntSubmit_07": 196521,
+          "didntSubmit_08": 213877,
+          "didntSubmit_09": 231233,
+          "didntSubmit_10": 248589,
+          "didntSubmit_11": 261868
+        },
+        "requested_12": {
+          "didntSubmit_01": 95996,
+          "didntSubmit_02": 105007,
+          "didntSubmit_03": 114255,
+          "didntSubmit_04": 129144,
+          "didntSubmit_05": 144032,
+          "didntSubmit_06": 158921,
+          "didntSubmit_07": 173810,
+          "didntSubmit_08": 188699,
+          "didntSubmit_09": 203588,
+          "didntSubmit_10": 218476,
+          "didntSubmit_11": 229305,
+          "didntSubmit_12": 244176
+        }
+      },
+      "operators_13": {
+        "requested_01": {
+          "didntSubmit_01": 109669
+        },
+        "requested_02": {
+          "didntSubmit_01": 109790,
+          "didntSubmit_02": 133563
+        },
+        "requested_03": {
+          "didntSubmit_01": 109889,
+          "didntSubmit_02": 133684,
+          "didntSubmit_03": 157457
+        },
+        "requested_04": {
+          "didntSubmit_01": 109988,
+          "didntSubmit_02": 133783,
+          "didntSubmit_03": 157578,
+          "didntSubmit_04": 181351
+        },
+        "requested_05": {
+          "didntSubmit_01": 110087,
+          "didntSubmit_02": 133882,
+          "didntSubmit_03": 157677,
+          "didntSubmit_04": 181472,
+          "didntSubmit_05": 205245
+        },
+        "requested_06": {
+          "didntSubmit_01": 110186,
+          "didntSubmit_02": 133981,
+          "didntSubmit_03": 157776,
+          "didntSubmit_04": 181571,
+          "didntSubmit_05": 205366,
+          "didntSubmit_06": 229139
+        },
+        "requested_07": {
+          "didntSubmit_01": 110285,
+          "didntSubmit_02": 134080,
+          "didntSubmit_03": 157875,
+          "didntSubmit_04": 181670,
+          "didntSubmit_05": 205465,
+          "didntSubmit_06": 229260,
+          "didntSubmit_07": 246133
+        },
+        "requested_08": {
+          "didntSubmit_01": 110384,
+          "didntSubmit_02": 134179,
+          "didntSubmit_03": 157974,
+          "didntSubmit_04": 181769,
+          "didntSubmit_05": 205564,
+          "didntSubmit_06": 222459,
+          "didntSubmit_07": 239354,
+          "didntSubmit_08": 256227
+        },
+        "requested_09": {
+          "didntSubmit_01": 110483,
+          "didntSubmit_02": 134278,
+          "didntSubmit_03": 158073,
+          "didntSubmit_04": 181868,
+          "didntSubmit_05": 198763,
+          "didntSubmit_06": 215658,
+          "didntSubmit_07": 232553,
+          "didntSubmit_08": 249448,
+          "didntSubmit_09": 266321
+        },
+        "requested_10": {
+          "didntSubmit_01": 110582,
+          "didntSubmit_02": 134377,
+          "didntSubmit_03": 158172,
+          "didntSubmit_04": 175067,
+          "didntSubmit_05": 191962,
+          "didntSubmit_06": 208857,
+          "didntSubmit_07": 225752,
+          "didntSubmit_08": 242647,
+          "didntSubmit_09": 259542,
+          "didntSubmit_10": 271615
+        },
+        "requested_11": {
+          "didntSubmit_01": 110681,
+          "didntSubmit_02": 134476,
+          "didntSubmit_03": 151371,
+          "didntSubmit_04": 168266,
+          "didntSubmit_05": 185161,
+          "didntSubmit_06": 202056,
+          "didntSubmit_07": 214151,
+          "didntSubmit_08": 226246,
+          "didntSubmit_09": 238341,
+          "didntSubmit_10": 254109,
+          "didntSubmit_11": 271448
+        },
+        "requested_12": {
+          "didntSubmit_01": 110780,
+          "didntSubmit_02": 127675,
+          "didntSubmit_03": 144570,
+          "didntSubmit_04": 156665,
+          "didntSubmit_05": 168760,
+          "didntSubmit_06": 180855,
+          "didntSubmit_07": 196600,
+          "didntSubmit_08": 213956,
+          "didntSubmit_09": 231312,
+          "didntSubmit_10": 248668,
+          "didntSubmit_11": 266024,
+          "didntSubmit_12": 279303
+        },
+        "requested_13": {
+          "didntSubmit_01": 96095,
+          "didntSubmit_02": 105106,
+          "didntSubmit_03": 114334,
+          "didntSubmit_04": 129223,
+          "didntSubmit_05": 144112,
+          "didntSubmit_06": 159000,
+          "didntSubmit_07": 173889,
+          "didntSubmit_08": 188778,
+          "didntSubmit_09": 203667,
+          "didntSubmit_10": 218556,
+          "didntSubmit_11": 233444,
+          "didntSubmit_12": 244273,
+          "didntSubmit_13": 259144
+        }
+      }
+    }
+  },
+  "failToSubmitCoGas": {
+    "calldataSizeInBytes": 4,
+    "description": "Gas usage for failToSubmitCo function by scenario: operators_XX -> requested_YY -> didntSubmit_ZZ",
+    "scenarios": {
+      "operators_02": {
+        "requested_01": {
+          "didntSubmit_01": 104257
+        },
+        "requested_02": {
+          "didntSubmit_01": 89563,
+          "didntSubmit_02": 94217
+        }
+      },
+      "operators_03": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 121239
+        },
+        "requested_03": {
+          "didntSubmit_01": 94728,
+          "didntSubmit_02": 98661,
+          "didntSubmit_03": 109176
+        }
+      },
+      "operators_04": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 126404,
+          "didntSubmit_03": 138221
+        },
+        "requested_04": {
+          "didntSubmit_01": 94818,
+          "didntSubmit_02": 103826,
+          "didntSubmit_03": 109248,
+          "didntSubmit_04": 124134
+        }
+      },
+      "operators_05": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 133304,
+          "didntSubmit_03": 150196
+        },
+        "requested_04": {
+          "didntSubmit_01": 109602,
+          "didntSubmit_02": 126494,
+          "didntSubmit_03": 143386,
+          "didntSubmit_04": 150403
+        },
+        "requested_05": {
+          "didntSubmit_01": 94908,
+          "didntSubmit_02": 103916,
+          "didntSubmit_03": 113380,
+          "didntSubmit_04": 124206,
+          "didntSubmit_05": 139092
+        }
+      },
+      "operators_06": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 133304,
+          "didntSubmit_03": 157096
+        },
+        "requested_04": {
+          "didntSubmit_01": 109602,
+          "didntSubmit_02": 133394,
+          "didntSubmit_03": 150286,
+          "didntSubmit_04": 167178
+        },
+        "requested_05": {
+          "didntSubmit_01": 109692,
+          "didntSubmit_02": 126584,
+          "didntSubmit_03": 143476,
+          "didntSubmit_04": 155568,
+          "didntSubmit_05": 162585
+        },
+        "requested_06": {
+          "didntSubmit_01": 94998,
+          "didntSubmit_02": 104006,
+          "didntSubmit_03": 113452,
+          "didntSubmit_04": 128338,
+          "didntSubmit_05": 139164,
+          "didntSubmit_06": 154051
+        }
+      },
+      "operators_07": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 133304,
+          "didntSubmit_03": 157096
+        },
+        "requested_04": {
+          "didntSubmit_01": 109602,
+          "didntSubmit_02": 133394,
+          "didntSubmit_03": 157186,
+          "didntSubmit_04": 174078
+        },
+        "requested_05": {
+          "didntSubmit_01": 109692,
+          "didntSubmit_02": 133484,
+          "didntSubmit_03": 150376,
+          "didntSubmit_04": 167268,
+          "didntSubmit_05": 184160
+        },
+        "requested_06": {
+          "didntSubmit_01": 109782,
+          "didntSubmit_02": 126674,
+          "didntSubmit_03": 143566,
+          "didntSubmit_04": 155658,
+          "didntSubmit_05": 167750,
+          "didntSubmit_06": 174767
+        },
+        "requested_07": {
+          "didntSubmit_01": 95088,
+          "didntSubmit_02": 104096,
+          "didntSubmit_03": 113524,
+          "didntSubmit_04": 128410,
+          "didntSubmit_05": 143296,
+          "didntSubmit_06": 154123,
+          "didntSubmit_07": 169009
+        }
+      },
+      "operators_08": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 133304,
+          "didntSubmit_03": 157096
+        },
+        "requested_04": {
+          "didntSubmit_01": 109602,
+          "didntSubmit_02": 133394,
+          "didntSubmit_03": 157186,
+          "didntSubmit_04": 180978
+        },
+        "requested_05": {
+          "didntSubmit_01": 109692,
+          "didntSubmit_02": 133484,
+          "didntSubmit_03": 157276,
+          "didntSubmit_04": 174168,
+          "didntSubmit_05": 191060
+        },
+        "requested_06": {
+          "didntSubmit_01": 109782,
+          "didntSubmit_02": 133574,
+          "didntSubmit_03": 150466,
+          "didntSubmit_04": 167358,
+          "didntSubmit_05": 184250,
+          "didntSubmit_06": 201142
+        },
+        "requested_07": {
+          "didntSubmit_01": 109872,
+          "didntSubmit_02": 126764,
+          "didntSubmit_03": 143656,
+          "didntSubmit_04": 155748,
+          "didntSubmit_05": 167840,
+          "didntSubmit_06": 179932,
+          "didntSubmit_07": 191800
+        },
+        "requested_08": {
+          "didntSubmit_01": 95178,
+          "didntSubmit_02": 104186,
+          "didntSubmit_03": 113596,
+          "didntSubmit_04": 128482,
+          "didntSubmit_05": 143368,
+          "didntSubmit_06": 158255,
+          "didntSubmit_07": 169081,
+          "didntSubmit_08": 183968
+        }
+      },
+      "operators_09": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 133304,
+          "didntSubmit_03": 157096
+        },
+        "requested_04": {
+          "didntSubmit_01": 109602,
+          "didntSubmit_02": 133394,
+          "didntSubmit_03": 157186,
+          "didntSubmit_04": 180978
+        },
+        "requested_05": {
+          "didntSubmit_01": 109692,
+          "didntSubmit_02": 133484,
+          "didntSubmit_03": 157276,
+          "didntSubmit_04": 181068,
+          "didntSubmit_05": 197960
+        },
+        "requested_06": {
+          "didntSubmit_01": 109782,
+          "didntSubmit_02": 133574,
+          "didntSubmit_03": 157366,
+          "didntSubmit_04": 174258,
+          "didntSubmit_05": 191150,
+          "didntSubmit_06": 208042
+        },
+        "requested_07": {
+          "didntSubmit_01": 109872,
+          "didntSubmit_02": 133664,
+          "didntSubmit_03": 150556,
+          "didntSubmit_04": 167448,
+          "didntSubmit_05": 184340,
+          "didntSubmit_06": 201232,
+          "didntSubmit_07": 213324
+        },
+        "requested_08": {
+          "didntSubmit_01": 109962,
+          "didntSubmit_02": 126854,
+          "didntSubmit_03": 143746,
+          "didntSubmit_04": 155838,
+          "didntSubmit_05": 167930,
+          "didntSubmit_06": 180022,
+          "didntSubmit_07": 195932,
+          "didntSubmit_08": 209225
+        },
+        "requested_09": {
+          "didntSubmit_01": 95268,
+          "didntSubmit_02": 104276,
+          "didntSubmit_03": 113668,
+          "didntSubmit_04": 128554,
+          "didntSubmit_05": 143440,
+          "didntSubmit_06": 158327,
+          "didntSubmit_07": 173213,
+          "didntSubmit_08": 184040,
+          "didntSubmit_09": 198926
+        }
+      },
+      "operators_10": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 133304,
+          "didntSubmit_03": 157096
+        },
+        "requested_04": {
+          "didntSubmit_01": 109602,
+          "didntSubmit_02": 133394,
+          "didntSubmit_03": 157186,
+          "didntSubmit_04": 180978
+        },
+        "requested_05": {
+          "didntSubmit_01": 109692,
+          "didntSubmit_02": 133484,
+          "didntSubmit_03": 157276,
+          "didntSubmit_04": 181068,
+          "didntSubmit_05": 204860
+        },
+        "requested_06": {
+          "didntSubmit_01": 109782,
+          "didntSubmit_02": 133574,
+          "didntSubmit_03": 157366,
+          "didntSubmit_04": 181158,
+          "didntSubmit_05": 198050,
+          "didntSubmit_06": 214942
+        },
+        "requested_07": {
+          "didntSubmit_01": 109872,
+          "didntSubmit_02": 133664,
+          "didntSubmit_03": 157456,
+          "didntSubmit_04": 174348,
+          "didntSubmit_05": 191240,
+          "didntSubmit_06": 208132,
+          "didntSubmit_07": 225024
+        },
+        "requested_08": {
+          "didntSubmit_01": 109962,
+          "didntSubmit_02": 133754,
+          "didntSubmit_03": 150646,
+          "didntSubmit_04": 167538,
+          "didntSubmit_05": 184430,
+          "didntSubmit_06": 201322,
+          "didntSubmit_07": 213414,
+          "didntSubmit_08": 225506
+        },
+        "requested_09": {
+          "didntSubmit_01": 110052,
+          "didntSubmit_02": 126944,
+          "didntSubmit_03": 143836,
+          "didntSubmit_04": 155928,
+          "didntSubmit_05": 168020,
+          "didntSubmit_06": 180112,
+          "didntSubmit_07": 196004,
+          "didntSubmit_08": 213357,
+          "didntSubmit_09": 226651
+        },
+        "requested_10": {
+          "didntSubmit_01": 95358,
+          "didntSubmit_02": 104366,
+          "didntSubmit_03": 113740,
+          "didntSubmit_04": 128626,
+          "didntSubmit_05": 143512,
+          "didntSubmit_06": 158399,
+          "didntSubmit_07": 173285,
+          "didntSubmit_08": 188172,
+          "didntSubmit_09": 198998,
+          "didntSubmit_10": 213884
+        }
+      },
+      "operators_11": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 133304,
+          "didntSubmit_03": 157096
+        },
+        "requested_04": {
+          "didntSubmit_01": 109602,
+          "didntSubmit_02": 133394,
+          "didntSubmit_03": 157186,
+          "didntSubmit_04": 180978
+        },
+        "requested_05": {
+          "didntSubmit_01": 109692,
+          "didntSubmit_02": 133484,
+          "didntSubmit_03": 157276,
+          "didntSubmit_04": 181068,
+          "didntSubmit_05": 204860
+        },
+        "requested_06": {
+          "didntSubmit_01": 109782,
+          "didntSubmit_02": 133574,
+          "didntSubmit_03": 157366,
+          "didntSubmit_04": 181158,
+          "didntSubmit_05": 204950,
+          "didntSubmit_06": 221842
+        },
+        "requested_07": {
+          "didntSubmit_01": 109872,
+          "didntSubmit_02": 133664,
+          "didntSubmit_03": 157456,
+          "didntSubmit_04": 181248,
+          "didntSubmit_05": 198140,
+          "didntSubmit_06": 215032,
+          "didntSubmit_07": 231924
+        },
+        "requested_08": {
+          "didntSubmit_01": 109962,
+          "didntSubmit_02": 133754,
+          "didntSubmit_03": 157546,
+          "didntSubmit_04": 174438,
+          "didntSubmit_05": 191330,
+          "didntSubmit_06": 208222,
+          "didntSubmit_07": 225114,
+          "didntSubmit_08": 242006
+        },
+        "requested_09": {
+          "didntSubmit_01": 110052,
+          "didntSubmit_02": 133844,
+          "didntSubmit_03": 150736,
+          "didntSubmit_04": 167628,
+          "didntSubmit_05": 184520,
+          "didntSubmit_06": 201412,
+          "didntSubmit_07": 213504,
+          "didntSubmit_08": 225596,
+          "didntSubmit_09": 237688
+        },
+        "requested_10": {
+          "didntSubmit_01": 110142,
+          "didntSubmit_02": 127034,
+          "didntSubmit_03": 143926,
+          "didntSubmit_04": 156018,
+          "didntSubmit_05": 168110,
+          "didntSubmit_06": 180202,
+          "didntSubmit_07": 196076,
+          "didntSubmit_08": 213429,
+          "didntSubmit_09": 230783,
+          "didntSubmit_10": 244076
+        },
+        "requested_11": {
+          "didntSubmit_01": 95448,
+          "didntSubmit_02": 104456,
+          "didntSubmit_03": 113812,
+          "didntSubmit_04": 128698,
+          "didntSubmit_05": 143584,
+          "didntSubmit_06": 158471,
+          "didntSubmit_07": 173357,
+          "didntSubmit_08": 188244,
+          "didntSubmit_09": 203130,
+          "didntSubmit_10": 213956,
+          "didntSubmit_11": 228843
+        }
+      },
+      "operators_12": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 133304,
+          "didntSubmit_03": 157096
+        },
+        "requested_04": {
+          "didntSubmit_01": 109602,
+          "didntSubmit_02": 133394,
+          "didntSubmit_03": 157186,
+          "didntSubmit_04": 180978
+        },
+        "requested_05": {
+          "didntSubmit_01": 109692,
+          "didntSubmit_02": 133484,
+          "didntSubmit_03": 157276,
+          "didntSubmit_04": 181068,
+          "didntSubmit_05": 204860
+        },
+        "requested_06": {
+          "didntSubmit_01": 109782,
+          "didntSubmit_02": 133574,
+          "didntSubmit_03": 157366,
+          "didntSubmit_04": 181158,
+          "didntSubmit_05": 204950,
+          "didntSubmit_06": 228742
+        },
+        "requested_07": {
+          "didntSubmit_01": 109872,
+          "didntSubmit_02": 133664,
+          "didntSubmit_03": 157456,
+          "didntSubmit_04": 181248,
+          "didntSubmit_05": 205040,
+          "didntSubmit_06": 221932,
+          "didntSubmit_07": 238824
+        },
+        "requested_08": {
+          "didntSubmit_01": 109962,
+          "didntSubmit_02": 133754,
+          "didntSubmit_03": 157546,
+          "didntSubmit_04": 181338,
+          "didntSubmit_05": 198230,
+          "didntSubmit_06": 215122,
+          "didntSubmit_07": 232014,
+          "didntSubmit_08": 248906
+        },
+        "requested_09": {
+          "didntSubmit_01": 110052,
+          "didntSubmit_02": 133844,
+          "didntSubmit_03": 157636,
+          "didntSubmit_04": 174528,
+          "didntSubmit_05": 191420,
+          "didntSubmit_06": 208312,
+          "didntSubmit_07": 225204,
+          "didntSubmit_08": 242096,
+          "didntSubmit_09": 258988
+        },
+        "requested_10": {
+          "didntSubmit_01": 110142,
+          "didntSubmit_02": 133934,
+          "didntSubmit_03": 150826,
+          "didntSubmit_04": 167718,
+          "didntSubmit_05": 184610,
+          "didntSubmit_06": 201502,
+          "didntSubmit_07": 213594,
+          "didntSubmit_08": 225686,
+          "didntSubmit_09": 237778,
+          "didntSubmit_10": 253656
+        },
+        "requested_11": {
+          "didntSubmit_01": 110232,
+          "didntSubmit_02": 127124,
+          "didntSubmit_03": 144016,
+          "didntSubmit_04": 156108,
+          "didntSubmit_05": 168200,
+          "didntSubmit_06": 180292,
+          "didntSubmit_07": 196148,
+          "didntSubmit_08": 213501,
+          "didntSubmit_09": 230855,
+          "didntSubmit_10": 248208,
+          "didntSubmit_11": 261502
+        },
+        "requested_12": {
+          "didntSubmit_01": 95538,
+          "didntSubmit_02": 104546,
+          "didntSubmit_03": 113884,
+          "didntSubmit_04": 128770,
+          "didntSubmit_05": 143656,
+          "didntSubmit_06": 158543,
+          "didntSubmit_07": 173429,
+          "didntSubmit_08": 188316,
+          "didntSubmit_09": 203202,
+          "didntSubmit_10": 218088,
+          "didntSubmit_11": 228915,
+          "didntSubmit_12": 243801
+        }
+      },
+      "operators_13": {
+        "requested_01": {
+          "didntSubmit_01": 109332
+        },
+        "requested_02": {
+          "didntSubmit_01": 109422,
+          "didntSubmit_02": 133214
+        },
+        "requested_03": {
+          "didntSubmit_01": 109512,
+          "didntSubmit_02": 133304,
+          "didntSubmit_03": 157096
+        },
+        "requested_04": {
+          "didntSubmit_01": 109602,
+          "didntSubmit_02": 133394,
+          "didntSubmit_03": 157186,
+          "didntSubmit_04": 180978
+        },
+        "requested_05": {
+          "didntSubmit_01": 109692,
+          "didntSubmit_02": 133484,
+          "didntSubmit_03": 157276,
+          "didntSubmit_04": 181068,
+          "didntSubmit_05": 204860
+        },
+        "requested_06": {
+          "didntSubmit_01": 109782,
+          "didntSubmit_02": 133574,
+          "didntSubmit_03": 157366,
+          "didntSubmit_04": 181158,
+          "didntSubmit_05": 204950,
+          "didntSubmit_06": 228742
+        },
+        "requested_07": {
+          "didntSubmit_01": 109872,
+          "didntSubmit_02": 133664,
+          "didntSubmit_03": 157456,
+          "didntSubmit_04": 181248,
+          "didntSubmit_05": 205040,
+          "didntSubmit_06": 228832,
+          "didntSubmit_07": 245724
+        },
+        "requested_08": {
+          "didntSubmit_01": 109962,
+          "didntSubmit_02": 133754,
+          "didntSubmit_03": 157546,
+          "didntSubmit_04": 181338,
+          "didntSubmit_05": 205130,
+          "didntSubmit_06": 222022,
+          "didntSubmit_07": 238914,
+          "didntSubmit_08": 255806
+        },
+        "requested_09": {
+          "didntSubmit_01": 110052,
+          "didntSubmit_02": 133844,
+          "didntSubmit_03": 157636,
+          "didntSubmit_04": 181428,
+          "didntSubmit_05": 198320,
+          "didntSubmit_06": 215212,
+          "didntSubmit_07": 232104,
+          "didntSubmit_08": 248996,
+          "didntSubmit_09": 265888
+        },
+        "requested_10": {
+          "didntSubmit_01": 110142,
+          "didntSubmit_02": 133934,
+          "didntSubmit_03": 157726,
+          "didntSubmit_04": 174618,
+          "didntSubmit_05": 191510,
+          "didntSubmit_06": 208402,
+          "didntSubmit_07": 225294,
+          "didntSubmit_08": 242186,
+          "didntSubmit_09": 259078,
+          "didntSubmit_10": 271170
+        },
+        "requested_11": {
+          "didntSubmit_01": 110232,
+          "didntSubmit_02": 134024,
+          "didntSubmit_03": 150916,
+          "didntSubmit_04": 167808,
+          "didntSubmit_05": 184700,
+          "didntSubmit_06": 201592,
+          "didntSubmit_07": 213684,
+          "didntSubmit_08": 225776,
+          "didntSubmit_09": 237868,
+          "didntSubmit_10": 253728,
+          "didntSubmit_11": 271082
+        },
+        "requested_12": {
+          "didntSubmit_01": 110322,
+          "didntSubmit_02": 127214,
+          "didntSubmit_03": 144106,
+          "didntSubmit_04": 156198,
+          "didntSubmit_05": 168290,
+          "didntSubmit_06": 180382,
+          "didntSubmit_07": 196220,
+          "didntSubmit_08": 213573,
+          "didntSubmit_09": 230927,
+          "didntSubmit_10": 248280,
+          "didntSubmit_11": 265634,
+          "didntSubmit_12": 278928
+        },
+        "requested_13": {
+          "didntSubmit_01": 95628,
+          "didntSubmit_02": 104636,
+          "didntSubmit_03": 113956,
+          "didntSubmit_04": 128842,
+          "didntSubmit_05": 143728,
+          "didntSubmit_06": 158615,
+          "didntSubmit_07": 173501,
+          "didntSubmit_08": 188388,
+          "didntSubmit_09": 203274,
+          "didntSubmit_10": 218160,
+          "didntSubmit_11": 233047,
+          "didntSubmit_12": 243873,
+          "didntSubmit_13": 258760
+        }
+      }
+    }
+  },
+  "failToSubmitSGas": {
+    "calldataSizeInBytes": 4,
+    "description": "Gas usage for failToSubmitS function by scenario: operators_XX -> requested_YY -> didntSubmit_ZZ",
+    "scenarios": {
+      "operators_02": {
+        "requested_01": {
+          "didntSubmit_01": 85320
+        },
+        "requested_02": {
+          "didntSubmit_01": 90120,
+          "didntSubmit_02": 90120
+        }
+      },
+      "operators_03": {
+        "requested_01": {
+          "didntSubmit_01": 95195
+        },
+        "requested_02": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 90395
+        },
+        "requested_03": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 95195,
+          "didntSubmit_03": 105182
+        }
+      },
+      "operators_04": {
+        "requested_01": {
+          "didntSubmit_01": 105182
+        },
+        "requested_02": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282
+        },
+        "requested_03": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 95195,
+          "didntSubmit_03": 122282
+        },
+        "requested_04": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 105182,
+          "didntSubmit_04": 105182
+        }
+      },
+      "operators_05": {
+        "requested_01": {
+          "didntSubmit_01": 105182
+        },
+        "requested_02": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282
+        },
+        "requested_03": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 105182
+        },
+        "requested_04": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 95195,
+          "didntSubmit_03": 105182,
+          "didntSubmit_04": 105182
+        },
+        "requested_05": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 95195,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 105182
+        }
+      },
+      "operators_06": {
+        "requested_01": {
+          "didntSubmit_01": 95195
+        },
+        "requested_02": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282
+        },
+        "requested_03": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282
+        },
+        "requested_04": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 105182,
+          "didntSubmit_04": 105182
+        },
+        "requested_05": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 105182,
+          "didntSubmit_05": 122282
+        },
+        "requested_06": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 105182,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 105182,
+          "didntSubmit_06": 122282
+        }
+      },
+      "operators_07": {
+        "requested_01": {
+          "didntSubmit_01": 90395
+        },
+        "requested_02": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182
+        },
+        "requested_03": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282
+        },
+        "requested_04": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 105182
+        },
+        "requested_05": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 105182,
+          "didntSubmit_05": 105182
+        },
+        "requested_06": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 95195,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282
+        },
+        "requested_07": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 105182,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282
+        }
+      },
+      "operators_08": {
+        "requested_01": {
+          "didntSubmit_01": 122282
+        },
+        "requested_02": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282
+        },
+        "requested_03": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 95195
+        },
+        "requested_04": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 105182,
+          "didntSubmit_04": 122282
+        },
+        "requested_05": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282
+        },
+        "requested_06": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 105182,
+          "didntSubmit_06": 122282
+        },
+        "requested_07": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 95195,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 95195,
+          "didntSubmit_07": 122282
+        },
+        "requested_08": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 105182,
+          "didntSubmit_06": 105182,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 105182
+        }
+      },
+      "operators_09": {
+        "requested_01": {
+          "didntSubmit_01": 122282
+        },
+        "requested_02": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282
+        },
+        "requested_03": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 95195
+        },
+        "requested_04": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 95195,
+          "didntSubmit_04": 122282
+        },
+        "requested_05": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 105182,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282
+        },
+        "requested_06": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 105182,
+          "didntSubmit_06": 122282
+        },
+        "requested_07": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 95195,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 105182,
+          "didntSubmit_07": 122282
+        },
+        "requested_08": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 105182,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 105182
+        },
+        "requested_09": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 95195,
+          "didntSubmit_09": 122282
+        }
+      },
+      "operators_10": {
+        "requested_01": {
+          "didntSubmit_01": 105182
+        },
+        "requested_02": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282
+        },
+        "requested_03": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282
+        },
+        "requested_04": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 95195,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282
+        },
+        "requested_05": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282
+        },
+        "requested_06": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282
+        },
+        "requested_07": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 105182,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282
+        },
+        "requested_08": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 95195,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282
+        },
+        "requested_09": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 95195,
+          "didntSubmit_07": 105182,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 122282
+        },
+        "requested_10": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 105182,
+          "didntSubmit_07": 95195,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 122282,
+          "didntSubmit_10": 122282
+        }
+      },
+      "operators_11": {
+        "requested_01": {
+          "didntSubmit_01": 95195
+        },
+        "requested_02": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282
+        },
+        "requested_03": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 105182
+        },
+        "requested_04": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282
+        },
+        "requested_05": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282
+        },
+        "requested_06": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282
+        },
+        "requested_07": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 95195,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 95195,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 95195
+        },
+        "requested_08": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 95195,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 95195,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282
+        },
+        "requested_09": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 95195,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 122282
+        },
+        "requested_10": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 105182,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 105182,
+          "didntSubmit_09": 122282,
+          "didntSubmit_10": 122282
+        },
+        "requested_11": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 105182,
+          "didntSubmit_10": 105182,
+          "didntSubmit_11": 122282
+        }
+      },
+      "operators_12": {
+        "requested_01": {
+          "didntSubmit_01": 122282
+        },
+        "requested_02": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282
+        },
+        "requested_03": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282
+        },
+        "requested_04": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 105182,
+          "didntSubmit_04": 122282
+        },
+        "requested_05": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282
+        },
+        "requested_06": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 105182
+        },
+        "requested_07": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 95195,
+          "didntSubmit_07": 122282
+        },
+        "requested_08": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 95195,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 95195
+        },
+        "requested_09": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 122282
+        },
+        "requested_10": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 95195,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 122282,
+          "didntSubmit_10": 122282
+        },
+        "requested_11": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 122282,
+          "didntSubmit_10": 122282,
+          "didntSubmit_11": 122282
+        },
+        "requested_12": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 122282,
+          "didntSubmit_10": 122282,
+          "didntSubmit_11": 122282,
+          "didntSubmit_12": 122282
+        }
+      },
+      "operators_13": {
+        "requested_01": {
+          "didntSubmit_01": 122282
+        },
+        "requested_02": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282
+        },
+        "requested_03": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282
+        },
+        "requested_04": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282
+        },
+        "requested_05": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282
+        },
+        "requested_06": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282
+        },
+        "requested_07": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 105182,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282
+        },
+        "requested_08": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 95195
+        },
+        "requested_09": {
+          "didntSubmit_01": 105182,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 95195,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 95195
+        },
+        "requested_10": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 122282,
+          "didntSubmit_10": 122282
+        },
+        "requested_11": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 95195,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 105182,
+          "didntSubmit_10": 122282,
+          "didntSubmit_11": 105182
+        },
+        "requested_12": {
+          "didntSubmit_01": 122282,
+          "didntSubmit_02": 105182,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 95195,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 105182,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 95195,
+          "didntSubmit_10": 122282,
+          "didntSubmit_11": 122282,
+          "didntSubmit_12": 122282
+        },
+        "requested_13": {
+          "didntSubmit_01": 95195,
+          "didntSubmit_02": 122282,
+          "didntSubmit_03": 122282,
+          "didntSubmit_04": 122282,
+          "didntSubmit_05": 122282,
+          "didntSubmit_06": 122282,
+          "didntSubmit_07": 122282,
+          "didntSubmit_08": 122282,
+          "didntSubmit_09": 122282,
+          "didntSubmit_10": 105182,
+          "didntSubmit_11": 122282,
+          "didntSubmit_12": 122282,
+          "didntSubmit_13": 122282
+        }
+      }
+    }
+  }
+}
