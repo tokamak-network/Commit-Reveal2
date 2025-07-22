@@ -3,6 +3,10 @@ pragma solidity ^0.8.30;
 
 import {ConsumerBase} from "./ConsumerBase.sol";
 
+/**
+ * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
+ * DO NOT USE THIS CODE IN PRODUCTION.
+ */
 contract ConsumerExample is ConsumerBase {
     struct RequestStatus {
         bool fulfilled; // whether the request has been successfully fulfilled
@@ -10,10 +14,8 @@ contract ConsumerExample is ConsumerBase {
     }
 
     struct RequestInfo {
-        uint256 requestBlockNumber;
         address requester;
         uint256 requestFee;
-        uint256 fulfillBlockNumber;
     }
 
     error ETHTransferFailed(); // 0xb12d13eb
@@ -33,9 +35,7 @@ contract ConsumerExample is ConsumerBase {
     function requestRandomNumber() external payable {
         (uint256 requestId, uint256 requestFee) = _requestRandomNumber(CALLBACK_GAS_LIMIT);
         s_requesterRequestIds[msg.sender].push(requestId);
-        s_requestInfos[requestId].requestBlockNumber = block.number;
-        s_requestInfos[requestId].requestFee = requestFee;
-        s_requestInfos[requestId].requester = msg.sender;
+        s_requestInfos[requestId] = RequestInfo(msg.sender, requestFee);
     }
 
     function refund(uint256 requestId) external {
@@ -44,7 +44,6 @@ contract ConsumerExample is ConsumerBase {
 
     function fulfillRandomRandomNumber(uint256 requestId, uint256 randomNumber) internal override {
         s_requests[requestId] = RequestStatus(true, randomNumber);
-        s_requestInfos[requestId].fulfillBlockNumber = block.number;
         lastRequestId = requestId;
     }
 

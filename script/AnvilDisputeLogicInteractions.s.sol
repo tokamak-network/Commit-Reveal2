@@ -143,6 +143,15 @@ contract FailToRequestSorGenerateRandomNumber is BaseScript {
     }
 }
 
+contract FailToSubmitMerkleRootAfterDispute is BaseScript {
+    function run() public {
+        BaseScript.scriptSetUp();
+        vm.startBroadcast();
+        s_commitReveal2.failToSubmitMerkleRootAfterDispute();
+        vm.stopBroadcast();
+    }
+}
+
 contract FailToSubmitS is BaseScript {
     function run() public {
         BaseScript.scriptSetUp();
