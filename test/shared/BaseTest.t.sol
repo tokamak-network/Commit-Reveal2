@@ -48,6 +48,15 @@ contract BaseTest is Test {
         return sum / (len - 1);
     }
 
+    function _getMaxExceptIndex0(uint256[] memory arr) internal pure returns (uint256) {
+        uint256 max = arr[1];
+        uint256 len = arr.length;
+        for (uint256 i = 2; i < len; i++) {
+            max = max > arr[i] ? max : arr[i];
+        }
+        return max;
+    }
+
     function _consoleAverageExceptIndex0(uint256[] memory arr, string memory msg1) internal pure {
         console2.log(msg1, _getAverageExceptIndex0(arr));
     }
