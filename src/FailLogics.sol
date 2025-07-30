@@ -186,7 +186,6 @@ contract FailLogics is DisputeLogics {
                 }
                 previousIndex := operatorIndex
             }
-            log0(0x20, 0x20)
             if iszero(didntSubmitCvLength) {
                 mstore(0, 0x7d39a81b) // AllSubmittedCv()
                 revert(0x1c, 0x04)
