@@ -24,7 +24,7 @@ contract BaseTest is Test {
         }
     }
 
-    function setOperatorAdresses(uint256 num) public {
+    function setOperatorAddresses(uint256 num) public {
         for (uint256 i; i < num; i++) {
             (address addr, uint256 key) = makeAddrAndKey(string(abi.encode(i)));
             s_operatorAddresses.push(addr);

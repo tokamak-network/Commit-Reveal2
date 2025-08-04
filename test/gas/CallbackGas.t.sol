@@ -13,7 +13,7 @@ contract CallBackGas is BaseTest {
 
         s_anyAddress = makeAddr("any");
         vm.deal(s_anyAddress, 10000 ether);
-        setOperatorAdresses(32);
+        setOperatorAddresses(32);
     }
 
     function test_callbackGas() public {

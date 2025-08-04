@@ -23,7 +23,7 @@ contract LeaderFailLogicsGas is BaseTest, CommitReveal2Helper {
         s_numOfTests = 5;
         s_anyAddress = makeAddr("any");
         vm.deal(s_anyAddress, 10000 ether);
-        setOperatorAdresses(32);
+        setOperatorAddresses(32);
     }
 
     function _deployContracts() internal {

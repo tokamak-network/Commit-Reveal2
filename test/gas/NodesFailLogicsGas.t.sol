@@ -2,10 +2,8 @@
 pragma solidity ^0.8.30;
 
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
-import {CommitReveal2ForGasTest} from "./../../src/test/CommitReveal2ForGasTest.sol";
 import {BaseTest} from "./../shared/BaseTest.t.sol";
 import {CommitReveal2Helper} from "./../shared/CommitReveal2Helper.sol";
-import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 import {DeployCommitReveal2} from "./../../script/DeployCommitReveal2.s.sol";
 import {DeployConsumerExample} from "./../../script/DeployConsumerExample.s.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
@@ -30,7 +28,7 @@ contract NodesFailLogicsGas is BaseTest, CommitReveal2Helper {
         s_numOfTests = 4;
         s_anyAddress = makeAddr("any");
         vm.deal(s_anyAddress, 10000 ether);
-        setOperatorAdresses(32);
+        setOperatorAddresses(32);
     }
 
     function _deployContracts() internal {
