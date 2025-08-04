@@ -467,7 +467,7 @@ contract FailLogics is DisputeLogics {
                 // 0x00 already has curRound
                 mstore(0x20, trialNum)
                 mstore(0x40, HALTED)
-                log1(0x00, 0x60, 0x31a1adb447f9b6b89f24bf104f0b7a06975ad9f35670dbfaf7ce29190ec54762) // emit Status(uint256 curStartTime, uint256 curState)
+                log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // emit Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
         }
     }
