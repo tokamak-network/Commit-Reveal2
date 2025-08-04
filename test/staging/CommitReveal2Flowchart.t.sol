@@ -65,7 +65,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         s_consumerExample = (new DeployConsumerExample()).deployConsumerExampleUsingConfig(address(s_commitReveal2));
 
         // *** Deposit And Activate
-        setOperatorAdresses(10);
+        setOperatorAddresses(10);
         for (uint256 i; i < s_operatorAddresses.length; i++) {
             vm.startPrank(s_operatorAddresses[i]);
             s_commitReveal2.depositAndActivate{value: s_activeNetworkConfig.activationThreshold}();

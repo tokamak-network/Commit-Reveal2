@@ -1,4 +1,1170 @@
 {
+  "disputeLogicsPath16Gas": {
+    "description": "Gas usage for dispute logic path 16: 1->2->3->5->8->9->16 by scenario: operators_XX_submitCv_YY_submitCo_ZZ",
+    "scenarios": {
+      "operators_02_submitCv_00_submitCo_00": "",
+      "operators_02_submitCv_00_submitCo_01": {
+        "requestToSubmitCoGas": 107785,
+        "submitCoGas": 46799
+      },
+      "operators_02_submitCv_00_submitCo_02": {
+        "requestToSubmitCoGas": 120037,
+        "submitCoGas": 46799
+      },
+      "operators_02_submitCv_01_submitCo_00": {
+        "requestToSubmitCoGas": 120037,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_02_submitCv_01_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_02_submitCv_01_submitCo_02": {
+        "requestToSubmitCoGas": 90690,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_02_submitCv_02_submitCo_00": {
+        "requestToSubmitCoGas": 90690,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_02_submitCv_02_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_02_submitCv_02_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_00_submitCo_00": "",
+      "operators_03_submitCv_00_submitCo_01": {
+        "requestToSubmitCoGas": 107785,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_00_submitCo_02": {
+        "requestToSubmitCoGas": 120049,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_00_submitCo_03": {
+        "requestToSubmitCoGas": 132313,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_01_submitCo_00": {
+        "requestToSubmitCoGas": 132313,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_01_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_01_submitCo_02": {
+        "requestToSubmitCoGas": 90702,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_01_submitCo_03": {
+        "requestToSubmitCoGas": 102978,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_02_submitCo_00": {
+        "requestToSubmitCoGas": 102978,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_02_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_02_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_02_submitCo_03": {
+        "requestToSubmitCoGas": 90857,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_03_submitCo_00": {
+        "requestToSubmitCoGas": 90857,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46787,
+        "submitCvGas": 43665
+      },
+      "operators_03_submitCv_03_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_03_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_03_submitCv_03_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_00_submitCo_00": "",
+      "operators_04_submitCv_00_submitCo_01": {
+        "requestToSubmitCoGas": 107773,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_00_submitCo_02": {
+        "requestToSubmitCoGas": 120061,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_00_submitCo_03": {
+        "requestToSubmitCoGas": 132337,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_00_submitCo_04": {
+        "requestToSubmitCoGas": 144541,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_01_submitCo_00": {
+        "requestToSubmitCoGas": 144541,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_01_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_04_submitCv_01_submitCo_02": {
+        "requestToSubmitCoGas": 90666,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_01_submitCo_03": {
+        "requestToSubmitCoGas": 102978,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_01_submitCo_04": {
+        "requestToSubmitCoGas": 115242,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_02_submitCo_00": {
+        "requestToSubmitCoGas": 115242,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_02_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_02_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_02_submitCo_03": {
+        "requestToSubmitCoGas": 90857,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_02_submitCo_04": {
+        "requestToSubmitCoGas": 103133,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_03_submitCo_00": {
+        "requestToSubmitCoGas": 103133,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_03_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_03_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_03_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_03_submitCo_04": {
+        "requestToSubmitCoGas": 91000,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_04_submitCo_00": {
+        "requestToSubmitCoGas": 91000,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_04_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_04_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_04_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_04_submitCv_04_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_00_submitCo_00": "",
+      "operators_05_submitCv_00_submitCo_01": {
+        "requestToSubmitCoGas": 107773,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_00_submitCo_02": {
+        "requestToSubmitCoGas": 120049,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_00_submitCo_03": {
+        "requestToSubmitCoGas": 132337,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_00_submitCo_04": {
+        "requestToSubmitCoGas": 144577,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_00_submitCo_05": {
+        "requestToSubmitCoGas": 156865,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_01_submitCo_00": {
+        "requestToSubmitCoGas": 156865,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_01_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_01_submitCo_02": {
+        "requestToSubmitCoGas": 90702,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_05_submitCv_01_submitCo_03": {
+        "requestToSubmitCoGas": 102954,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_01_submitCo_04": {
+        "requestToSubmitCoGas": 115230,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_01_submitCo_05": {
+        "requestToSubmitCoGas": 127506,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_05_submitCv_02_submitCo_00": {
+        "requestToSubmitCoGas": 127506,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_02_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_02_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_02_submitCo_03": {
+        "requestToSubmitCoGas": 90833,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_02_submitCo_04": {
+        "requestToSubmitCoGas": 103121,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_02_submitCo_05": {
+        "requestToSubmitCoGas": 115397,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_03_submitCo_00": {
+        "requestToSubmitCoGas": 115397,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_05_submitCv_03_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_03_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_03_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_03_submitCo_04": {
+        "requestToSubmitCoGas": 91000,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_03_submitCo_05": {
+        "requestToSubmitCoGas": 103288,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_04_submitCo_00": {
+        "requestToSubmitCoGas": 103288,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_04_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_04_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_04_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_05_submitCv_04_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_04_submitCo_05": {
+        "requestToSubmitCoGas": 91167,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_05_submitCo_00": {
+        "requestToSubmitCoGas": 91167,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_05_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_05_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_05_submitCv_05_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_05_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_05_submitCv_05_submitCo_05": {
+        "requestToSubmitCoGas": 76231,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_00_submitCo_00": "",
+      "operators_06_submitCv_00_submitCo_01": {
+        "requestToSubmitCoGas": 107785,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_00_submitCo_02": {
+        "requestToSubmitCoGas": 120061,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_00_submitCo_03": {
+        "requestToSubmitCoGas": 132337,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_00_submitCo_04": {
+        "requestToSubmitCoGas": 144601,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_00_submitCo_05": {
+        "requestToSubmitCoGas": 156865,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_00_submitCo_06": {
+        "requestToSubmitCoGas": 169117,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_01_submitCo_00": {
+        "requestToSubmitCoGas": 169117,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_01_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_01_submitCo_02": {
+        "requestToSubmitCoGas": 90702,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_01_submitCo_03": {
+        "requestToSubmitCoGas": 102978,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_01_submitCo_04": {
+        "requestToSubmitCoGas": 115254,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_01_submitCo_05": {
+        "requestToSubmitCoGas": 127530,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_01_submitCo_06": {
+        "requestToSubmitCoGas": 139794,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_02_submitCo_00": {
+        "requestToSubmitCoGas": 139794,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_06_submitCv_02_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_02_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_02_submitCo_03": {
+        "requestToSubmitCoGas": 90845,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_06_submitCv_02_submitCo_04": {
+        "requestToSubmitCoGas": 103109,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_06_submitCv_02_submitCo_05": {
+        "requestToSubmitCoGas": 115397,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_02_submitCo_06": {
+        "requestToSubmitCoGas": 127673,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_03_submitCo_00": {
+        "requestToSubmitCoGas": 127673,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_03_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_03_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_03_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_03_submitCo_04": {
+        "requestToSubmitCoGas": 91000,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_03_submitCo_05": {
+        "requestToSubmitCoGas": 103288,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_03_submitCo_06": {
+        "requestToSubmitCoGas": 115540,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_04_submitCo_00": {
+        "requestToSubmitCoGas": 115540,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_04_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_04_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_04_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_04_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_04_submitCo_05": {
+        "requestToSubmitCoGas": 91155,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_04_submitCo_06": {
+        "requestToSubmitCoGas": 103431,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_05_submitCo_00": {
+        "requestToSubmitCoGas": 103431,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_05_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_05_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_05_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_05_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_05_submitCo_05": {
+        "requestToSubmitCoGas": 76231,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_06_submitCv_05_submitCo_06": {
+        "requestToSubmitCoGas": 91310,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_06_submitCo_00": {
+        "requestToSubmitCoGas": 91310,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_06_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_06_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_06_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46787,
+        "submitCvGas": 43665
+      },
+      "operators_06_submitCv_06_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_06_submitCo_05": {
+        "requestToSubmitCoGas": 76231,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_06_submitCv_06_submitCo_06": {
+        "requestToSubmitCoGas": 76386,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_00_submitCo_00": "",
+      "operators_07_submitCv_00_submitCo_01": {
+        "requestToSubmitCoGas": 107785,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_00_submitCo_02": {
+        "requestToSubmitCoGas": 120049,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_00_submitCo_03": {
+        "requestToSubmitCoGas": 132325,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_00_submitCo_04": {
+        "requestToSubmitCoGas": 144601,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_00_submitCo_05": {
+        "requestToSubmitCoGas": 156877,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_00_submitCo_06": {
+        "requestToSubmitCoGas": 169141,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_00_submitCo_07": {
+        "requestToSubmitCoGas": 181429,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_01_submitCo_00": {
+        "requestToSubmitCoGas": 181429,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_01_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_01_submitCo_02": {
+        "requestToSubmitCoGas": 90690,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_01_submitCo_03": {
+        "requestToSubmitCoGas": 102966,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_01_submitCo_04": {
+        "requestToSubmitCoGas": 115242,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_01_submitCo_05": {
+        "requestToSubmitCoGas": 127482,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_01_submitCo_06": {
+        "requestToSubmitCoGas": 139782,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_01_submitCo_07": {
+        "requestToSubmitCoGas": 152034,
+        "requestToSubmitCvGas": 64655,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_02_submitCo_00": {
+        "requestToSubmitCoGas": 152034,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_07_submitCv_02_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_02_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_02_submitCo_03": {
+        "requestToSubmitCoGas": 90833,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_07_submitCv_02_submitCo_04": {
+        "requestToSubmitCoGas": 103121,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_02_submitCo_05": {
+        "requestToSubmitCoGas": 115385,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_02_submitCo_06": {
+        "requestToSubmitCoGas": 127661,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_07_submitCv_02_submitCo_07": {
+        "requestToSubmitCoGas": 139937,
+        "requestToSubmitCvGas": 64768,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_03_submitCo_00": {
+        "requestToSubmitCoGas": 139937,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_03_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_03_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_03_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_03_submitCo_04": {
+        "requestToSubmitCoGas": 91012,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_07_submitCv_03_submitCo_05": {
+        "requestToSubmitCoGas": 103264,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_03_submitCo_06": {
+        "requestToSubmitCoGas": 115564,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_03_submitCo_07": {
+        "requestToSubmitCoGas": 127816,
+        "requestToSubmitCvGas": 64881,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_04_submitCo_00": {
+        "requestToSubmitCoGas": 127816,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_04_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_04_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43665
+      },
+      "operators_07_submitCv_04_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_04_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_04_submitCo_05": {
+        "requestToSubmitCoGas": 91167,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_04_submitCo_06": {
+        "requestToSubmitCoGas": 103431,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_04_submitCo_07": {
+        "requestToSubmitCoGas": 115719,
+        "requestToSubmitCvGas": 64994,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_05_submitCo_00": {
+        "requestToSubmitCoGas": 115719,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_05_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46787,
+        "submitCvGas": 43665
+      },
+      "operators_07_submitCv_05_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_05_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46775,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_05_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_05_submitCo_05": {
+        "requestToSubmitCoGas": 76231,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_05_submitCo_06": {
+        "requestToSubmitCoGas": 91322,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_05_submitCo_07": {
+        "requestToSubmitCoGas": 103598,
+        "requestToSubmitCvGas": 65107,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_06_submitCo_00": {
+        "requestToSubmitCoGas": 103598,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_06_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_06_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46787,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_06_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_06_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_06_submitCo_05": {
+        "requestToSubmitCoGas": 76231,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_06_submitCo_06": {
+        "requestToSubmitCoGas": 76386,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_06_submitCo_07": {
+        "requestToSubmitCoGas": 91477,
+        "requestToSubmitCvGas": 65220,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_07_submitCo_00": {
+        "requestToSubmitCoGas": 91477,
+        "requestToSubmitCvGas": 65333,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_07_submitCo_01": {
+        "requestToSubmitCoGas": 75611,
+        "requestToSubmitCvGas": 65333,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_07_submitCo_02": {
+        "requestToSubmitCoGas": 75766,
+        "requestToSubmitCvGas": 65333,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_07_submitCo_03": {
+        "requestToSubmitCoGas": 75921,
+        "requestToSubmitCvGas": 65333,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_07_submitCo_04": {
+        "requestToSubmitCoGas": 76076,
+        "requestToSubmitCvGas": 65333,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_07_submitCo_05": {
+        "requestToSubmitCoGas": 76231,
+        "requestToSubmitCvGas": 65333,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_07_submitCo_06": {
+        "requestToSubmitCoGas": 76386,
+        "requestToSubmitCvGas": 65333,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      },
+      "operators_07_submitCv_07_submitCo_07": {
+        "requestToSubmitCoGas": 76541,
+        "requestToSubmitCvGas": 65333,
+        "submitCoGas": 46799,
+        "submitCvGas": 43677
+      }
+    }
+  },
+  "disputeLogicsPath12_13Gas": {},
   "commitReveal2Gas": {
     "generateRandomNumber_numOfOperators_calldataSizeInBytes": {
       "02": 324,
