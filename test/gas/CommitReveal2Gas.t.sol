@@ -33,48 +33,9 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         (commitRevealAddress, s_networkHelperConfig) = (new DeployCommitReveal2()).runForTest();
         s_commitReveal2 = CommitReveal2(commitRevealAddress);
         s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
-        // ** Deploy ConsumerExample
-        s_consumerExample = (new DeployConsumerExample()).deployConsumerExampleUsingConfig(address(s_commitReveal2));
     }
 
     function test_commitReveal2Gas() public {
-        string memory gasOutput;
-        // ** Test
-        for (s_numOfOperators = 2; s_numOfOperators <= 32; s_numOfOperators++) {
-            _deployContracts();
-            _depositAndActivateOperators(s_operatorAddresses);
-            s_submitMerkleRootGas = new uint256[](s_numOfTests);
-            s_generateRandomNumberGas = new uint256[](s_numOfTests);
-
-            uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_callbackGas, tx.gasprice);
-            console2.log("s_numOfOperators", s_numOfOperators);
-            for (uint256 i; i < s_numOfTests; i++) {
-                vm.startPrank(s_anyAddress);
-                //s_consumerExample.requestRandomNumber{value: requestFee}();
-                s_commitReveal2.requestRandomNumber{value: requestFee}(90000);
-                vm.stopPrank();
-
-                _setSCoCvRevealOrders(s_privateKeys);
-                vm.startPrank(LEADERNODE);
-                s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
-
-                s_submitMerkleRootGas[i] = vm.lastCallGas().gasTotalUsed;
-                console2.log("submitMerkleRootGas", s_submitMerkleRootGas[i]);
-
-                s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
-                s_generateRandomNumberGas[i] = vm.lastCallGas().gasTotalUsed;
-                vm.stopPrank();
-                console2.log("generateRandomNumberGas", s_generateRandomNumberGas[i]);
-
-                vm.startPrank(address(s_commitReveal2));
-                s_consumerExample.rawFulfillRandomNumber(type(uint256).max, type(uint256).max);
-                vm.stopPrank();
-                console2.log("rawFulfillRandomNumberGas", vm.lastCallGas().gasTotalUsed);
-            }
-        }
-    }
-
-    function test_commitReveal2Gas2() public {
         string memory gasOutput;
         string memory gasOutputMax;
         string memory gasOutput2;
@@ -90,27 +51,18 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
             console2.log("s_numOfOperators", s_numOfOperators);
             for (uint256 i; i < s_numOfTests; i++) {
                 vm.startPrank(s_anyAddress);
-                s_consumerExample.requestRandomNumber{value: requestFee}();
+                s_commitReveal2.requestRandomNumber{value: requestFee}(90000);
                 vm.stopPrank();
             }
             for (uint256 i; i < s_numOfTests; i++) {
                 _setSCoCvRevealOrders(s_privateKeys);
                 vm.startPrank(LEADERNODE);
                 s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
-
                 s_submitMerkleRootGas[i] = vm.lastCallGas().gasTotalUsed;
-                console2.log("submitMerkleRootGas", s_submitMerkleRootGas[i]);
 
                 s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
                 s_generateRandomNumberGas[i] = vm.lastCallGas().gasTotalUsed;
                 vm.stopPrank();
-                console2.log("generateRandomNumberGas", s_generateRandomNumberGas[i]);
-                console2.log(
-                    "generateRandomNumberGas Calldata Size In Bytes:",
-                    abi.encodeWithSelector(
-                        s_commitReveal2.generateRandomNumber.selector, s_secretSigRSs, s_packedVs, s_packedRevealOrders
-                    ).length
-                );
             }
 
             string memory numOfOperatorsString = Strings.toString(s_numOfOperators);

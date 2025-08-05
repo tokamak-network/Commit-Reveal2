@@ -16,7 +16,9 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
     uint256[] public s_requestToSubmitCoGas;
     uint256[] public s_submitCoGas;
     uint256[] public s_requestToSubmitSGas;
+    uint256[] public s_lastSubmitSGas;
     uint256[] public s_submitSGas;
+    uint256[] public s_generateRandomNumberWhenSomeCvsAreOnChainGas;
 
     uint256 public s_submitCvLength;
     uint256 public s_submitCoLength;
@@ -50,11 +52,9 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
 
     // ** Path: 1 -> 2 -> 3 -> 5 -> 8 -> 9 -> 16
     // ** requestRandomNumber -> requestToSubmitCv -> submitCv -> submitMerkleRoot -> requestToSubmitCo -> submitCo -> generateRandomNumberWhenSomeCvsAreOnChain
-    function test_disputeLogicsPath16Gas() public {
-        string memory numOfOperatorGasOutput;
+    function test_disputeCvCoGenerateRandomNumberWhenSomeCvsAreOnChainGas() public {
         string memory submitCvGasOutput;
         string memory submitCoGasOutput;
-        string memory finalGasOutput;
 
         for (s_numOfOperators = 2; s_numOfOperators <= 7; s_numOfOperators++) {
             submitCvGasOutput = "";
@@ -69,12 +69,13 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
                     s_submitCvGas = new uint256[](s_numOfTests);
                     s_requestToSubmitCoGas = new uint256[](s_numOfTests);
                     s_submitCoGas = new uint256[](s_numOfTests);
+                    s_generateRandomNumberWhenSomeCvsAreOnChainGas = new uint256[](s_numOfTests);
 
                     uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_callbackGas, tx.gasprice);
 
                     for (uint256 i; i < s_numOfTests; i++) {
                         vm.startPrank(s_anyAddress);
-                        s_consumerExample.requestRandomNumber{value: requestFee}();
+                        s_commitReveal2.requestRandomNumber{value: requestFee}(90000);
                         vm.stopPrank();
 
                         uint256[] memory revealOrders = _setSCoCvRevealOrders(s_privateKeys);
@@ -139,6 +140,7 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
                                 s_packedVsForAllCvsNotOnChain,
                                 s_packedRevealOrders
                             );
+                            s_generateRandomNumberWhenSomeCvsAreOnChainGas[i] = vm.lastCallGas().gasTotalUsed;
                         } else {
                             // 11. generateRandomNumber
                             s_commitReveal2.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
@@ -164,12 +166,19 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
                     // Serialize gas data for this combination
                     string memory gasData = "";
                     if (s_submitCvLength > 0) {
-                        gasData = vm.serializeUint("gasData", "requestToSubmitCvGas", s_requestToSubmitCvGas[3]);
-                        gasData = vm.serializeUint("gasData", "submitCvGas", s_submitCvGas[3]);
+                        gasData = vm.serializeUint(scenarioKey, "requestToSubmitCvGas", s_requestToSubmitCvGas[3]);
+                        gasData = vm.serializeUint(scenarioKey, "submitCvGas", s_submitCvGas[3]);
                     }
                     if (s_submitCoLength > 0) {
-                        gasData = vm.serializeUint("gasData", "requestToSubmitCoGas", s_requestToSubmitCoGas[3]);
-                        gasData = vm.serializeUint("gasData", "submitCoGas", s_submitCoGas[3]);
+                        gasData = vm.serializeUint(scenarioKey, "requestToSubmitCoGas", s_requestToSubmitCoGas[3]);
+                        gasData = vm.serializeUint(scenarioKey, "submitCoGas", s_submitCoGas[3]);
+                    }
+                    if (s_submitCvLength > 0 || s_submitCoLength > 0) {
+                        gasData = vm.serializeUint(
+                            scenarioKey,
+                            "generateRandomNumberWhenSomeCvsAreOnChainGas",
+                            s_generateRandomNumberWhenSomeCvsAreOnChainGas[3]
+                        );
                     }
 
                     submitCoGasOutput = vm.serializeString("scenarios", scenarioKey, gasData);
@@ -177,21 +186,19 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
             }
         }
 
-        string memory finalOutput = vm.serializeString("disputeLogicsPath16Gas", "scenarios", submitCoGasOutput);
+        string memory finalOutput = vm.serializeString("disputeCvCoGas", "scenarios", submitCoGasOutput);
         finalOutput = vm.serializeString(
-            "disputeLogicsPath16Gas",
+            "disputeCvCoGas",
             "description",
             "Gas usage for dispute logic path 16: 1->2->3->5->8->9->16 by scenario: operators_XX_submitCv_YY_submitCo_ZZ"
         );
-        vm.writeJson(finalOutput, s_gasReportPath, ".disputeLogicsPath16Gas");
+        vm.writeJson(finalOutput, s_gasReportPath, ".disputeCvCoGas");
     }
 
     // ** Path: 1 -> 2 -> 3 -> 5 -> 12 -> 13
     // ** requestRandomNumber -> requestToSubmitCv -> submitCv -> submitMerkleRoot -> requestToSubmitS -> submitS
-    function test_disputeLogicsPath12_13Gas() public {
-        string memory numOfOperatorGasOutput;
+    function test_disputeSecretsGas() public {
         string memory submitCvGasOutput;
-        string memory finalGasOutput;
 
         for (s_numOfOperators = 2; s_numOfOperators <= 13; s_numOfOperators++) {
             submitCvGasOutput = "";
@@ -203,6 +210,7 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
                 s_requestToSubmitCvGas = new uint256[](s_numOfTests);
                 s_submitCvGas = new uint256[](s_numOfTests);
                 s_requestToSubmitSGas = new uint256[](s_numOfTests);
+                s_lastSubmitSGas = new uint256[](s_numOfTests);
                 s_submitSGas = new uint256[](s_numOfTests);
 
                 uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_callbackGas, tx.gasprice);
@@ -240,8 +248,8 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
                     vm.stopPrank();
 
                     // ** 12. requestToSubmitS
-                    // Calculate how many secrets are already "submitted" off-chain based on CVs not on chain
-                    uint256 k = s_numOfOperators - s_submitCvLength;
+                    // Set k to 0 as requested
+                    uint256 k = 0;
                     _setParametersForRequestToSubmitS(k, revealOrders);
                     vm.startPrank(LEADERNODE);
                     s_commitReveal2.requestToSubmitS(
@@ -258,7 +266,12 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
                     for (uint256 j = k; j < s_numOfOperators; j++) {
                         vm.startPrank(s_activatedOperators[revealOrders[j]]);
                         s_commitReveal2.submitS(s_secrets[revealOrders[j]]);
-                        if (j == s_numOfOperators - 1) s_submitSGas[i] = vm.lastCallGas().gasTotalUsed; // Measure last submission (highest gas)
+                        // Measure second to last submission (only if there are at least 2 operators)
+                        if (s_numOfOperators >= 2 && j == s_numOfOperators - 2) {
+                            s_submitSGas[i] = vm.lastCallGas().gasTotalUsed;
+                        }
+                        // Measure last submission
+                        if (j == s_numOfOperators - 1) s_lastSubmitSGas[i] = vm.lastCallGas().gasTotalUsed;
                         vm.stopPrank();
                     }
                 }
@@ -278,22 +291,23 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
                 // Serialize gas data for this combination
                 string memory gasData = "";
                 if (s_submitCvLength > 0) {
-                    gasData = vm.serializeUint("gasData", "requestToSubmitCvGas", s_requestToSubmitCvGas[3]);
-                    gasData = vm.serializeUint("gasData", "submitCvGas", s_submitCvGas[3]);
+                    gasData = vm.serializeUint(scenarioKey, "requestToSubmitCvGas", s_requestToSubmitCvGas[3]);
+                    gasData = vm.serializeUint(scenarioKey, "submitCvGas", s_submitCvGas[3]);
                 }
-                gasData = vm.serializeUint("gasData", "requestToSubmitSGas", s_requestToSubmitSGas[3]);
-                gasData = vm.serializeUint("gasData", "submitSGas", s_submitSGas[3]);
+                gasData = vm.serializeUint(scenarioKey, "requestToSubmitSGas", s_requestToSubmitSGas[3]);
+                gasData = vm.serializeUint(scenarioKey, "submitSGas", s_submitSGas[3]);
+                gasData = vm.serializeUint(scenarioKey, "lastSubmitSGas", s_lastSubmitSGas[3]);
 
                 submitCvGasOutput = vm.serializeString("scenarios", scenarioKey, gasData);
             }
         }
 
-        string memory finalOutput = vm.serializeString("disputeLogicsPath12_13Gas", "scenarios", submitCvGasOutput);
+        string memory finalOutput = vm.serializeString("disputeSecretsGas", "scenarios", submitCvGasOutput);
         finalOutput = vm.serializeString(
-            "disputeLogicsPath12_13Gas",
+            "disputeSecretsGas",
             "description",
             "Gas usage for dispute logic path 12-13: 1->2->3->5->12->13 by scenario: operators_XX_submitCv_YY"
         );
-        vm.writeJson(finalOutput, s_gasReportPath, ".disputeLogicsPath12_13Gas");
+        vm.writeJson(finalOutput, s_gasReportPath, ".disputeSecretsGas");
     }
 }
