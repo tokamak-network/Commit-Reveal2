@@ -40,7 +40,7 @@ contract CommitReveal2 is FailLogics {
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator
-    ) external onlyOwner {
+    ) external onlyOwner notInProcess {
         assembly ("memory-safe") {
             sstore(s_offChainSubmissionPeriod.slot, offChainSubmissionPeriod)
             sstore(s_requestOrSubmitOrFailDecisionPeriod.slot, requestOrSubmitOrFailDecisionPeriod)
