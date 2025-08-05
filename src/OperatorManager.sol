@@ -230,6 +230,10 @@ contract OperatorManager is Ownable {
     }
 
     function deactivate() external notInProcess {
+        // Note: Intentionally no operator activation check for gas optimization.
+        // Non-activated operators have s_activatedOperatorIndex1Based[msg.sender] = 0,
+        // causing underflow (0 - 1) which serves as implicit validation and reverts.
+        // This design prioritizes gas efficiency over verbose error messages.
         _deactivate(s_activatedOperatorIndex1Based[msg.sender] - 1, msg.sender);
         assembly ("memory-safe") {
             let currentSlashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
