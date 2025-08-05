@@ -1257,694 +1257,694 @@
     "description": "Gas usage for dispute logic path 12-13: 1->2->3->5->12->13 by scenario: operators_XX_submitCv_YY",
     "scenarios": {
       "operators_02_submitCv_00": {
-        "lastSubmitSGas": 127718,
+        "lastSubmitSGas": 125608,
         "requestToSubmitSGas": 111732,
-        "submitSGas": 66444
+        "submitSGas": 66422
       },
       "operators_02_submitCv_01": {
-        "lastSubmitSGas": 127706,
+        "lastSubmitSGas": 125596,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 84325,
         "submitCvGas": 43677,
-        "submitSGas": 66444
+        "submitSGas": 66422
       },
       "operators_02_submitCv_02": {
-        "lastSubmitSGas": 127718,
+        "lastSubmitSGas": 125608,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 72023,
         "submitCvGas": 43665,
-        "submitSGas": 66432
+        "submitSGas": 66410
       },
       "operators_03_submitCv_00": {
-        "lastSubmitSGas": 129898,
+        "lastSubmitSGas": 127788,
         "requestToSubmitSGas": 124603,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_03_submitCv_01": {
-        "lastSubmitSGas": 129898,
+        "lastSubmitSGas": 127788,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 97204,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_03_submitCv_02": {
-        "lastSubmitSGas": 129898,
+        "lastSubmitSGas": 127788,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 87721,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_03_submitCv_03": {
-        "lastSubmitSGas": 129898,
+        "lastSubmitSGas": 127788,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 78223,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_04_submitCv_00": {
-        "lastSubmitSGas": 132078,
+        "lastSubmitSGas": 129968,
         "requestToSubmitSGas": 137476,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_04_submitCv_01": {
-        "lastSubmitSGas": 132078,
+        "lastSubmitSGas": 129968,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 110073,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_04_submitCv_02": {
-        "lastSubmitSGas": 132078,
+        "lastSubmitSGas": 129968,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 100578,
         "submitCvGas": 43677,
-        "submitSGas": 49320
+        "submitSGas": 49298
       },
       "operators_04_submitCv_03": {
-        "lastSubmitSGas": 132078,
+        "lastSubmitSGas": 129968,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 91107,
         "submitCvGas": 43677,
-        "submitSGas": 66444
+        "submitSGas": 66422
       },
       "operators_04_submitCv_04": {
-        "lastSubmitSGas": 132078,
+        "lastSubmitSGas": 129968,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 81608,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_05_submitCv_00": {
-        "lastSubmitSGas": 134246,
+        "lastSubmitSGas": 132136,
         "requestToSubmitSGas": 150319,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_05_submitCv_01": {
-        "lastSubmitSGas": 134258,
+        "lastSubmitSGas": 132148,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 122912,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_05_submitCv_02": {
-        "lastSubmitSGas": 134258,
+        "lastSubmitSGas": 132148,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 113425,
         "submitCvGas": 43665,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_05_submitCv_03": {
-        "lastSubmitSGas": 134258,
+        "lastSubmitSGas": 132148,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 103962,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_05_submitCv_04": {
-        "lastSubmitSGas": 134258,
+        "lastSubmitSGas": 132148,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 94475,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_05_submitCv_05": {
-        "lastSubmitSGas": 134258,
+        "lastSubmitSGas": 132148,
         "requestToSubmitCvGas": 65107,
         "requestToSubmitSGas": 84973,
         "submitCvGas": 43665,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_06_submitCv_00": {
-        "lastSubmitSGas": 136438,
+        "lastSubmitSGas": 134328,
         "requestToSubmitSGas": 163203,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_06_submitCv_01": {
-        "lastSubmitSGas": 136426,
+        "lastSubmitSGas": 134316,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 135784,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_06_submitCv_02": {
-        "lastSubmitSGas": 136438,
+        "lastSubmitSGas": 134328,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 126341,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_06_submitCv_03": {
-        "lastSubmitSGas": 136438,
+        "lastSubmitSGas": 134328,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 116818,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_06_submitCv_04": {
-        "lastSubmitSGas": 136438,
+        "lastSubmitSGas": 134328,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 107351,
         "submitCvGas": 43677,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_06_submitCv_05": {
-        "lastSubmitSGas": 136438,
+        "lastSubmitSGas": 134328,
         "requestToSubmitCvGas": 65107,
         "requestToSubmitSGas": 97852,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_06_submitCv_06": {
-        "lastSubmitSGas": 136438,
+        "lastSubmitSGas": 134328,
         "requestToSubmitCvGas": 65220,
         "requestToSubmitSGas": 88366,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_07_submitCv_00": {
-        "lastSubmitSGas": 138618,
+        "lastSubmitSGas": 136508,
         "requestToSubmitSGas": 176071,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_07_submitCv_01": {
-        "lastSubmitSGas": 138618,
+        "lastSubmitSGas": 136508,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 148660,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_07_submitCv_02": {
-        "lastSubmitSGas": 138606,
+        "lastSubmitSGas": 136496,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 139201,
         "submitCvGas": 43665,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_07_submitCv_03": {
-        "lastSubmitSGas": 138618,
+        "lastSubmitSGas": 136508,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 129690,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_07_submitCv_04": {
-        "lastSubmitSGas": 138618,
+        "lastSubmitSGas": 136508,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 120223,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_07_submitCv_05": {
-        "lastSubmitSGas": 138618,
+        "lastSubmitSGas": 136508,
         "requestToSubmitCvGas": 65107,
         "requestToSubmitSGas": 110748,
         "submitCvGas": 43677,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_07_submitCv_06": {
-        "lastSubmitSGas": 138618,
+        "lastSubmitSGas": 136508,
         "requestToSubmitCvGas": 65220,
         "requestToSubmitSGas": 101257,
         "submitCvGas": 43665,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_07_submitCv_07": {
-        "lastSubmitSGas": 138618,
+        "lastSubmitSGas": 136508,
         "requestToSubmitCvGas": 65333,
         "requestToSubmitSGas": 91758,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_08_submitCv_00": {
-        "lastSubmitSGas": 140798,
+        "lastSubmitSGas": 138688,
         "requestToSubmitSGas": 188947,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_08_submitCv_01": {
-        "lastSubmitSGas": 140798,
+        "lastSubmitSGas": 138688,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 161508,
         "submitCvGas": 43677,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_08_submitCv_02": {
-        "lastSubmitSGas": 140798,
+        "lastSubmitSGas": 138688,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 152049,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_08_submitCv_03": {
-        "lastSubmitSGas": 140786,
+        "lastSubmitSGas": 138676,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 142586,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_08_submitCv_04": {
-        "lastSubmitSGas": 140798,
+        "lastSubmitSGas": 138688,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 133091,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_08_submitCv_05": {
-        "lastSubmitSGas": 140798,
+        "lastSubmitSGas": 138688,
         "requestToSubmitCvGas": 65107,
         "requestToSubmitSGas": 123572,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_08_submitCv_06": {
-        "lastSubmitSGas": 140798,
+        "lastSubmitSGas": 138688,
         "requestToSubmitCvGas": 65220,
         "requestToSubmitSGas": 114129,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_08_submitCv_07": {
-        "lastSubmitSGas": 140798,
+        "lastSubmitSGas": 138688,
         "requestToSubmitCvGas": 65333,
         "requestToSubmitSGas": 104634,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_08_submitCv_08": {
-        "lastSubmitSGas": 140798,
+        "lastSubmitSGas": 138688,
         "requestToSubmitCvGas": 65446,
         "requestToSubmitSGas": 95127,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_09_submitCv_00": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitSGas": 201801,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_09_submitCv_01": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 174370,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_09_submitCv_02": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 164947,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_09_submitCv_03": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 155436,
         "submitCvGas": 43653,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_09_submitCv_04": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 145901,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_09_submitCv_05": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitCvGas": 65107,
         "requestToSubmitSGas": 136446,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_09_submitCv_06": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitCvGas": 65220,
         "requestToSubmitSGas": 126943,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_09_submitCv_07": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitCvGas": 65333,
         "requestToSubmitSGas": 117464,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_09_submitCv_08": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitCvGas": 65446,
         "requestToSubmitSGas": 108029,
         "submitCvGas": 43677,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_09_submitCv_09": {
-        "lastSubmitSGas": 142978,
+        "lastSubmitSGas": 140868,
         "requestToSubmitCvGas": 65559,
         "requestToSubmitSGas": 98478,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_00": {
-        "lastSubmitSGas": 145158,
+        "lastSubmitSGas": 143048,
         "requestToSubmitSGas": 214653,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_01": {
-        "lastSubmitSGas": 145158,
+        "lastSubmitSGas": 143048,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 187282,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_02": {
-        "lastSubmitSGas": 145158,
+        "lastSubmitSGas": 143048,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 177779,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_03": {
-        "lastSubmitSGas": 145158,
+        "lastSubmitSGas": 143048,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 168340,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_04": {
-        "lastSubmitSGas": 145146,
+        "lastSubmitSGas": 143036,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 158789,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_05": {
-        "lastSubmitSGas": 145158,
+        "lastSubmitSGas": 143048,
         "requestToSubmitCvGas": 65107,
         "requestToSubmitSGas": 149310,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_06": {
-        "lastSubmitSGas": 145146,
+        "lastSubmitSGas": 143036,
         "requestToSubmitCvGas": 65220,
         "requestToSubmitSGas": 139823,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_07": {
-        "lastSubmitSGas": 145158,
+        "lastSubmitSGas": 143048,
         "requestToSubmitCvGas": 65333,
         "requestToSubmitSGas": 130332,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_08": {
-        "lastSubmitSGas": 145158,
+        "lastSubmitSGas": 143048,
         "requestToSubmitCvGas": 65446,
         "requestToSubmitSGas": 120865,
         "submitCvGas": 43665,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_09": {
-        "lastSubmitSGas": 145158,
+        "lastSubmitSGas": 143048,
         "requestToSubmitCvGas": 65559,
         "requestToSubmitSGas": 111390,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_10_submitCv_10": {
-        "lastSubmitSGas": 145158,
+        "lastSubmitSGas": 143048,
         "requestToSubmitCvGas": 65672,
         "requestToSubmitSGas": 101903,
         "submitCvGas": 43665,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_00": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitSGas": 227588,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_01": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 200137,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_02": {
-        "lastSubmitSGas": 147326,
+        "lastSubmitSGas": 145216,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 190650,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_03": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 181151,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_04": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 171692,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_05": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 65107,
         "requestToSubmitSGas": 162213,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_06": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 65220,
         "requestToSubmitSGas": 152750,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_07": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 65333,
         "requestToSubmitSGas": 143239,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_08": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 65446,
         "requestToSubmitSGas": 133744,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_09": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 65559,
         "requestToSubmitSGas": 124237,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_10": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 65672,
         "requestToSubmitSGas": 114782,
         "submitCvGas": 43665,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_11_submitCv_11": {
-        "lastSubmitSGas": 147338,
+        "lastSubmitSGas": 145228,
         "requestToSubmitCvGas": 65785,
         "requestToSubmitSGas": 105295,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_00": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitSGas": 240412,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_12_submitCv_01": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 213093,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_02": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 203558,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_03": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 194075,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_04": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 184448,
         "submitCvGas": 43677,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_12_submitCv_05": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 65107,
         "requestToSubmitSGas": 175037,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_06": {
-        "lastSubmitSGas": 149506,
+        "lastSubmitSGas": 147396,
         "requestToSubmitCvGas": 65220,
         "requestToSubmitSGas": 165582,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_07": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 65333,
         "requestToSubmitSGas": 156083,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_08": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 65446,
         "requestToSubmitSGas": 146660,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_09": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 65559,
         "requestToSubmitSGas": 137161,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_10": {
-        "lastSubmitSGas": 149506,
+        "lastSubmitSGas": 147396,
         "requestToSubmitCvGas": 65672,
         "requestToSubmitSGas": 127670,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_11": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 65785,
         "requestToSubmitSGas": 118199,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_12_submitCv_12": {
-        "lastSubmitSGas": 149518,
+        "lastSubmitSGas": 147408,
         "requestToSubmitCvGas": 65898,
         "requestToSubmitSGas": 108664,
         "submitCvGas": 43665,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_00": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitSGas": 253282,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_01": {
-        "lastSubmitSGas": 151686,
+        "lastSubmitSGas": 149576,
         "requestToSubmitCvGas": 64655,
         "requestToSubmitSGas": 225911,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_02": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 64768,
         "requestToSubmitSGas": 216364,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_03": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 64881,
         "requestToSubmitSGas": 206917,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_04": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 64994,
         "requestToSubmitSGas": 197438,
         "submitCvGas": 43665,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_13_submitCv_05": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 65107,
         "requestToSubmitSGas": 187907,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_06": {
-        "lastSubmitSGas": 151686,
+        "lastSubmitSGas": 149576,
         "requestToSubmitCvGas": 65220,
         "requestToSubmitSGas": 178508,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_07": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 65333,
         "requestToSubmitSGas": 168997,
         "submitCvGas": 43677,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_13_submitCv_08": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 65446,
         "requestToSubmitSGas": 159498,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_09": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 65559,
         "requestToSubmitSGas": 149999,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_10": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 65672,
         "requestToSubmitSGas": 140540,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       },
       "operators_13_submitCv_11": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 65785,
         "requestToSubmitSGas": 131017,
         "submitCvGas": 43677,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_13_submitCv_12": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 65898,
         "requestToSubmitSGas": 121578,
         "submitCvGas": 43677,
-        "submitSGas": 49332
+        "submitSGas": 49310
       },
       "operators_13_submitCv_13": {
-        "lastSubmitSGas": 151698,
+        "lastSubmitSGas": 149588,
         "requestToSubmitCvGas": 66011,
         "requestToSubmitSGas": 112059,
         "submitCvGas": 43677,
-        "submitSGas": 49344
+        "submitSGas": 49322
       }
     }
   },
@@ -2197,660 +2197,660 @@
     "scenarios": {
       "operators_02": {
         "requested_01": {
-          "didntSubmit_01": 103957
+          "didntSubmit_01": 103935
         },
         "requested_02": {
-          "didntSubmit_01": 89294,
-          "didntSubmit_02": 93987
+          "didntSubmit_01": 89272,
+          "didntSubmit_02": 93969
         }
       },
       "operators_03": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 120951
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 120929
         },
         "requested_03": {
-          "didntSubmit_01": 94468,
-          "didntSubmit_02": 98404,
-          "didntSubmit_03": 108955
+          "didntSubmit_01": 94446,
+          "didntSubmit_02": 98382,
+          "didntSubmit_03": 108937
         }
       },
       "operators_04": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 126147,
-          "didntSubmit_03": 137945
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 126125,
+          "didntSubmit_03": 137923
         },
         "requested_04": {
-          "didntSubmit_01": 94567,
-          "didntSubmit_02": 103578,
-          "didntSubmit_03": 109052,
-          "didntSubmit_04": 123923
+          "didntSubmit_01": 94545,
+          "didntSubmit_02": 103556,
+          "didntSubmit_03": 109034,
+          "didntSubmit_04": 123905
         }
       },
       "operators_05": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 133047,
-          "didntSubmit_03": 149920
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 133025,
+          "didntSubmit_03": 149898
         },
         "requested_04": {
-          "didntSubmit_01": 109351,
-          "didntSubmit_02": 126246,
-          "didntSubmit_03": 143141,
-          "didntSubmit_04": 150139
+          "didntSubmit_01": 109329,
+          "didntSubmit_02": 126224,
+          "didntSubmit_03": 143119,
+          "didntSubmit_04": 150117
         },
         "requested_05": {
-          "didntSubmit_01": 94666,
-          "didntSubmit_02": 103677,
-          "didntSubmit_03": 113191,
-          "didntSubmit_04": 124020,
-          "didntSubmit_05": 138891
+          "didntSubmit_01": 94644,
+          "didntSubmit_02": 103655,
+          "didntSubmit_03": 113173,
+          "didntSubmit_04": 124002,
+          "didntSubmit_05": 138873
         }
       },
       "operators_06": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 133047,
-          "didntSubmit_03": 156820
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 133025,
+          "didntSubmit_03": 156798
         },
         "requested_04": {
-          "didntSubmit_01": 109351,
-          "didntSubmit_02": 133146,
-          "didntSubmit_03": 150041,
-          "didntSubmit_04": 166914
+          "didntSubmit_01": 109329,
+          "didntSubmit_02": 133124,
+          "didntSubmit_03": 150019,
+          "didntSubmit_04": 166892
         },
         "requested_05": {
-          "didntSubmit_01": 109450,
-          "didntSubmit_02": 126345,
-          "didntSubmit_03": 143240,
-          "didntSubmit_04": 155335,
-          "didntSubmit_05": 162333
+          "didntSubmit_01": 109428,
+          "didntSubmit_02": 126323,
+          "didntSubmit_03": 143218,
+          "didntSubmit_04": 155313,
+          "didntSubmit_05": 162311
         },
         "requested_06": {
-          "didntSubmit_01": 94765,
-          "didntSubmit_02": 103776,
-          "didntSubmit_03": 113270,
-          "didntSubmit_04": 128159,
-          "didntSubmit_05": 138988,
-          "didntSubmit_06": 153859
+          "didntSubmit_01": 94743,
+          "didntSubmit_02": 103754,
+          "didntSubmit_03": 113252,
+          "didntSubmit_04": 128141,
+          "didntSubmit_05": 138970,
+          "didntSubmit_06": 153841
         }
       },
       "operators_07": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 133047,
-          "didntSubmit_03": 156820
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 133025,
+          "didntSubmit_03": 156798
         },
         "requested_04": {
-          "didntSubmit_01": 109351,
-          "didntSubmit_02": 133146,
-          "didntSubmit_03": 156941,
-          "didntSubmit_04": 173814
+          "didntSubmit_01": 109329,
+          "didntSubmit_02": 133124,
+          "didntSubmit_03": 156919,
+          "didntSubmit_04": 173792
         },
         "requested_05": {
-          "didntSubmit_01": 109450,
-          "didntSubmit_02": 133245,
-          "didntSubmit_03": 150140,
-          "didntSubmit_04": 167035,
-          "didntSubmit_05": 183908
+          "didntSubmit_01": 109428,
+          "didntSubmit_02": 133223,
+          "didntSubmit_03": 150118,
+          "didntSubmit_04": 167013,
+          "didntSubmit_05": 183886
         },
         "requested_06": {
-          "didntSubmit_01": 109549,
-          "didntSubmit_02": 126444,
-          "didntSubmit_03": 143339,
-          "didntSubmit_04": 155434,
-          "didntSubmit_05": 167529,
-          "didntSubmit_06": 174527
+          "didntSubmit_01": 109527,
+          "didntSubmit_02": 126422,
+          "didntSubmit_03": 143317,
+          "didntSubmit_04": 155412,
+          "didntSubmit_05": 167507,
+          "didntSubmit_06": 174505
         },
         "requested_07": {
-          "didntSubmit_01": 94864,
-          "didntSubmit_02": 103875,
-          "didntSubmit_03": 113349,
-          "didntSubmit_04": 128238,
-          "didntSubmit_05": 143127,
-          "didntSubmit_06": 153956,
-          "didntSubmit_07": 168827
+          "didntSubmit_01": 94842,
+          "didntSubmit_02": 103853,
+          "didntSubmit_03": 113332,
+          "didntSubmit_04": 128220,
+          "didntSubmit_05": 143109,
+          "didntSubmit_06": 153938,
+          "didntSubmit_07": 168809
         }
       },
       "operators_08": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 133047,
-          "didntSubmit_03": 156820
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 133025,
+          "didntSubmit_03": 156798
         },
         "requested_04": {
-          "didntSubmit_01": 109351,
-          "didntSubmit_02": 133146,
-          "didntSubmit_03": 156941,
-          "didntSubmit_04": 180714
+          "didntSubmit_01": 109329,
+          "didntSubmit_02": 133124,
+          "didntSubmit_03": 156919,
+          "didntSubmit_04": 180692
         },
         "requested_05": {
-          "didntSubmit_01": 109450,
-          "didntSubmit_02": 133245,
-          "didntSubmit_03": 157040,
-          "didntSubmit_04": 173935,
-          "didntSubmit_05": 190808
+          "didntSubmit_01": 109428,
+          "didntSubmit_02": 133223,
+          "didntSubmit_03": 157018,
+          "didntSubmit_04": 173913,
+          "didntSubmit_05": 190786
         },
         "requested_06": {
-          "didntSubmit_01": 109549,
-          "didntSubmit_02": 133344,
-          "didntSubmit_03": 150239,
-          "didntSubmit_04": 167134,
-          "didntSubmit_05": 184029,
-          "didntSubmit_06": 200902
+          "didntSubmit_01": 109527,
+          "didntSubmit_02": 133322,
+          "didntSubmit_03": 150217,
+          "didntSubmit_04": 167112,
+          "didntSubmit_05": 184007,
+          "didntSubmit_06": 200880
         },
         "requested_07": {
-          "didntSubmit_01": 109648,
-          "didntSubmit_02": 126543,
-          "didntSubmit_03": 143438,
-          "didntSubmit_04": 155533,
-          "didntSubmit_05": 167628,
-          "didntSubmit_06": 179723,
-          "didntSubmit_07": 191617
+          "didntSubmit_01": 109626,
+          "didntSubmit_02": 126521,
+          "didntSubmit_03": 143416,
+          "didntSubmit_04": 155511,
+          "didntSubmit_05": 167606,
+          "didntSubmit_06": 179701,
+          "didntSubmit_07": 191600
         },
         "requested_08": {
-          "didntSubmit_01": 94963,
-          "didntSubmit_02": 103974,
-          "didntSubmit_03": 113428,
-          "didntSubmit_04": 128317,
-          "didntSubmit_05": 143206,
-          "didntSubmit_06": 158095,
-          "didntSubmit_07": 168924,
-          "didntSubmit_08": 183795
+          "didntSubmit_01": 94941,
+          "didntSubmit_02": 103952,
+          "didntSubmit_03": 113411,
+          "didntSubmit_04": 128300,
+          "didntSubmit_05": 143188,
+          "didntSubmit_06": 158077,
+          "didntSubmit_07": 168906,
+          "didntSubmit_08": 183777
         }
       },
       "operators_09": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 133047,
-          "didntSubmit_03": 156820
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 133025,
+          "didntSubmit_03": 156798
         },
         "requested_04": {
-          "didntSubmit_01": 109351,
-          "didntSubmit_02": 133146,
-          "didntSubmit_03": 156941,
-          "didntSubmit_04": 180714
+          "didntSubmit_01": 109329,
+          "didntSubmit_02": 133124,
+          "didntSubmit_03": 156919,
+          "didntSubmit_04": 180692
         },
         "requested_05": {
-          "didntSubmit_01": 109450,
-          "didntSubmit_02": 133245,
-          "didntSubmit_03": 157040,
-          "didntSubmit_04": 180835,
-          "didntSubmit_05": 197708
+          "didntSubmit_01": 109428,
+          "didntSubmit_02": 133223,
+          "didntSubmit_03": 157018,
+          "didntSubmit_04": 180813,
+          "didntSubmit_05": 197686
         },
         "requested_06": {
-          "didntSubmit_01": 109549,
-          "didntSubmit_02": 133344,
-          "didntSubmit_03": 157139,
-          "didntSubmit_04": 174034,
-          "didntSubmit_05": 190929,
-          "didntSubmit_06": 207802
+          "didntSubmit_01": 109527,
+          "didntSubmit_02": 133322,
+          "didntSubmit_03": 157117,
+          "didntSubmit_04": 174012,
+          "didntSubmit_05": 190907,
+          "didntSubmit_06": 207780
         },
         "requested_07": {
-          "didntSubmit_01": 109648,
-          "didntSubmit_02": 133443,
-          "didntSubmit_03": 150338,
-          "didntSubmit_04": 167233,
-          "didntSubmit_05": 184128,
-          "didntSubmit_06": 201023,
-          "didntSubmit_07": 213096
+          "didntSubmit_01": 109626,
+          "didntSubmit_02": 133421,
+          "didntSubmit_03": 150316,
+          "didntSubmit_04": 167211,
+          "didntSubmit_05": 184106,
+          "didntSubmit_06": 201001,
+          "didntSubmit_07": 213074
         },
         "requested_08": {
-          "didntSubmit_01": 109747,
-          "didntSubmit_02": 126642,
-          "didntSubmit_03": 143537,
-          "didntSubmit_04": 155632,
-          "didntSubmit_05": 167727,
-          "didntSubmit_06": 179822,
-          "didntSubmit_07": 195774,
-          "didntSubmit_08": 209052
+          "didntSubmit_01": 109725,
+          "didntSubmit_02": 126620,
+          "didntSubmit_03": 143515,
+          "didntSubmit_04": 155610,
+          "didntSubmit_05": 167705,
+          "didntSubmit_06": 179800,
+          "didntSubmit_07": 195756,
+          "didntSubmit_08": 209035
         },
         "requested_09": {
-          "didntSubmit_01": 95062,
-          "didntSubmit_02": 104073,
-          "didntSubmit_03": 113508,
-          "didntSubmit_04": 128396,
-          "didntSubmit_05": 143285,
-          "didntSubmit_06": 158174,
-          "didntSubmit_07": 173063,
-          "didntSubmit_08": 183892,
-          "didntSubmit_09": 198763
+          "didntSubmit_01": 95040,
+          "didntSubmit_02": 104051,
+          "didntSubmit_03": 113490,
+          "didntSubmit_04": 128379,
+          "didntSubmit_05": 143268,
+          "didntSubmit_06": 158156,
+          "didntSubmit_07": 173045,
+          "didntSubmit_08": 183874,
+          "didntSubmit_09": 198745
         }
       },
       "operators_10": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 133047,
-          "didntSubmit_03": 156820
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 133025,
+          "didntSubmit_03": 156798
         },
         "requested_04": {
-          "didntSubmit_01": 109351,
-          "didntSubmit_02": 133146,
-          "didntSubmit_03": 156941,
-          "didntSubmit_04": 180714
+          "didntSubmit_01": 109329,
+          "didntSubmit_02": 133124,
+          "didntSubmit_03": 156919,
+          "didntSubmit_04": 180692
         },
         "requested_05": {
-          "didntSubmit_01": 109450,
-          "didntSubmit_02": 133245,
-          "didntSubmit_03": 157040,
-          "didntSubmit_04": 180835,
-          "didntSubmit_05": 204608
+          "didntSubmit_01": 109428,
+          "didntSubmit_02": 133223,
+          "didntSubmit_03": 157018,
+          "didntSubmit_04": 180813,
+          "didntSubmit_05": 204586
         },
         "requested_06": {
-          "didntSubmit_01": 109549,
-          "didntSubmit_02": 133344,
-          "didntSubmit_03": 157139,
-          "didntSubmit_04": 180934,
-          "didntSubmit_05": 197829,
-          "didntSubmit_06": 214702
+          "didntSubmit_01": 109527,
+          "didntSubmit_02": 133322,
+          "didntSubmit_03": 157117,
+          "didntSubmit_04": 180912,
+          "didntSubmit_05": 197807,
+          "didntSubmit_06": 214680
         },
         "requested_07": {
-          "didntSubmit_01": 109648,
-          "didntSubmit_02": 133443,
-          "didntSubmit_03": 157238,
-          "didntSubmit_04": 174133,
-          "didntSubmit_05": 191028,
-          "didntSubmit_06": 207923,
-          "didntSubmit_07": 224796
+          "didntSubmit_01": 109626,
+          "didntSubmit_02": 133421,
+          "didntSubmit_03": 157216,
+          "didntSubmit_04": 174111,
+          "didntSubmit_05": 191006,
+          "didntSubmit_06": 207901,
+          "didntSubmit_07": 224774
         },
         "requested_08": {
-          "didntSubmit_01": 109747,
-          "didntSubmit_02": 133542,
-          "didntSubmit_03": 150437,
-          "didntSubmit_04": 167332,
-          "didntSubmit_05": 184227,
-          "didntSubmit_06": 201122,
-          "didntSubmit_07": 213217,
-          "didntSubmit_08": 225290
+          "didntSubmit_01": 109725,
+          "didntSubmit_02": 133520,
+          "didntSubmit_03": 150415,
+          "didntSubmit_04": 167310,
+          "didntSubmit_05": 184205,
+          "didntSubmit_06": 201100,
+          "didntSubmit_07": 213195,
+          "didntSubmit_08": 225268
         },
         "requested_09": {
-          "didntSubmit_01": 109846,
-          "didntSubmit_02": 126741,
-          "didntSubmit_03": 143636,
-          "didntSubmit_04": 155731,
-          "didntSubmit_05": 167826,
-          "didntSubmit_06": 179921,
-          "didntSubmit_07": 195853,
-          "didntSubmit_08": 213209,
-          "didntSubmit_09": 226488
+          "didntSubmit_01": 109824,
+          "didntSubmit_02": 126719,
+          "didntSubmit_03": 143614,
+          "didntSubmit_04": 155709,
+          "didntSubmit_05": 167804,
+          "didntSubmit_06": 179899,
+          "didntSubmit_07": 195836,
+          "didntSubmit_08": 213192,
+          "didntSubmit_09": 226470
         },
         "requested_10": {
-          "didntSubmit_01": 95161,
-          "didntSubmit_02": 104172,
-          "didntSubmit_03": 113587,
-          "didntSubmit_04": 128476,
-          "didntSubmit_05": 143364,
-          "didntSubmit_06": 158253,
-          "didntSubmit_07": 173142,
-          "didntSubmit_08": 188031,
-          "didntSubmit_09": 198860,
-          "didntSubmit_10": 213731
+          "didntSubmit_01": 95139,
+          "didntSubmit_02": 104150,
+          "didntSubmit_03": 113569,
+          "didntSubmit_04": 128458,
+          "didntSubmit_05": 143347,
+          "didntSubmit_06": 158236,
+          "didntSubmit_07": 173124,
+          "didntSubmit_08": 188013,
+          "didntSubmit_09": 198842,
+          "didntSubmit_10": 213713
         }
       },
       "operators_11": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 133047,
-          "didntSubmit_03": 156820
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 133025,
+          "didntSubmit_03": 156798
         },
         "requested_04": {
-          "didntSubmit_01": 109351,
-          "didntSubmit_02": 133146,
-          "didntSubmit_03": 156941,
-          "didntSubmit_04": 180714
+          "didntSubmit_01": 109329,
+          "didntSubmit_02": 133124,
+          "didntSubmit_03": 156919,
+          "didntSubmit_04": 180692
         },
         "requested_05": {
-          "didntSubmit_01": 109450,
-          "didntSubmit_02": 133245,
-          "didntSubmit_03": 157040,
-          "didntSubmit_04": 180835,
-          "didntSubmit_05": 204608
+          "didntSubmit_01": 109428,
+          "didntSubmit_02": 133223,
+          "didntSubmit_03": 157018,
+          "didntSubmit_04": 180813,
+          "didntSubmit_05": 204586
         },
         "requested_06": {
-          "didntSubmit_01": 109549,
-          "didntSubmit_02": 133344,
-          "didntSubmit_03": 157139,
-          "didntSubmit_04": 180934,
-          "didntSubmit_05": 204729,
-          "didntSubmit_06": 221602
+          "didntSubmit_01": 109527,
+          "didntSubmit_02": 133322,
+          "didntSubmit_03": 157117,
+          "didntSubmit_04": 180912,
+          "didntSubmit_05": 204707,
+          "didntSubmit_06": 221580
         },
         "requested_07": {
-          "didntSubmit_01": 109648,
-          "didntSubmit_02": 133443,
-          "didntSubmit_03": 157238,
-          "didntSubmit_04": 181033,
-          "didntSubmit_05": 197928,
-          "didntSubmit_06": 214823,
-          "didntSubmit_07": 231696
+          "didntSubmit_01": 109626,
+          "didntSubmit_02": 133421,
+          "didntSubmit_03": 157216,
+          "didntSubmit_04": 181011,
+          "didntSubmit_05": 197906,
+          "didntSubmit_06": 214801,
+          "didntSubmit_07": 231674
         },
         "requested_08": {
-          "didntSubmit_01": 109747,
-          "didntSubmit_02": 133542,
-          "didntSubmit_03": 157337,
-          "didntSubmit_04": 174232,
-          "didntSubmit_05": 191127,
-          "didntSubmit_06": 208022,
-          "didntSubmit_07": 224917,
-          "didntSubmit_08": 241790
+          "didntSubmit_01": 109725,
+          "didntSubmit_02": 133520,
+          "didntSubmit_03": 157315,
+          "didntSubmit_04": 174210,
+          "didntSubmit_05": 191105,
+          "didntSubmit_06": 208000,
+          "didntSubmit_07": 224895,
+          "didntSubmit_08": 241768
         },
         "requested_09": {
-          "didntSubmit_01": 109846,
-          "didntSubmit_02": 133641,
-          "didntSubmit_03": 150536,
-          "didntSubmit_04": 167431,
-          "didntSubmit_05": 184326,
-          "didntSubmit_06": 201221,
-          "didntSubmit_07": 213316,
-          "didntSubmit_08": 225411,
-          "didntSubmit_09": 237484
+          "didntSubmit_01": 109824,
+          "didntSubmit_02": 133619,
+          "didntSubmit_03": 150514,
+          "didntSubmit_04": 167409,
+          "didntSubmit_05": 184304,
+          "didntSubmit_06": 201199,
+          "didntSubmit_07": 213294,
+          "didntSubmit_08": 225389,
+          "didntSubmit_09": 237462
         },
         "requested_10": {
-          "didntSubmit_01": 109945,
-          "didntSubmit_02": 126840,
-          "didntSubmit_03": 143735,
-          "didntSubmit_04": 155830,
-          "didntSubmit_05": 167925,
-          "didntSubmit_06": 180020,
-          "didntSubmit_07": 195932,
-          "didntSubmit_08": 213288,
-          "didntSubmit_09": 230644,
-          "didntSubmit_10": 243923
+          "didntSubmit_01": 109923,
+          "didntSubmit_02": 126818,
+          "didntSubmit_03": 143713,
+          "didntSubmit_04": 155808,
+          "didntSubmit_05": 167903,
+          "didntSubmit_06": 179998,
+          "didntSubmit_07": 195915,
+          "didntSubmit_08": 213271,
+          "didntSubmit_09": 230627,
+          "didntSubmit_10": 243905
         },
         "requested_11": {
-          "didntSubmit_01": 95260,
-          "didntSubmit_02": 104271,
-          "didntSubmit_03": 113666,
-          "didntSubmit_04": 128555,
-          "didntSubmit_05": 143444,
-          "didntSubmit_06": 158332,
-          "didntSubmit_07": 173221,
-          "didntSubmit_08": 188110,
-          "didntSubmit_09": 202999,
-          "didntSubmit_10": 213828,
-          "didntSubmit_11": 228699
+          "didntSubmit_01": 95238,
+          "didntSubmit_02": 104249,
+          "didntSubmit_03": 113648,
+          "didntSubmit_04": 128537,
+          "didntSubmit_05": 143426,
+          "didntSubmit_06": 158315,
+          "didntSubmit_07": 173204,
+          "didntSubmit_08": 188092,
+          "didntSubmit_09": 202981,
+          "didntSubmit_10": 213810,
+          "didntSubmit_11": 228681
         }
       },
       "operators_12": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 133047,
-          "didntSubmit_03": 156820
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 133025,
+          "didntSubmit_03": 156798
         },
         "requested_04": {
-          "didntSubmit_01": 109351,
-          "didntSubmit_02": 133146,
-          "didntSubmit_03": 156941,
-          "didntSubmit_04": 180714
+          "didntSubmit_01": 109329,
+          "didntSubmit_02": 133124,
+          "didntSubmit_03": 156919,
+          "didntSubmit_04": 180692
         },
         "requested_05": {
-          "didntSubmit_01": 109450,
-          "didntSubmit_02": 133245,
-          "didntSubmit_03": 157040,
-          "didntSubmit_04": 180835,
-          "didntSubmit_05": 204608
+          "didntSubmit_01": 109428,
+          "didntSubmit_02": 133223,
+          "didntSubmit_03": 157018,
+          "didntSubmit_04": 180813,
+          "didntSubmit_05": 204586
         },
         "requested_06": {
-          "didntSubmit_01": 109549,
-          "didntSubmit_02": 133344,
-          "didntSubmit_03": 157139,
-          "didntSubmit_04": 180934,
-          "didntSubmit_05": 204729,
-          "didntSubmit_06": 228502
+          "didntSubmit_01": 109527,
+          "didntSubmit_02": 133322,
+          "didntSubmit_03": 157117,
+          "didntSubmit_04": 180912,
+          "didntSubmit_05": 204707,
+          "didntSubmit_06": 228480
         },
         "requested_07": {
-          "didntSubmit_01": 109648,
-          "didntSubmit_02": 133443,
-          "didntSubmit_03": 157238,
-          "didntSubmit_04": 181033,
-          "didntSubmit_05": 204828,
-          "didntSubmit_06": 221723,
-          "didntSubmit_07": 238596
+          "didntSubmit_01": 109626,
+          "didntSubmit_02": 133421,
+          "didntSubmit_03": 157216,
+          "didntSubmit_04": 181011,
+          "didntSubmit_05": 204806,
+          "didntSubmit_06": 221701,
+          "didntSubmit_07": 238574
         },
         "requested_08": {
-          "didntSubmit_01": 109747,
-          "didntSubmit_02": 133542,
-          "didntSubmit_03": 157337,
-          "didntSubmit_04": 181132,
-          "didntSubmit_05": 198027,
-          "didntSubmit_06": 214922,
-          "didntSubmit_07": 231817,
-          "didntSubmit_08": 248690
+          "didntSubmit_01": 109725,
+          "didntSubmit_02": 133520,
+          "didntSubmit_03": 157315,
+          "didntSubmit_04": 181110,
+          "didntSubmit_05": 198005,
+          "didntSubmit_06": 214900,
+          "didntSubmit_07": 231795,
+          "didntSubmit_08": 248668
         },
         "requested_09": {
-          "didntSubmit_01": 109846,
-          "didntSubmit_02": 133641,
-          "didntSubmit_03": 157436,
-          "didntSubmit_04": 174331,
-          "didntSubmit_05": 191226,
-          "didntSubmit_06": 208121,
-          "didntSubmit_07": 225016,
-          "didntSubmit_08": 241911,
-          "didntSubmit_09": 258784
+          "didntSubmit_01": 109824,
+          "didntSubmit_02": 133619,
+          "didntSubmit_03": 157414,
+          "didntSubmit_04": 174309,
+          "didntSubmit_05": 191204,
+          "didntSubmit_06": 208099,
+          "didntSubmit_07": 224994,
+          "didntSubmit_08": 241889,
+          "didntSubmit_09": 258762
         },
         "requested_10": {
-          "didntSubmit_01": 109945,
-          "didntSubmit_02": 133740,
-          "didntSubmit_03": 150635,
-          "didntSubmit_04": 167530,
-          "didntSubmit_05": 184425,
-          "didntSubmit_06": 201320,
-          "didntSubmit_07": 213415,
-          "didntSubmit_08": 225510,
-          "didntSubmit_09": 237605,
-          "didntSubmit_10": 253503
+          "didntSubmit_01": 109923,
+          "didntSubmit_02": 133718,
+          "didntSubmit_03": 150613,
+          "didntSubmit_04": 167508,
+          "didntSubmit_05": 184403,
+          "didntSubmit_06": 201298,
+          "didntSubmit_07": 213393,
+          "didntSubmit_08": 225488,
+          "didntSubmit_09": 237583,
+          "didntSubmit_10": 253485
         },
         "requested_11": {
-          "didntSubmit_01": 110044,
-          "didntSubmit_02": 126939,
-          "didntSubmit_03": 143834,
-          "didntSubmit_04": 155929,
-          "didntSubmit_05": 168024,
-          "didntSubmit_06": 180119,
-          "didntSubmit_07": 196012,
-          "didntSubmit_08": 213368,
-          "didntSubmit_09": 230724,
-          "didntSubmit_10": 248080,
-          "didntSubmit_11": 261358
+          "didntSubmit_01": 110022,
+          "didntSubmit_02": 126917,
+          "didntSubmit_03": 143812,
+          "didntSubmit_04": 155907,
+          "didntSubmit_05": 168002,
+          "didntSubmit_06": 180097,
+          "didntSubmit_07": 195994,
+          "didntSubmit_08": 213350,
+          "didntSubmit_09": 230706,
+          "didntSubmit_10": 248062,
+          "didntSubmit_11": 261340
         },
         "requested_12": {
-          "didntSubmit_01": 95359,
-          "didntSubmit_02": 104370,
-          "didntSubmit_03": 113745,
-          "didntSubmit_04": 128634,
-          "didntSubmit_05": 143523,
-          "didntSubmit_06": 158412,
-          "didntSubmit_07": 173300,
-          "didntSubmit_08": 188189,
-          "didntSubmit_09": 203078,
-          "didntSubmit_10": 217967,
-          "didntSubmit_11": 228796,
-          "didntSubmit_12": 243667
+          "didntSubmit_01": 95337,
+          "didntSubmit_02": 104348,
+          "didntSubmit_03": 113728,
+          "didntSubmit_04": 128616,
+          "didntSubmit_05": 143505,
+          "didntSubmit_06": 158394,
+          "didntSubmit_07": 173283,
+          "didntSubmit_08": 188172,
+          "didntSubmit_09": 203060,
+          "didntSubmit_10": 217949,
+          "didntSubmit_11": 228778,
+          "didntSubmit_12": 243649
         }
       },
       "operators_13": {
         "requested_01": {
-          "didntSubmit_01": 109032
+          "didntSubmit_01": 109010
         },
         "requested_02": {
-          "didntSubmit_01": 109153,
-          "didntSubmit_02": 132926
+          "didntSubmit_01": 109131,
+          "didntSubmit_02": 132904
         },
         "requested_03": {
-          "didntSubmit_01": 109252,
-          "didntSubmit_02": 133047,
-          "didntSubmit_03": 156820
+          "didntSubmit_01": 109230,
+          "didntSubmit_02": 133025,
+          "didntSubmit_03": 156798
         },
         "requested_04": {
-          "didntSubmit_01": 109351,
-          "didntSubmit_02": 133146,
-          "didntSubmit_03": 156941,
-          "didntSubmit_04": 180714
+          "didntSubmit_01": 109329,
+          "didntSubmit_02": 133124,
+          "didntSubmit_03": 156919,
+          "didntSubmit_04": 180692
         },
         "requested_05": {
-          "didntSubmit_01": 109450,
-          "didntSubmit_02": 133245,
-          "didntSubmit_03": 157040,
-          "didntSubmit_04": 180835,
-          "didntSubmit_05": 204608
+          "didntSubmit_01": 109428,
+          "didntSubmit_02": 133223,
+          "didntSubmit_03": 157018,
+          "didntSubmit_04": 180813,
+          "didntSubmit_05": 204586
         },
         "requested_06": {
-          "didntSubmit_01": 109549,
-          "didntSubmit_02": 133344,
-          "didntSubmit_03": 157139,
-          "didntSubmit_04": 180934,
-          "didntSubmit_05": 204729,
-          "didntSubmit_06": 228502
+          "didntSubmit_01": 109527,
+          "didntSubmit_02": 133322,
+          "didntSubmit_03": 157117,
+          "didntSubmit_04": 180912,
+          "didntSubmit_05": 204707,
+          "didntSubmit_06": 228480
         },
         "requested_07": {
-          "didntSubmit_01": 109648,
-          "didntSubmit_02": 133443,
-          "didntSubmit_03": 157238,
-          "didntSubmit_04": 181033,
-          "didntSubmit_05": 204828,
-          "didntSubmit_06": 228623,
-          "didntSubmit_07": 245496
+          "didntSubmit_01": 109626,
+          "didntSubmit_02": 133421,
+          "didntSubmit_03": 157216,
+          "didntSubmit_04": 181011,
+          "didntSubmit_05": 204806,
+          "didntSubmit_06": 228601,
+          "didntSubmit_07": 245474
         },
         "requested_08": {
-          "didntSubmit_01": 109747,
-          "didntSubmit_02": 133542,
-          "didntSubmit_03": 157337,
-          "didntSubmit_04": 181132,
-          "didntSubmit_05": 204927,
-          "didntSubmit_06": 221822,
-          "didntSubmit_07": 238717,
-          "didntSubmit_08": 255590
+          "didntSubmit_01": 109725,
+          "didntSubmit_02": 133520,
+          "didntSubmit_03": 157315,
+          "didntSubmit_04": 181110,
+          "didntSubmit_05": 204905,
+          "didntSubmit_06": 221800,
+          "didntSubmit_07": 238695,
+          "didntSubmit_08": 255568
         },
         "requested_09": {
-          "didntSubmit_01": 109846,
-          "didntSubmit_02": 133641,
-          "didntSubmit_03": 157436,
-          "didntSubmit_04": 181231,
-          "didntSubmit_05": 198126,
-          "didntSubmit_06": 215021,
-          "didntSubmit_07": 231916,
-          "didntSubmit_08": 248811,
-          "didntSubmit_09": 265684
+          "didntSubmit_01": 109824,
+          "didntSubmit_02": 133619,
+          "didntSubmit_03": 157414,
+          "didntSubmit_04": 181209,
+          "didntSubmit_05": 198104,
+          "didntSubmit_06": 214999,
+          "didntSubmit_07": 231894,
+          "didntSubmit_08": 248789,
+          "didntSubmit_09": 265662
         },
         "requested_10": {
-          "didntSubmit_01": 109945,
-          "didntSubmit_02": 133740,
-          "didntSubmit_03": 157535,
-          "didntSubmit_04": 174430,
-          "didntSubmit_05": 191325,
-          "didntSubmit_06": 208220,
-          "didntSubmit_07": 225115,
-          "didntSubmit_08": 242010,
-          "didntSubmit_09": 258905,
-          "didntSubmit_10": 270978
+          "didntSubmit_01": 109923,
+          "didntSubmit_02": 133718,
+          "didntSubmit_03": 157513,
+          "didntSubmit_04": 174408,
+          "didntSubmit_05": 191303,
+          "didntSubmit_06": 208198,
+          "didntSubmit_07": 225093,
+          "didntSubmit_08": 241988,
+          "didntSubmit_09": 258883,
+          "didntSubmit_10": 270956
         },
         "requested_11": {
-          "didntSubmit_01": 110044,
-          "didntSubmit_02": 133839,
-          "didntSubmit_03": 150734,
-          "didntSubmit_04": 167629,
-          "didntSubmit_05": 184524,
-          "didntSubmit_06": 201419,
-          "didntSubmit_07": 213514,
-          "didntSubmit_08": 225609,
-          "didntSubmit_09": 237704,
-          "didntSubmit_10": 253600,
-          "didntSubmit_11": 270938
+          "didntSubmit_01": 110022,
+          "didntSubmit_02": 133817,
+          "didntSubmit_03": 150712,
+          "didntSubmit_04": 167607,
+          "didntSubmit_05": 184502,
+          "didntSubmit_06": 201397,
+          "didntSubmit_07": 213492,
+          "didntSubmit_08": 225587,
+          "didntSubmit_09": 237682,
+          "didntSubmit_10": 253582,
+          "didntSubmit_11": 270920
         },
         "requested_12": {
-          "didntSubmit_01": 110143,
-          "didntSubmit_02": 127038,
-          "didntSubmit_03": 143933,
-          "didntSubmit_04": 156028,
-          "didntSubmit_05": 168123,
-          "didntSubmit_06": 180218,
-          "didntSubmit_07": 196091,
-          "didntSubmit_08": 213447,
-          "didntSubmit_09": 230803,
-          "didntSubmit_10": 248159,
-          "didntSubmit_11": 265515,
-          "didntSubmit_12": 278793
+          "didntSubmit_01": 110121,
+          "didntSubmit_02": 127016,
+          "didntSubmit_03": 143911,
+          "didntSubmit_04": 156006,
+          "didntSubmit_05": 168101,
+          "didntSubmit_06": 180196,
+          "didntSubmit_07": 196073,
+          "didntSubmit_08": 213429,
+          "didntSubmit_09": 230785,
+          "didntSubmit_10": 248141,
+          "didntSubmit_11": 265497,
+          "didntSubmit_12": 278776
         },
         "requested_13": {
-          "didntSubmit_01": 95458,
-          "didntSubmit_02": 104469,
-          "didntSubmit_03": 113824,
-          "didntSubmit_04": 128713,
-          "didntSubmit_05": 143602,
-          "didntSubmit_06": 158491,
-          "didntSubmit_07": 173380,
-          "didntSubmit_08": 188268,
-          "didntSubmit_09": 203157,
-          "didntSubmit_10": 218046,
-          "didntSubmit_11": 232935,
-          "didntSubmit_12": 243764,
-          "didntSubmit_13": 258635
+          "didntSubmit_01": 95436,
+          "didntSubmit_02": 104447,
+          "didntSubmit_03": 113807,
+          "didntSubmit_04": 128696,
+          "didntSubmit_05": 143584,
+          "didntSubmit_06": 158473,
+          "didntSubmit_07": 173362,
+          "didntSubmit_08": 188251,
+          "didntSubmit_09": 203140,
+          "didntSubmit_10": 218028,
+          "didntSubmit_11": 232917,
+          "didntSubmit_12": 243746,
+          "didntSubmit_13": 258617
         }
       }
     }
