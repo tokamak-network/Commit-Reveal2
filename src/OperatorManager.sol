@@ -46,6 +46,7 @@ contract OperatorManager is Ownable {
     error LessThanActivationThreshold(); // 0x5af30906
     error AlreadyActivated(); // 0xef65161f
     error ActivatedOperatorsLimitReached(); // 0x3e8fbd5f
+    error WithdrawAmountIsZero(); // 0xa393d14b
 
     constructor() {
         _initializeOwner(msg.sender);
@@ -216,6 +217,10 @@ contract OperatorManager is Ownable {
                 withdrawAmount :=
                     add(withdrawAmount, shr(8, sub(currentSlashRewardPerOperatorX8, sload(keccak256(0x00, 0x40)))))
             }
+            if iszero(withdrawAmount) {
+                mstore(0x00, 0xa393d14b) // `WithdrawAmountIsZero()`.
+                revert(0x1c, 0x04)
+            }
             mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
             sstore(keccak256(0x00, 0x40), currentSlashRewardPerOperatorX8)
             // Reset deposit to zero and attempt transfer
@@ -266,6 +271,10 @@ contract OperatorManager is Ownable {
             let slashRewardPerOperatorPaidX8Slot := keccak256(0x00, 0x40)
             let slashRewardAmount :=
                 shr(8, sub(currentSlashRewardPerOperatorX8, sload(slashRewardPerOperatorPaidX8Slot)))
+            if iszero(slashRewardAmount) {
+                mstore(0x00, 0xa393d14b) // `WithdrawAmountIsZero()`.
+                revert(0x1c, 0x04)
+            }
             sstore(slashRewardPerOperatorPaidX8Slot, currentSlashRewardPerOperatorX8)
             // Transfer the ETH and check if it succeeded or not.
             if iszero(call(gas(), caller(), slashRewardAmount, 0x00, 0x00, 0x00, 0x00)) {
