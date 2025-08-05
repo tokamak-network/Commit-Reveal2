@@ -66,7 +66,7 @@ contract NetworkHelperConfig is Script, BaseTest {
             offChainSubmissionPeriod: 80,
             requestOrSubmitOrFailDecisionPeriod: 60,
             onChainSubmissionPeriod: 120,
-            offChainSubmissionPeriodPerOperator: 40,
+            offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 40,
             deployer: LEADERNODE
         });
@@ -85,7 +85,7 @@ contract NetworkHelperConfig is Script, BaseTest {
             offChainSubmissionPeriod: 80,
             requestOrSubmitOrFailDecisionPeriod: 60,
             onChainSubmissionPeriod: 120,
-            offChainSubmissionPeriodPerOperator: 40,
+            offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 40,
             deployer: s_deployer
         });
@@ -104,7 +104,7 @@ contract NetworkHelperConfig is Script, BaseTest {
             offChainSubmissionPeriod: 80,
             requestOrSubmitOrFailDecisionPeriod: 60,
             onChainSubmissionPeriod: 120,
-            offChainSubmissionPeriodPerOperator: 40,
+            offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 40,
             deployer: s_deployer
         });
@@ -123,7 +123,7 @@ contract NetworkHelperConfig is Script, BaseTest {
             offChainSubmissionPeriod: 80,
             requestOrSubmitOrFailDecisionPeriod: 60,
             onChainSubmissionPeriod: 120,
-            offChainSubmissionPeriodPerOperator: 40,
+            offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 40,
             deployer: s_deployer
         });
