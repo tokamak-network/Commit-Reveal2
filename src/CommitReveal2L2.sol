@@ -70,7 +70,7 @@ contract CommitReveal2L2 is CommitReveal2 {
      * @param numOfOperators The number of active operators factored into the total gas cost.
      * @return requestFee The calculated total fee (in wei) needed to cover the request.
      */
-    function _calculateRequestPrice(uint256 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
+    function _calculateRequestPrice(uint32 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
         internal
         view
         override

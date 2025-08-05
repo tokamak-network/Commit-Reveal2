@@ -69,7 +69,7 @@ contract CommitReveal2Helper is Test {
     uint256 public s_onChainSubmissionPeriod;
     uint256 public s_offChainSubmissionPeriodPerOperator;
     uint256 public s_onChainSubmissionPeriodPerOperator;
-    uint256 public s_callbackGas;
+    uint32 public s_callbackGas;
 
     function _depositAndActivateOperators(address[] storage operatorAddresses) internal {
         for (uint256 i; i < s_numOfOperators; i++) {

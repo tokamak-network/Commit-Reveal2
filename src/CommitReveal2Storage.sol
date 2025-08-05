@@ -27,9 +27,9 @@ contract CommitReveal2Storage {
      */
     struct RequestInfo {
         address consumer;
+        uint32 callbackGasLimit;
         uint256 startTime;
         uint256 cost;
-        uint256 callbackGasLimit;
     }
 
     struct SigRS {

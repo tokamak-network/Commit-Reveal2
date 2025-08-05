@@ -30,7 +30,7 @@ clean :; forge clean
 remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 
 # Install dependencies (use 'make all' if this fails)
-install :; forge install OpenZeppelin/openzeppelin-contracts@v5.4.0 && forge install Cyfrin/foundry-devops@0.4.0 && forge install vectorized/solady@v0.1.24
+install :; forge install foundry-rs/forge-std@v1.8.2 && forge install OpenZeppelin/openzeppelin-contracts@v5.4.0 && forge install Cyfrin/foundry-devops@0.4.0 && forge install vectorized/solady@v0.1.24
 
 # Safe install with cleanup (recommended)
 install-clean: remove install

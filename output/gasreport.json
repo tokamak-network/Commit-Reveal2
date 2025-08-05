@@ -4,48 +4,48 @@
     "scenarios": {
       "operators_02_submitCv_00_submitCo_00": "",
       "operators_02_submitCv_00_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83387,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 81299,
         "requestToSubmitCoGas": 107785,
         "submitCoGas": 46799
       },
       "operators_02_submitCv_00_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 78920,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 76832,
         "requestToSubmitCoGas": 120037,
         "submitCoGas": 46799
       },
       "operators_02_submitCv_01_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83399,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 81311,
         "requestToSubmitCvGas": 64655,
         "submitCvGas": 43677
       },
       "operators_02_submitCv_01_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83411,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 81323,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_02_submitCv_01_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 78928,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 76840,
         "requestToSubmitCoGas": 90690,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_02_submitCv_02_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 78936,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 76848,
         "requestToSubmitCvGas": 64768,
         "submitCvGas": 43677
       },
       "operators_02_submitCv_02_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 78928,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 76840,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_02_submitCv_02_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 78936,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 76848,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
@@ -53,93 +53,93 @@
       },
       "operators_03_submitCv_00_submitCo_00": "",
       "operators_03_submitCv_00_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91331,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89243,
         "requestToSubmitCoGas": 107785,
         "submitCoGas": 46799
       },
       "operators_03_submitCv_00_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 86875,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 84787,
         "requestToSubmitCoGas": 120049,
         "submitCoGas": 46799
       },
       "operators_03_submitCv_00_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 82392,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 80304,
         "requestToSubmitCoGas": 132313,
         "submitCoGas": 46799
       },
       "operators_03_submitCv_01_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91331,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89243,
         "requestToSubmitCvGas": 64655,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_01_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91331,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89243,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_01_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 86851,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 84763,
         "requestToSubmitCoGas": 90702,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_01_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 82400,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 80312,
         "requestToSubmitCoGas": 102978,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_02_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 86887,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 84799,
         "requestToSubmitCvGas": 64768,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_02_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 86883,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 84795,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_02_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 86867,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 84779,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_02_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 82408,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 80320,
         "requestToSubmitCoGas": 90857,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_03_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 82384,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 80296,
         "requestToSubmitCvGas": 64881,
         "submitCvGas": 43665
       },
       "operators_03_submitCv_03_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 82400,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 80312,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_03_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 82404,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 80316,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_03_submitCv_03_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 82404,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 80316,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
@@ -147,152 +147,152 @@
       },
       "operators_04_submitCv_00_submitCo_00": "",
       "operators_04_submitCv_00_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99269,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97181,
         "requestToSubmitCoGas": 107773,
         "submitCoGas": 46799
       },
       "operators_04_submitCv_00_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94805,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92717,
         "requestToSubmitCoGas": 120061,
         "submitCoGas": 46799
       },
       "operators_04_submitCv_00_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90329,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 88241,
         "requestToSubmitCoGas": 132337,
         "submitCoGas": 46799
       },
       "operators_04_submitCv_00_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 85877,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83789,
         "requestToSubmitCoGas": 144541,
         "submitCoGas": 46799
       },
       "operators_04_submitCv_01_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99277,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97189,
         "requestToSubmitCvGas": 64655,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_01_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99285,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97197,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_04_submitCv_01_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94809,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92721,
         "requestToSubmitCoGas": 90666,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_01_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90353,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 88265,
         "requestToSubmitCoGas": 102978,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_01_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 85877,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83789,
         "requestToSubmitCoGas": 115242,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_02_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94817,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92729,
         "requestToSubmitCvGas": 64768,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_02_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94821,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92733,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_02_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94833,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92745,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_02_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90341,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 88253,
         "requestToSubmitCoGas": 90857,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_02_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 85877,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83789,
         "requestToSubmitCoGas": 103133,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_03_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90345,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 88257,
         "requestToSubmitCvGas": 64881,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_03_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90353,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 88265,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_03_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90361,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 88273,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_03_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90357,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 88269,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_03_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 85889,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83801,
         "requestToSubmitCoGas": 91000,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_04_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 85873,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83785,
         "requestToSubmitCvGas": 64994,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_04_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 85861,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83773,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_04_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 85889,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83801,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_04_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 85889,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83801,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_04_submitCv_04_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 85885,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 83797,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
@@ -300,225 +300,225 @@
       },
       "operators_05_submitCv_00_submitCo_00": "",
       "operators_05_submitCv_00_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107205,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105117,
         "requestToSubmitCoGas": 107773,
         "submitCoGas": 46787
       },
       "operators_05_submitCv_00_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 102749,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100661,
         "requestToSubmitCoGas": 120049,
         "submitCoGas": 46799
       },
       "operators_05_submitCv_00_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98277,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96189,
         "requestToSubmitCoGas": 132337,
         "submitCoGas": 46799
       },
       "operators_05_submitCv_00_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 93813,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91725,
         "requestToSubmitCoGas": 144577,
         "submitCoGas": 46787
       },
       "operators_05_submitCv_00_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89346,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87258,
         "requestToSubmitCoGas": 156865,
         "submitCoGas": 46799
       },
       "operators_05_submitCv_01_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107201,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105113,
         "requestToSubmitCvGas": 64655,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_01_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107209,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105121,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_01_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 102753,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100665,
         "requestToSubmitCoGas": 90702,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_05_submitCv_01_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98261,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96173,
         "requestToSubmitCoGas": 102954,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_01_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 93825,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91737,
         "requestToSubmitCoGas": 115230,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_01_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89342,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87254,
         "requestToSubmitCoGas": 127506,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_05_submitCv_02_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 102737,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100649,
         "requestToSubmitCvGas": 64768,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_02_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 102765,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100677,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_02_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 102729,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100641,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_02_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98261,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96173,
         "requestToSubmitCoGas": 90833,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_02_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 93809,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91721,
         "requestToSubmitCoGas": 103121,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_02_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89342,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87254,
         "requestToSubmitCoGas": 115397,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_03_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98277,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96189,
         "requestToSubmitCvGas": 64881,
         "submitCvGas": 43665
       },
       "operators_05_submitCv_03_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98281,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96193,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_03_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98297,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96209,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_03_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98293,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96205,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_03_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 93829,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91741,
         "requestToSubmitCoGas": 91000,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_03_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89346,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87258,
         "requestToSubmitCoGas": 103288,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_04_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 93825,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91737,
         "requestToSubmitCvGas": 64994,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_04_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 93837,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91749,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_04_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 93821,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91733,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_04_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 93821,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91733,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_05_submitCv_04_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 93805,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 91717,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_04_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89346,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87258,
         "requestToSubmitCoGas": 91167,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_05_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89342,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87254,
         "requestToSubmitCvGas": 65107,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_05_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89362,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87274,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_05_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89354,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87266,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_05_submitCv_05_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89350,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87262,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_05_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89350,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87262,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_05_submitCv_05_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 89350,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 87262,
         "requestToSubmitCoGas": 76231,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
@@ -526,312 +526,312 @@
       },
       "operators_06_submitCv_00_submitCo_00": "",
       "operators_06_submitCv_00_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 115138,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 113050,
         "requestToSubmitCoGas": 107785,
         "submitCoGas": 46799
       },
       "operators_06_submitCv_00_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 110658,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 108570,
         "requestToSubmitCoGas": 120061,
         "submitCoGas": 46799
       },
       "operators_06_submitCv_00_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 106206,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 104118,
         "requestToSubmitCoGas": 132337,
         "submitCoGas": 46799
       },
       "operators_06_submitCv_00_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 101734,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99646,
         "requestToSubmitCoGas": 144601,
         "submitCoGas": 46799
       },
       "operators_06_submitCv_00_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97266,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95178,
         "requestToSubmitCoGas": 156865,
         "submitCoGas": 46799
       },
       "operators_06_submitCv_00_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92803,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90715,
         "requestToSubmitCoGas": 169117,
         "submitCoGas": 46799
       },
       "operators_06_submitCv_01_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 115114,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 113026,
         "requestToSubmitCvGas": 64655,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_01_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 115154,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 113066,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_01_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 110654,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 108566,
         "requestToSubmitCoGas": 90702,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_01_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 106166,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 104078,
         "requestToSubmitCoGas": 102978,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_01_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 101750,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99662,
         "requestToSubmitCoGas": 115254,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_01_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97278,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95190,
         "requestToSubmitCoGas": 127530,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_01_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92823,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90735,
         "requestToSubmitCoGas": 139794,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_02_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 110654,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 108566,
         "requestToSubmitCvGas": 64768,
         "submitCvGas": 43665
       },
       "operators_06_submitCv_02_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 110654,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 108566,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_02_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 110682,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 108594,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_02_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 106202,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 104114,
         "requestToSubmitCoGas": 90845,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_06_submitCv_02_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 101746,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99658,
         "requestToSubmitCoGas": 103109,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_06_submitCv_02_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97310,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95222,
         "requestToSubmitCoGas": 115397,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_02_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92823,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90735,
         "requestToSubmitCoGas": 127673,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_03_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 106230,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 104142,
         "requestToSubmitCvGas": 64881,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_03_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 106194,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 104106,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_03_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 106198,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 104110,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_03_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 106218,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 104130,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_03_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 101750,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99662,
         "requestToSubmitCoGas": 91000,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_03_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97286,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95198,
         "requestToSubmitCoGas": 103288,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_03_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92799,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90711,
         "requestToSubmitCoGas": 115540,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_04_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 101734,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99646,
         "requestToSubmitCvGas": 64994,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_04_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 101734,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99646,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_04_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 101726,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99638,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_04_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 101754,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99666,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_04_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 101746,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 99658,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_04_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97282,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95194,
         "requestToSubmitCoGas": 91155,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_04_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92819,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90731,
         "requestToSubmitCoGas": 103431,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_05_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97250,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95162,
         "requestToSubmitCvGas": 65107,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_05_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97270,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95182,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_05_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97306,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95218,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_05_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97298,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95210,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_05_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97282,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95194,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_05_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 97274,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 95186,
         "requestToSubmitCoGas": 76231,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_06_submitCv_05_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92799,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90711,
         "requestToSubmitCoGas": 91310,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_06_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92815,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90727,
         "requestToSubmitCvGas": 65220,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_06_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92815,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90727,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_06_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92807,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90719,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_06_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92827,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90739,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46787,
         "submitCvGas": 43665
       },
       "operators_06_submitCv_06_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92787,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90699,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_06_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92799,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90711,
         "requestToSubmitCoGas": 76231,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_06_submitCv_06_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 92815,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 90727,
         "requestToSubmitCoGas": 76386,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
@@ -839,413 +839,413 @@
       },
       "operators_07_submitCv_00_submitCo_00": "",
       "operators_07_submitCv_00_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 123039,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 120951,
         "requestToSubmitCoGas": 107785,
         "submitCoGas": 46799
       },
       "operators_07_submitCv_00_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 118595,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 116507,
         "requestToSubmitCoGas": 120049,
         "submitCoGas": 46799
       },
       "operators_07_submitCv_00_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 114139,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 112051,
         "requestToSubmitCoGas": 132325,
         "submitCoGas": 46799
       },
       "operators_07_submitCv_00_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 109711,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107623,
         "requestToSubmitCoGas": 144601,
         "submitCoGas": 46787
       },
       "operators_07_submitCv_00_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105187,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103099,
         "requestToSubmitCoGas": 156877,
         "submitCoGas": 46799
       },
       "operators_07_submitCv_00_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100767,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98679,
         "requestToSubmitCoGas": 169141,
         "submitCoGas": 46799
       },
       "operators_07_submitCv_00_submitCo_07": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96271,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94183,
         "requestToSubmitCoGas": 181429,
         "submitCoGas": 46799
       },
       "operators_07_submitCv_01_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 123067,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 120979,
         "requestToSubmitCvGas": 64655,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_01_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 123059,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 120971,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_01_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 118615,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 116527,
         "requestToSubmitCoGas": 90690,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_01_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 114147,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 112059,
         "requestToSubmitCoGas": 102966,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_01_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 109691,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107603,
         "requestToSubmitCoGas": 115242,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_01_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105247,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103159,
         "requestToSubmitCoGas": 127482,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_01_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100747,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98659,
         "requestToSubmitCoGas": 139782,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_01_submitCo_07": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96291,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94203,
         "requestToSubmitCoGas": 152034,
         "requestToSubmitCvGas": 64655,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_02_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 118623,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 116535,
         "requestToSubmitCvGas": 64768,
         "submitCvGas": 43665
       },
       "operators_07_submitCv_02_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 118615,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 116527,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_02_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 118631,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 116543,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_02_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 114127,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 112039,
         "requestToSubmitCoGas": 90833,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_07_submitCv_02_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 109659,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107571,
         "requestToSubmitCoGas": 103121,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_02_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105211,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103123,
         "requestToSubmitCoGas": 115385,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_02_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100755,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98667,
         "requestToSubmitCoGas": 127661,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_07_submitCv_02_submitCo_07": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96271,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94183,
         "requestToSubmitCoGas": 139937,
         "requestToSubmitCvGas": 64768,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_03_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 114135,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 112047,
         "requestToSubmitCvGas": 64881,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_03_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 114143,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 112055,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_03_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 114139,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 112051,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_03_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 114147,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 112059,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_03_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 109675,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107587,
         "requestToSubmitCoGas": 91012,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_07_submitCv_03_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105195,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103107,
         "requestToSubmitCoGas": 103264,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_03_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100763,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98675,
         "requestToSubmitCoGas": 115564,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_03_submitCo_07": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96295,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94207,
         "requestToSubmitCoGas": 127816,
         "requestToSubmitCvGas": 64881,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_04_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 109691,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107603,
         "requestToSubmitCvGas": 64994,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_04_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 109683,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107595,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_04_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 109699,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107611,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43665
       },
       "operators_07_submitCv_04_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 109675,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107587,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_04_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 109659,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 107571,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_04_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105227,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103139,
         "requestToSubmitCoGas": 91167,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_04_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100763,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98675,
         "requestToSubmitCoGas": 103431,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_04_submitCo_07": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96283,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94195,
         "requestToSubmitCoGas": 115719,
         "requestToSubmitCvGas": 64994,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_05_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105183,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103095,
         "requestToSubmitCvGas": 65107,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_05_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105223,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103135,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46787,
         "submitCvGas": 43665
       },
       "operators_07_submitCv_05_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105207,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103119,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_05_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105219,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103131,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46775,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_05_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105235,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103147,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_05_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 105211,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 103123,
         "requestToSubmitCoGas": 76231,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_05_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100759,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98671,
         "requestToSubmitCoGas": 91322,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_05_submitCo_07": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96275,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94187,
         "requestToSubmitCoGas": 103598,
         "requestToSubmitCvGas": 65107,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_06_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100747,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98659,
         "requestToSubmitCvGas": 65220,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_06_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100767,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98679,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_06_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100747,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98659,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46787,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_06_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100735,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98647,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_06_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100759,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98671,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_06_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100743,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98655,
         "requestToSubmitCoGas": 76231,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_06_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 100779,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 98691,
         "requestToSubmitCoGas": 76386,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_06_submitCo_07": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96283,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94195,
         "requestToSubmitCoGas": 91477,
         "requestToSubmitCvGas": 65220,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_07_submitCo_00": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96287,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94199,
         "requestToSubmitCvGas": 65333,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_07_submitCo_01": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96251,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94163,
         "requestToSubmitCoGas": 75611,
         "requestToSubmitCvGas": 65333,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_07_submitCo_02": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96267,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94179,
         "requestToSubmitCoGas": 75766,
         "requestToSubmitCvGas": 65333,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_07_submitCo_03": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96267,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94179,
         "requestToSubmitCoGas": 75921,
         "requestToSubmitCvGas": 65333,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_07_submitCo_04": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96263,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94175,
         "requestToSubmitCoGas": 76076,
         "requestToSubmitCvGas": 65333,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_07_submitCo_05": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96259,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94171,
         "requestToSubmitCoGas": 76231,
         "requestToSubmitCvGas": 65333,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_07_submitCo_06": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96299,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94211,
         "requestToSubmitCoGas": 76386,
         "requestToSubmitCvGas": 65333,
         "submitCoGas": 46799,
         "submitCvGas": 43677
       },
       "operators_07_submitCv_07_submitCo_07": {
-        "generateRandomNumberWhenSomeCvsAreOnChainGas": 96283,
+        "generateRandomNumberWhenSomeCvsAreOnChainGas": 94195,
         "requestToSubmitCoGas": 76541,
         "requestToSubmitCvGas": 65333,
         "submitCoGas": 46799,
@@ -1983,70 +1983,70 @@
       "32": 3204
     },
     "generateRandomNumber_numOfOperators_gasUsed_average": {
-      "02": 103869,
-      "03": 111727,
-      "04": 119584,
-      "05": 127437,
-      "06": 135298,
-      "07": 143158,
-      "08": 151015,
-      "09": 158885,
-      "10": 166728,
-      "11": 174599,
-      "12": 182449,
-      "13": 190339,
-      "14": 198168,
-      "15": 206054,
-      "16": 213906,
-      "17": 221770,
-      "18": 229642,
-      "19": 237492,
-      "20": 245372,
-      "21": 253226,
-      "22": 261063,
-      "23": 268932,
-      "24": 276826,
-      "25": 284680,
-      "26": 292524,
-      "27": 300407,
-      "28": 308254,
-      "29": 316096,
-      "30": 323985,
-      "31": 331843,
-      "32": 339714
+      "02": 101803,
+      "03": 109661,
+      "04": 117518,
+      "05": 125371,
+      "06": 133232,
+      "07": 141092,
+      "08": 148949,
+      "09": 156819,
+      "10": 164662,
+      "11": 172533,
+      "12": 180383,
+      "13": 188273,
+      "14": 196102,
+      "15": 203988,
+      "16": 211840,
+      "17": 219704,
+      "18": 227576,
+      "19": 235426,
+      "20": 243306,
+      "21": 251160,
+      "22": 258997,
+      "23": 266866,
+      "24": 274760,
+      "25": 282614,
+      "26": 290458,
+      "27": 298341,
+      "28": 306188,
+      "29": 314030,
+      "30": 321919,
+      "31": 329777,
+      "32": 337648
     },
     "generateRandomNumber_numOfOperators_gasUsed_max": {
-      "02": 106371,
-      "03": 114237,
-      "04": 122089,
-      "05": 129963,
-      "06": 137822,
-      "07": 145669,
-      "08": 153552,
-      "09": 161417,
-      "10": 169268,
-      "11": 177126,
-      "12": 185005,
-      "13": 192866,
-      "14": 200721,
-      "15": 208607,
-      "16": 216430,
-      "17": 224336,
-      "18": 232187,
-      "19": 240038,
-      "20": 247889,
-      "21": 255755,
-      "22": 263623,
-      "23": 271485,
-      "24": 279377,
-      "25": 287235,
-      "26": 295063,
-      "27": 303006,
-      "28": 310801,
-      "29": 318700,
-      "30": 326544,
-      "31": 334375,
-      "32": 342255
+      "02": 104305,
+      "03": 112171,
+      "04": 120023,
+      "05": 127897,
+      "06": 135756,
+      "07": 143603,
+      "08": 151486,
+      "09": 159351,
+      "10": 167202,
+      "11": 175060,
+      "12": 182939,
+      "13": 190800,
+      "14": 198655,
+      "15": 206541,
+      "16": 214364,
+      "17": 222270,
+      "18": 230121,
+      "19": 237972,
+      "20": 245823,
+      "21": 253689,
+      "22": 261557,
+      "23": 269419,
+      "24": 277311,
+      "25": 285169,
+      "26": 292997,
+      "27": 300940,
+      "28": 308735,
+      "29": 316634,
+      "30": 324478,
+      "31": 332309,
+      "32": 340189
     },
     "submitMerkleRoot_calldataSizeInBytes": 36,
     "submitMerkleRoot_numOfOperators_gasUsed": {

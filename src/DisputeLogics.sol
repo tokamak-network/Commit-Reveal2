@@ -677,10 +677,11 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 // if g - g//64 <= gas
                 // we subtract g//64 because of EIP-150
                 g := sub(g, div(g, 64))
-                let callbackGasLimit := sload(add(currentRequestInfoSlot, 3))
+                let consumerAndCallbackGasLimitPacked := sload(currentRequestInfoSlot)
+                let callbackGasLimit := and(consumerAndCallbackGasLimitPacked, 0xffffffff)
                 if iszero(gt(sub(g, div(g, 64)), callbackGasLimit)) { revert(0, 0) }
                 // solidity calls check that a contract actually exists at the destination, so we do the same
-                let consumer := sload(currentRequestInfoSlot)
+                let consumer := shr(96, consumerAndCallbackGasLimitPacked)
                 if gt(extcodesize(consumer), 0) {
                     // call and return whether we succeeded. ignore return data
                     // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
@@ -969,10 +970,11 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             // if g - g//64 <= gas
             // we subtract g//64 because of EIP-150
             g := sub(g, div(g, 64))
-            let callbackGasLimit := sload(add(currentRequestInfoSlot, 3))
+            let consumerAndCallbackGasLimitPacked := sload(currentRequestInfoSlot)
+            let callbackGasLimit := and(consumerAndCallbackGasLimitPacked, 0xffffffff)
             if iszero(gt(sub(g, div(g, 64)), callbackGasLimit)) { revert(0, 0) }
             // solidity calls check that a contract actually exists at the destination, so we do the same
-            let consumer := sload(currentRequestInfoSlot)
+            let consumer := shr(96, consumerAndCallbackGasLimitPacked)
             if gt(extcodesize(consumer), 0) {
                 // call and return whether we succeeded. ignore return data
                 // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)

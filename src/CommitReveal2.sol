@@ -50,11 +50,11 @@ contract CommitReveal2 is FailLogics {
         }
     }
 
-    function estimateRequestPrice(uint256 callbackGasLimit, uint256 gasPrice) external view returns (uint256) {
+    function estimateRequestPrice(uint32 callbackGasLimit, uint256 gasPrice) external view returns (uint256) {
         return _calculateRequestPrice(callbackGasLimit, gasPrice, s_activatedOperators.length);
     }
 
-    function estimateRequestPrice(uint256 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
+    function estimateRequestPrice(uint32 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
         external
         view
         returns (uint256)
@@ -125,15 +125,14 @@ contract CommitReveal2 is FailLogics {
             mstore(0x00, newRound)
             mstore(0x20, s_requestInfo.slot)
             let requestInfoSlot := keccak256(0x00, 0x40)
-            sstore(requestInfoSlot, caller())
+            sstore(requestInfoSlot, or(shl(96, caller()), callbackGasLimit))
             sstore(add(requestInfoSlot, 1), startTime)
             sstore(add(requestInfoSlot, 2), callvalue())
-            sstore(add(requestInfoSlot, 3), callbackGasLimit)
             return(0x00, 0x20)
         }
     }
 
-    function _calculateRequestPrice(uint256 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
+    function _calculateRequestPrice(uint32 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
         internal
         view
         virtual
@@ -438,10 +437,11 @@ contract CommitReveal2 is FailLogics {
             // if g - g//64 <= gas
             // we subtract g//64 because of EIP-150
             g := sub(g, div(g, 64))
-            let callbackGasLimit := sload(add(currentRequestInfoSlot, 3))
+            let consumerAndCallbackGasLimitPacked := sload(currentRequestInfoSlot)
+            let callbackGasLimit := and(consumerAndCallbackGasLimitPacked, 0xffffffff)
             if iszero(gt(sub(g, div(g, 64)), callbackGasLimit)) { revert(0, 0) }
             // solidity calls check that a contract actually exists at the destination, so we do the same
-            let consumer := sload(currentRequestInfoSlot)
+            let consumer := shr(96, consumerAndCallbackGasLimitPacked)
             if gt(extcodesize(consumer), 0) {
                 // call and return whether we succeeded. ignore return data
                 // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
@@ -470,7 +470,7 @@ contract CommitReveal2 is FailLogics {
             mstore(0x20, s_requestInfo.slot)
             let consumerSlot := keccak256(0x00, 0x40)
             // ** check if the caller is the consumer
-            if iszero(eq(sload(consumerSlot), caller())) {
+            if iszero(eq(shr(96, sload(consumerSlot)), caller())) {
                 mstore(0, 0x8c7dc13d) // selector for NotConsumer()
                 revert(0x1c, 0x04)
             }
