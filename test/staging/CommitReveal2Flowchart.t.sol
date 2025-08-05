@@ -555,9 +555,8 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 4.
         (s_currentRound, s_currentTrialNum) = s_commitReveal2.getCurRoundAndTrialNum();
         (, s_startTimestamp,,) = s_commitReveal2.s_requestInfo(s_currentRound);
-        // ** s_offChainSubmissionPeriod passed
         mine(s_activeNetworkConfig.offChainSubmissionPeriod);
-        // ** s_requestOrSubmitOrFailDecisionPeriod passed
+        mine(s_activeNetworkConfig.offChainSubmissionPeriodPerOperator * s_activatedOperators.length);
         mine(s_activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod);
 
         vm.deal(s_anyAddress, 10000 ether);

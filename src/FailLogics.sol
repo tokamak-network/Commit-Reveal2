@@ -612,7 +612,7 @@ contract FailLogics is DisputeLogics {
                     add(
                         add(
                             add(requestedToSubmitCoTimestamp, sload(s_onChainSubmissionPeriod.slot)),
-                            mul(sload(s_onChainSubmissionPeriodPerOperator.slot), activatedOperatorLength)
+                            mul(sload(s_offChainSubmissionPeriodPerOperator.slot), activatedOperatorLength)
                         ),
                         sload(s_requestOrSubmitOrFailDecisionPeriod.slot)
                     )
