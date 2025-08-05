@@ -78,7 +78,7 @@ contract DisputeLogicsGas is BaseTest, CommitReveal2Helper {
                         s_commitReveal2.requestRandomNumber{value: requestFee}(90000);
                         vm.stopPrank();
 
-                        uint256[] memory revealOrders = _setSCoCvRevealOrders(s_privateKeys);
+                        _setSCoCvRevealOrders(s_privateKeys);
 
                         // ** 2. requestToSubmitCv (if any)
                         if (s_submitCvLength > 0) {

@@ -20,7 +20,7 @@ clean :; forge clean
 # Remove modules
 remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 
-install :; forge install OpenZeppelin/openzeppelin-contracts@v5.2.0 && forge install Cyfrin/foundry-devops@0.4.0rc && forge install vectorized/solady@v0.1.12
+install :; forge install OpenZeppelin/openzeppelin-contracts@v5.4.0 && forge install Cyfrin/foundry-devops@0.4.0 && forge install vectorized/solady@v0.1.24
 
 # Update Dependencies
 update :; forge update
