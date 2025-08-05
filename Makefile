@@ -6,9 +6,18 @@ DEFAULT_ANVIL_KEY := 0xf214f2b2cd398c806f84e317254e0f0b801d0643303237d97a22a48e0
 
 help:
 	@echo "Usage:"
-	@echo "  make deploy [ARGS=...]\n    example: make deploy ARGS=\"--network thanossepolia\""
-	@echo "    make deploy ARGS=\"--network sepolia\""
-	@echo "    make deploy ARGS=\"--network opsepolia\""
+	@echo "Setup Commands:"
+	@echo "  make all              - Complete clean build (recommended)"
+	@echo "  make install          - Install dependencies only"
+	@echo "  make install-clean    - Clean install dependencies"
+	@echo "  make build            - Build the project"
+	@echo "  make test             - Run tests"
+	@echo ""
+	@echo "Deploy Commands:"
+	@echo "  make deploy [ARGS=...] - Deploy to network"
+	@echo "    example: make deploy ARGS=\"--network thanossepolia\""
+	@echo "    example: make deploy ARGS=\"--network sepolia\""
+	@echo "    example: make deploy ARGS=\"--network opsepolia\""
 
 .PHONY: all test clean deploy fund help install snapshot format anvil 
 
@@ -20,7 +29,11 @@ clean :; forge clean
 # Remove modules
 remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
 
+# Install dependencies (use 'make all' if this fails)
 install :; forge install OpenZeppelin/openzeppelin-contracts@v5.4.0 && forge install Cyfrin/foundry-devops@0.4.0 && forge install vectorized/solady@v0.1.24
+
+# Safe install with cleanup (recommended)
+install-clean: remove install
 
 # Update Dependencies
 update :; forge update

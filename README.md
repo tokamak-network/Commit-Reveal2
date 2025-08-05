@@ -9,10 +9,46 @@
 
 ## Quickstart
 
+For a clean installation (recommended for first-time setup or when dependencies fail):
+
+```
+make all
+```
+
+This command will:
+
+1. Clean the project (`make clean`)
+2. Remove existing dependencies (`make remove`)
+3. Install fresh dependencies (`make install`)
+4. Update dependencies (`make update`)
+5. Build the project (`make build`)
+
+### Alternative Installation Options
+
+#### Option 1: Manual Installation (when dependencies are clean)
+
 ```
 make install
 make build
 ```
+
+#### Option 2: Clean Install (when `make install` fails)
+
+```
+make install-clean
+make build
+```
+
+#### Option 3: Full Clean Build (most reliable)
+
+```
+make all
+```
+
+**Troubleshooting**: If you encounter "already exists and is not a valid git repo" error:
+
+- **Quick fix**: Use `make install-clean` or `make all`
+- **Manual fix**: Delete the `lib/` directory and run `make install`
 
 ## Test
 
