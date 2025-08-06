@@ -47,6 +47,7 @@ contract OperatorManager is Ownable {
     error AlreadyActivated(); // 0xef65161f
     error ActivatedOperatorsLimitReached(); // 0x3e8fbd5f
     error WithdrawAmountIsZero(); // 0xa393d14b
+    error PendingOwnerCannotBeActivatedOperator(); // 0x5df6bf29
 
     constructor() {
         _initializeOwner(msg.sender);
@@ -105,6 +106,30 @@ contract OperatorManager is Ownable {
                 log2(0, 0, 0xdbf36a107da19e49527a7176a1babf963b4b0ff8cde35ee35d6cd8f1f9ac7e1d, caller()) // _OWNERSHIP_HANDOVER_REQUESTED_EVENT_SIGNATURE
             }
         }
+    }
+
+    function completeOwnershipHandover(address pendingOwner) public payable override onlyOwner {
+        /// @solidity memory-safe-assembly
+        assembly {
+            mstore(0x00, pendingOwner)
+            mstore(0x20, s_activatedOperatorIndex1Based.slot)
+            if gt(sload(keccak256(0x00, 0x40)), 0) {
+                mstore(0x00, 0x5df6bf29) // PendingOwnerCannotBeActivatedOperator()
+                revert(0x1c, 0x04)
+            }
+            // Compute and set the handover slot to 0.
+            mstore(0x0c, 0x389a75e1) // _HANDOVER_SLOT_SEED
+            mstore(0x00, pendingOwner)
+            let handoverSlot := keccak256(0x0c, 0x20)
+            // If the handover does not exist, or has expired.
+            if gt(timestamp(), sload(handoverSlot)) {
+                mstore(0x00, 0x6f5e8818) // `NoHandoverRequest()`.
+                revert(0x1c, 0x04)
+            }
+            // Set the handover slot to 0.
+            sstore(handoverSlot, 0)
+        }
+        _setOwner(pendingOwner);
     }
 
     function deposit() public payable {

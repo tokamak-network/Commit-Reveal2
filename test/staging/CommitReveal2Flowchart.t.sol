@@ -1124,7 +1124,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         }
 
         // ** 15. failToSubmitS()
-        mine(s_activeNetworkConfig.offChainSubmissionPeriodPerOperator);
+        mine(s_activeNetworkConfig.onChainSubmissionPeriodPerOperator);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.failToSubmitS();
         mine(1);
@@ -1182,7 +1182,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         mine(1);
 
         // ** 15. failToSubmitS()
-        mine(s_activeNetworkConfig.offChainSubmissionPeriodPerOperator);
+        mine(s_activeNetworkConfig.onChainSubmissionPeriodPerOperator);
         vm.startPrank(LEADERNODE);
         s_commitReveal2.failToSubmitS();
         mine(1);
