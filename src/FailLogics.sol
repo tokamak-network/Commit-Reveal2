@@ -21,7 +21,7 @@ contract FailLogics is DisputeLogics {
         assembly ("memory-safe") {
             // ** check if the contract is COMPLETED or HALTED
             if iszero(eq(sload(s_isInProcess.slot), IN_PROGRESS)) {
-                mstore(0, 0xd51a29b7) // RandomNumGenerated()
+                mstore(0, 0x6b4bc078) // RoundNotInProgress()
                 revert(0x1c, 0x04)
             }
         }
