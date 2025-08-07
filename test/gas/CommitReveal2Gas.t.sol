@@ -48,7 +48,6 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
             s_generateRandomNumberGas = new uint256[](s_numOfTests);
 
             uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_callbackGas, tx.gasprice);
-            console2.log("s_numOfOperators", s_numOfOperators);
             for (uint256 i; i < s_numOfTests; i++) {
                 vm.startPrank(s_anyAddress);
                 s_commitReveal2.requestRandomNumber{value: requestFee}(90000);
@@ -123,10 +122,5 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         );
 
         vm.writeJson(finalOutput, s_gasReportPath, ".commitReveal2Gas");
-
-        console2.log(
-            "submitMerkleRootGas Calldata Size In Bytes:",
-            abi.encodeWithSelector(s_commitReveal2.submitMerkleRoot.selector, type(uint256).max).length
-        );
     }
 }
