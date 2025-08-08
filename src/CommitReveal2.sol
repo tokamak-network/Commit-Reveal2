@@ -54,7 +54,7 @@ contract CommitReveal2 is FailLogics {
         return _calculateRequestPrice(callbackGasLimit, gasPrice, s_activatedOperators.length);
     }
 
-    function estimateRequestPrice(uint32 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
+    function estimateRequestPriceWithNumOfOperators(uint32 callbackGasLimit, uint256 gasPrice, uint256 numOfOperators)
         external
         view
         returns (uint256)
