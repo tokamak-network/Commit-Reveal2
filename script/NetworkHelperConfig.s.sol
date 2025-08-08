@@ -40,6 +40,7 @@ contract NetworkHelperConfig is Script, BaseTest {
         if (chainId == 111551119090) {
             activeNetworkConfig = getThanosSepoliaConfig();
         } else if (chainId == 31337) {
+            s_deployer = LEADERNODE;
             vm.deal(s_deployer, 10000 ether);
             activeNetworkConfig = getAnvilConfig();
         } else if (chainId == 11155420) {
@@ -53,7 +54,7 @@ contract NetworkHelperConfig is Script, BaseTest {
         return activeNetworkConfig;
     }
 
-    function getAnvilConfig() public pure returns (NetworkConfig memory) {
+    function getAnvilConfig() public view returns (NetworkConfig memory) {
         string memory name = "Commit Reveal2";
         string memory version = "1";
         return NetworkConfig({
@@ -68,7 +69,7 @@ contract NetworkHelperConfig is Script, BaseTest {
             onChainSubmissionPeriod: 120,
             offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 40,
-            deployer: LEADERNODE
+            deployer: s_deployer
         });
     }
 

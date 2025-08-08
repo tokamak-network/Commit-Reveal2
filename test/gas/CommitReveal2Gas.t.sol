@@ -50,7 +50,7 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
             uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_callbackGas, tx.gasprice);
             for (uint256 i; i < s_numOfTests; i++) {
                 vm.startPrank(s_anyAddress);
-                s_commitReveal2.requestRandomNumber{value: requestFee}(90000);
+                s_commitReveal2.requestRandomNumber{value: requestFee * 11 / 10}(90000);
                 vm.stopPrank();
             }
             for (uint256 i; i < s_numOfTests; i++) {

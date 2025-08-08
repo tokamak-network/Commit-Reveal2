@@ -158,3 +158,12 @@ contract SuccessfulPaths is BaseScript {
         console2.log("random number generated successfully");
     }
 }
+
+contract ETCFunctions is BaseScript {
+    function run() public {
+        BaseScript.scriptSetUp();
+        uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_consumerExample.CALLBACK_GAS_LIMIT(), tx.gasprice);
+        console2.log("current gas fee:", tx.gasprice);
+        console2.log("requestFee %e", requestFee);
+    }
+}

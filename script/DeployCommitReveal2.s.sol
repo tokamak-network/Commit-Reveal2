@@ -50,7 +50,6 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
     function runForTest() public returns (address commitReveal2, NetworkHelperConfig networkHelperConfig) {
         networkHelperConfig = new NetworkHelperConfig();
         NetworkHelperConfig.NetworkConfig memory activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
-
         vm.startBroadcast(activeNetworkConfig.deployer);
         commitReveal2 = address(
             new CommitReveal2L2{value: activeNetworkConfig.activationThreshold}(
@@ -66,6 +65,7 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
             )
         );
         DeployMockGasPriceOracle mockGasPriceOracle = new DeployMockGasPriceOracle();
+        vm.allowCheatcodes(address(mockGasPriceOracle));
         mockGasPriceOracle.deployMockGasPriceOracle();
         vm.stopBroadcast();
     }
@@ -89,6 +89,7 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
             )
         );
         DeployMockGasPriceOracle mockGasPriceOracle = new DeployMockGasPriceOracle();
+        vm.allowCheatcodes(address(mockGasPriceOracle));
         mockGasPriceOracle.deployMockGasPriceOracle();
         vm.stopBroadcast();
     }
