@@ -439,14 +439,14 @@
     "description": "Gas usage for participant withholding path 3: 1->5->12->15->depositAndActivate->resume->5->11 (2 operators only)",
     "scenarios": {
       "operators_02": {
-        "depositAndActivateGas": 73093,
+        "depositAndActivateGas": 73115,
         "failToSubmitSGas": 95691,
         "generateRandomNumberGas": 81828,
         "requestToSubmitSGas": 121661,
         "resumeGas": 70312,
         "submitMerkleRoot2Gas": 58131,
         "submitMerkleRootGas": 58131,
-        "totalGas": 558847
+        "totalGas": 558869
       }
     }
   },
