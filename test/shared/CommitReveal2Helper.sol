@@ -219,7 +219,7 @@ contract CommitReveal2Helper is Test {
                 if (nextRequestedRound == lastfulfilledRound) {
                     break; // because it is already updated in s_depositAmount
                 }
-                (,, uint256 cost,) = commitReveal2.s_requestInfo(nextRequestedRound);
+                (,,, uint256 cost) = commitReveal2.s_requestInfo(nextRequestedRound);
                 sum += cost;
             }
             if (++nextRequestedRound >= requestCount) {

@@ -123,6 +123,24 @@ contract CommitReveal2Storage {
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator
     ); // 0xe0fd8eabd2cc23ea87b43a00ac588c61789ad28d3edfeb76613f623fa1f6bd08
+    event GasParametersSet(
+        uint128 gasUsedMerkleRootSubAndGenRandNumA,
+        uint128 gasUsedMerkleRootSubAndGenRandNumB,
+        uint256 maxCallbackGasLimit,
+        uint48 getL1UpperBoundGasUsedWhenCalldataSize4,
+        uint48 failToSubmitCvOrSubmitMerkleRootGasUsed,
+        uint48 failToSubmitMerkleRootAfterDisputeGasUsed,
+        uint48 failToRequestSOrGenerateRandomNumberGasUsed,
+        uint48 failToSubmitSGasUsed,
+        uint32 failToSubmitCoGasUsedBaseA,
+        uint32 failToSubmitCvGasUsedBaseA,
+        uint32 failToSubmitGasUsedBaseB,
+        uint32 perOperatorIncreaseGasUsedA,
+        uint32 perOperatorIncreaseGasUsedB,
+        uint32 perAdditionalDidntSubmitGasUsedA,
+        uint32 perAdditionalDidntSubmitGasUsedB,
+        uint32 perRequestedIncreaseGasUsed
+    ); // 0x8d09171105499771f96d6d39dcdda061a70fd18e5eafd65881c2158c55f94e1d
 
     // * State Variables
     // ** public
@@ -252,10 +270,10 @@ contract CommitReveal2Storage {
     uint256 internal constant MERKLEROOTSUB_CALLDATA_BYTES_SIZE = 36;
     uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_A = 96;
     uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_B = 132;
-    uint256 internal constant GASUSED_MERKLEROOTSUB_GENRANDNUM_A = 7900;
-    uint256 internal constant GASUSED_MERKLEROOTSUB_GENRANDNUM_B = 91000 + 58131;
-
-    uint256 internal constant MAX_CALLBACK_GAS_LIMIT = 2500000;
+    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumA = 7900;
+    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumB = 91000 + 58131;
+    uint256 internal constant GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK = 0xffffffffffffffffffffffffffffffff;
+    uint256 internal s_maxCallbackGasLimit = 2500000;
     uint256 internal constant GAS_FOR_CALL_EXACT_CHECK = 5_000;
 
     bytes32 internal constant MESSAGE_TYPEHASH = keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)");
@@ -264,11 +282,13 @@ contract CommitReveal2Storage {
 
     // *** functions gasUsed;
     uint256 internal constant FAIL_FUNCTIONS_CALLDATA_BYTES_SIZE = 4;
-    // 21833 ~ 21934
-    uint256 internal constant GETL1UPPERBOUND_GASUSED_CALLDATASIZE4 = 21833;
-    uint256 internal constant FAILTOREQUESTSUBMITCVORSUBMITMERKLEROOT_GASUSED = 85386;
-    uint256 internal constant FAILTOSUBMITMERKLEROOTAFTERDISPUTE_GASUSED = 82746;
-    uint256 internal constant FAILTOREQUESTSORGENERATERANDOMNUMBER_GASUSED = 86242;
+
+    uint48 internal s_getL1UpperBoundGasUsedWhenCalldataSize4 = 21833; // 21833 ~ 21934
+    uint48 internal s_failToSubmitCvOrSubmitMerkleRootGasUsed = 85386;
+    uint48 internal s_failToSubmitMerkleRootAfterDisputeGasUsed = 82746;
+    uint48 internal s_failToRequestSOrGenerateRandomNumberGasUsed = 86242;
+    uint48 internal s_failToSubmitSGasUsed = 122282;
+    uint256 internal constant FAILTOSUBMIT_MASK = 0xffffffffffff;
 
     /**
      * @dev  FailToSubmitCo GasUsed
@@ -278,7 +298,7 @@ contract CommitReveal2Storage {
      * gasUsage = 110,000 + 200 × operatorsLength + 500 × requestedToSubmitLength +
      *            24,000 × (didntSubmitLength - 1)
      */
-    uint256 internal constant FAILTOSUBMITCO_GASUSED_BASE_A = 95000;
+    uint32 internal s_failToSubmitCoGasUsedBaseA = 95000;
 
     /**
      * @dev  FailToSubmitCv GasUsed
@@ -288,16 +308,15 @@ contract CommitReveal2Storage {
      * gasUsage = 110,000 + 200 × operatorsLength + 500 × requestedToSubmitLength +
      *            24,000 × (didntSubmitLength - 1)
      */
-    uint256 internal constant FAILTOSUBMITCV_GASUSED_BASE_A = 95500;
+    uint32 internal s_failToSubmitCvGasUsedBaseA = 95500; // shr(32, )
 
-    uint256 internal constant FAILTOSUBMIT_GASUSED_BASE_B = 110000;
-    uint256 internal constant PER_OPERATOR_INCREASE_GASUSED_A = 500;
-    uint256 internal constant PER_OPERATOR_INCREASE_GASUSED_B = 200;
-    uint256 internal constant PER_ADDITIONAL_DIDNTSUBMIT_A = 15000;
-    uint256 internal constant PER_ADDITIONAL_DIDNTSUBMIT_B = 24000;
-    uint256 internal constant PER_REQUESTED_INCREASE_GASUSED = 500;
-
-    uint256 internal constant FAILTOSUBMITS_GASUSED = 122282;
+    uint32 internal s_failToSubmitGasUsedBaseB = 110000; // shr(64, )
+    uint32 internal s_perOperatorIncreaseGasUsedA = 500; // shr(96, )
+    uint32 internal s_perOperatorIncreaseGasUsedB = 200; // shr(128, )
+    uint32 internal s_perAdditionalDidntSubmitGasUsedA = 15000; // shr(160, )
+    uint32 internal s_perAdditionalDidntSubmitGasUsedB = 24000; // shr(192, )
+    uint32 internal s_perRequestedIncreaseGasUsed = 500; // shr(224, )
+    uint256 internal constant DYNAMICFAILTOSUBMIT_MASK = 0xffffffff;
 
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;

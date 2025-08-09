@@ -92,6 +92,7 @@ contract CommitReveal2L2 is CommitReveal2 {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
             }
+            let gasUsedMerkleRootSubAndGenRandNum := sload(s_gasUsedMerkleRootSubAndGenRandNumA.slot)
             requestFee :=
                 add(
                     add(
@@ -100,8 +101,11 @@ contract CommitReveal2L2 is CommitReveal2 {
                             add(
                                 callbackGasLimit,
                                 add(
-                                    mul(GASUSED_MERKLEROOTSUB_GENRANDNUM_A, numOfOperators),
-                                    GASUSED_MERKLEROOTSUB_GENRANDNUM_B
+                                    mul(
+                                        and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
+                                        numOfOperators
+                                    ),
+                                    shr(128, gasUsedMerkleRootSubAndGenRandNum)
                                 )
                             )
                         ),

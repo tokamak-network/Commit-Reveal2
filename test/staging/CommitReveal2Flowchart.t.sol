@@ -82,6 +82,7 @@ contract CommitReveal2WithDispute is BaseTest, CommitReveal2Helper {
         // ** 1. Request Three Times
         s_requestFee = s_commitReveal2.estimateRequestPrice(s_consumerExample.CALLBACK_GAS_LIMIT(), tx.gasprice);
         console2.log("requestFee", s_requestFee);
+        console2.log("activationThreshold", s_activeNetworkConfig.activationThreshold);
         for (uint256 i; i < 3; i++) {
             s_consumerExample.requestRandomNumber{value: s_requestFee}();
         }

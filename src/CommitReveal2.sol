@@ -59,6 +59,89 @@ contract CommitReveal2 is FailLogics {
         }
     }
 
+    function setGasParameters(
+        uint128 gasUsedMerkleRootSubAndGenRandNumA,
+        uint128 gasUsedMerkleRootSubAndGenRandNumB,
+        uint256 maxCallbackGasLimit,
+        uint48 getL1UpperBoundGasUsedWhenCalldataSize4,
+        uint48 failToSubmitCvOrSubmitMerkleRootGasUsed,
+        uint48 failToSubmitMerkleRootAfterDisputeGasUsed,
+        uint48 failToRequestSOrGenerateRandomNumberGasUsed,
+        uint48 failToSubmitSGasUsed,
+        uint32 failToSubmitCoGasUsedBaseA,
+        uint32 failToSubmitCvGasUsedBaseA,
+        uint32 failToSubmitGasUsedBaseB,
+        uint32 perOperatorIncreaseGasUsedA,
+        uint32 perOperatorIncreaseGasUsedB,
+        uint32 perAdditionalDidntSubmitGasUsedA,
+        uint32 perAdditionalDidntSubmitGasUsedB,
+        uint32 perRequestedIncreaseGasUsed
+    ) external onlyOwner notInProcess {
+        assembly ("memory-safe") {
+            sstore(
+                s_gasUsedMerkleRootSubAndGenRandNumA.slot,
+                or(shl(128, gasUsedMerkleRootSubAndGenRandNumA), gasUsedMerkleRootSubAndGenRandNumB)
+            )
+            sstore(s_maxCallbackGasLimit.slot, maxCallbackGasLimit)
+
+            sstore(
+                s_getL1UpperBoundGasUsedWhenCalldataSize4.slot,
+                or(
+                    getL1UpperBoundGasUsedWhenCalldataSize4,
+                    or(
+                        shl(48, failToSubmitCvOrSubmitMerkleRootGasUsed),
+                        or(
+                            shl(96, failToSubmitMerkleRootAfterDisputeGasUsed),
+                            or(shl(144, failToRequestSOrGenerateRandomNumberGasUsed), shl(192, failToSubmitSGasUsed))
+                        )
+                    )
+                )
+            )
+            sstore(
+                s_failToSubmitCoGasUsedBaseA.slot,
+                or(
+                    failToSubmitCoGasUsedBaseA,
+                    or(
+                        shl(32, failToSubmitCvGasUsedBaseA),
+                        or(
+                            shl(64, failToSubmitGasUsedBaseB),
+                            or(
+                                shl(96, perOperatorIncreaseGasUsedA),
+                                or(
+                                    shl(128, perOperatorIncreaseGasUsedB),
+                                    or(
+                                        shl(160, perAdditionalDidntSubmitGasUsedA),
+                                        or(
+                                            shl(192, perAdditionalDidntSubmitGasUsedB),
+                                            shl(224, perRequestedIncreaseGasUsed)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+            mstore(0x00, gasUsedMerkleRootSubAndGenRandNumA)
+            mstore(0x20, gasUsedMerkleRootSubAndGenRandNumB)
+            mstore(0x40, maxCallbackGasLimit)
+            mstore(0x60, getL1UpperBoundGasUsedWhenCalldataSize4)
+            mstore(0x80, failToSubmitCvOrSubmitMerkleRootGasUsed)
+            mstore(0xa0, failToSubmitMerkleRootAfterDisputeGasUsed)
+            mstore(0xc0, failToRequestSOrGenerateRandomNumberGasUsed)
+            mstore(0xe0, failToSubmitSGasUsed)
+            mstore(0x100, failToSubmitCoGasUsedBaseA)
+            mstore(0x120, failToSubmitCvGasUsedBaseA)
+            mstore(0x140, failToSubmitGasUsedBaseB)
+            mstore(0x160, perOperatorIncreaseGasUsedA)
+            mstore(0x180, perOperatorIncreaseGasUsedB)
+            mstore(0x1a0, perAdditionalDidntSubmitGasUsedA)
+            mstore(0x1c0, perAdditionalDidntSubmitGasUsedB)
+            mstore(0x1e0, perRequestedIncreaseGasUsed)
+            log1(0x00, 0x200, 0x8d09171105499771f96d6d39dcdda061a70fd18e5eafd65881c2158c55f94e1d) // event GasParametersSet(...)
+        }
+    }
+
     function estimateRequestPrice(uint32 callbackGasLimit, uint256 gasPrice) external view returns (uint256) {
         return _calculateRequestPrice(callbackGasLimit, gasPrice, s_activatedOperators.length);
     }
@@ -80,7 +163,7 @@ contract CommitReveal2 is FailLogics {
         );
         assembly ("memory-safe") {
             // ** check if the callbackGasLimit is within the limit
-            if gt(callbackGasLimit, MAX_CALLBACK_GAS_LIMIT) {
+            if gt(callbackGasLimit, sload(s_maxCallbackGasLimit.slot)) {
                 mstore(0, 0x1cf7ab79) // selector for ExceedCallbackGasLimit()
                 revert(0x1c, 0x04)
             }
@@ -148,13 +231,20 @@ contract CommitReveal2 is FailLogics {
         returns (uint256 requestFee)
     {
         assembly ("memory-safe") {
+            let gasUsedMerkleRootSubAndGenRandNum := sload(s_gasUsedMerkleRootSubAndGenRandNumA.slot)
             requestFee :=
                 add(
                     mul(
                         gasPrice,
                         add(
                             callbackGasLimit,
-                            add(mul(GASUSED_MERKLEROOTSUB_GENRANDNUM_A, numOfOperators), GASUSED_MERKLEROOTSUB_GENRANDNUM_B)
+                            add(
+                                mul(
+                                    and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
+                                    numOfOperators
+                                ),
+                                shr(128, gasUsedMerkleRootSubAndGenRandNum)
+                            )
                         )
                     ),
                     sload(s_flatFee.slot)
