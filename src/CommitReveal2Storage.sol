@@ -239,8 +239,6 @@ contract CommitReveal2Storage {
      */
     uint256 internal s_onChainSubmissionPeriodPerOperator;
 
-    // ** constant
-
     // uint256 internal constant MERKLEROOTSUB_RANDOMNUMGENERATE_GASUSED = 100000;
     uint256 internal constant MERKLEROOTSUB_CALLDATA_BYTES_SIZE = 36;
     uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_A = 96;

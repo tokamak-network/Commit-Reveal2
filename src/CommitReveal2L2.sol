@@ -12,7 +12,9 @@ contract CommitReveal2L2 is CommitReveal2 {
     /// @dev reference: https://community.optimism.io/docs/developers/build/transaction-fees/#estimating-the-l1-data-fee
     address internal constant OVM_GASPRICEORACLE_ADDR = 0x420000000000000000000000000000000000000F;
 
-    /// @dev L1 fee coefficient can be applied to reduce possibly inflated gas price
+    /// @dev L1 fee coefficient is used to account for the impact of data compression on the l1 fee
+    /// getL1FeeUpperBound returns the upper bound of l1 fee so this configurable coefficient will help
+    /// charge a predefined percentage of the upper bound.
     uint8 public s_l1FeeCoefficient = 100;
 
     error InvalidL1FeeCoefficient(uint8 coefficient);
@@ -44,11 +46,7 @@ contract CommitReveal2L2 is CommitReveal2 {
         )
     {}
 
-    function setL1FeeCoefficient(uint8 coefficient) external onlyOwner {
-        _setL1FeeCoefficientInternal(coefficient);
-    }
-
-    function _setL1FeeCoefficientInternal(uint8 coefficient) internal {
+    function setL1FeeCoefficient(uint8 coefficient) external onlyOwner notInProcess {
         if (coefficient == 0 || coefficient > 100) {
             revert InvalidL1FeeCoefficient(coefficient);
         }
