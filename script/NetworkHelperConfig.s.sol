@@ -64,11 +64,11 @@ contract NetworkHelperConfig is Script, BaseTest {
             version: version,
             nameHash: keccak256(bytes(name)),
             versionHash: keccak256(bytes(version)),
-            offChainSubmissionPeriod: 80,
-            requestOrSubmitOrFailDecisionPeriod: 60,
-            onChainSubmissionPeriod: 120,
+            offChainSubmissionPeriod: 40,
+            requestOrSubmitOrFailDecisionPeriod: 30,
+            onChainSubmissionPeriod: 60,
             offChainSubmissionPeriodPerOperator: 20,
-            onChainSubmissionPeriodPerOperator: 40,
+            onChainSubmissionPeriodPerOperator: 30,
             deployer: s_deployer
         });
     }
@@ -83,11 +83,11 @@ contract NetworkHelperConfig is Script, BaseTest {
             version: version,
             nameHash: keccak256(bytes(name)),
             versionHash: keccak256(bytes(version)),
-            offChainSubmissionPeriod: 80,
-            requestOrSubmitOrFailDecisionPeriod: 60,
-            onChainSubmissionPeriod: 120,
+            offChainSubmissionPeriod: 40,
+            requestOrSubmitOrFailDecisionPeriod: 30,
+            onChainSubmissionPeriod: 60,
             offChainSubmissionPeriodPerOperator: 20,
-            onChainSubmissionPeriodPerOperator: 40,
+            onChainSubmissionPeriodPerOperator: 30,
             deployer: s_deployer
         });
     }
@@ -121,11 +121,11 @@ contract NetworkHelperConfig is Script, BaseTest {
             version: version,
             nameHash: keccak256(bytes(name)),
             versionHash: keccak256(bytes(version)),
-            offChainSubmissionPeriod: 80,
-            requestOrSubmitOrFailDecisionPeriod: 60,
-            onChainSubmissionPeriod: 120,
+            offChainSubmissionPeriod: 40,
+            requestOrSubmitOrFailDecisionPeriod: 30,
+            onChainSubmissionPeriod: 60,
             offChainSubmissionPeriodPerOperator: 20,
-            onChainSubmissionPeriodPerOperator: 40,
+            onChainSubmissionPeriodPerOperator: 30,
             deployer: s_deployer
         });
     }

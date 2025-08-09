@@ -68,7 +68,8 @@ contract RequestToSubmitS is BaseScript {
     function run() public {
         BaseScript.scriptSetUp();
         uint256[] memory revealOrders = BaseScript.generateSCoCv();
-        indexK = 2;
+        uint256 activatedOperatorsLength = s_commitReveal2.getActivatedOperatorsLength();
+        indexK = activatedOperatorsLength - 1;
         _setParametersForRequestToSubmitS(indexK, revealOrders);
         vm.startBroadcast(s_activeNetworkConfig.deployer);
         s_commitReveal2.requestToSubmitS(
@@ -86,10 +87,10 @@ contract SubmitCv is BaseScript {
     function run(uint256 index) public {
         BaseScript.scriptSetUp();
         BaseScript.generateSCoCv();
-        console2.log("regular node address:", s_operators[index]);
+        console2.log("regular node address:", s_activatedOperators[index]);
         console2.log("C_vi :");
         console2.logBytes32(s_cvs[index]);
-        vm.startBroadcast(s_privateKeysForRealNetwork[index]);
+        vm.startBroadcast(s_privateKeysForAnvil[s_activatedOperators[index]]);
         s_commitReveal2.submitCv(s_cvs[index]);
         vm.stopBroadcast();
     }
@@ -99,10 +100,10 @@ contract SubmitCo is BaseScript {
     function run(uint256 index) public {
         BaseScript.scriptSetUp();
         BaseScript.generateSCoCv();
-        console2.log("regular node address:", s_operators[index]);
+        console2.log("regular node address:", s_activatedOperators[index]);
         console2.log("C_oi :");
         console2.logBytes32(s_cos[index]);
-        vm.startBroadcast(s_privateKeysForRealNetwork[index]);
+        vm.startBroadcast(s_privateKeysForAnvil[s_activatedOperators[index]]);
         s_commitReveal2.submitCo(s_cos[index]);
         vm.stopBroadcast();
     }
@@ -112,10 +113,10 @@ contract SubmitS is BaseScript {
     function run(uint256 index) public {
         BaseScript.scriptSetUp();
         BaseScript.generateSCoCv();
-        console2.log("regular node address:", s_operators[index]);
+        console2.log("regular node address:", s_activatedOperators[index]);
         console2.log("S :");
         console2.logBytes32(s_secrets[index]);
-        vm.startBroadcast(s_privateKeysForRealNetwork[index]);
+        vm.startBroadcast(s_privateKeysForAnvil[s_activatedOperators[index]]);
         s_commitReveal2.submitS(s_secrets[index]);
         vm.stopBroadcast();
     }
