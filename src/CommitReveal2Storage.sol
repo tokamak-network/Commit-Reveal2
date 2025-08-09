@@ -115,6 +115,15 @@ contract CommitReveal2Storage {
     event RequestedToSubmitSFromIndexK(uint256 round, uint256 trialNum, uint256 indexK); // 0x583f939e9612a50da8a140b5e7247ff7c3c899c45e4051a5ba045abea6177f08
     event SSubmitted(uint256 round, uint256 trialNum, bytes32 s, uint256 index); // 0xfa070a58e2c77080acd5c2b1819669eb194bbeeca6f680a31a2076510be5a7b1
 
+    event EconomicParametersSet(uint256 activationThreshold, uint256 flatFee); // 0x08f0774e7eb69e2d6a7cf2192cbf9c6f519a40bcfa16ff60d3f18496585e46dc
+    event PeriodsSet(
+        uint256 offChainSubmissionPeriod,
+        uint256 requestOrSubmitOrFailDecisionPeriod,
+        uint256 onChainSubmissionPeriod,
+        uint256 offChainSubmissionPeriodPerOperator,
+        uint256 onChainSubmissionPeriodPerOperator
+    ); // 0xe0fd8eabd2cc23ea87b43a00ac588c61789ad28d3edfeb76613f623fa1f6bd08
+
     // * State Variables
     // ** public
 

@@ -27,10 +27,13 @@ contract CommitReveal2 is FailLogics {
         s_isInProcess = COMPLETED;
     }
 
-    function setFees(uint256 activationThreshold, uint256 flatFee) external onlyOwner {
+    function setEconomicParameters(uint256 activationThreshold, uint256 flatFee) external onlyOwner {
         assembly ("memory-safe") {
             sstore(s_activationThreshold.slot, activationThreshold)
             sstore(s_flatFee.slot, flatFee)
+            mstore(0x00, activationThreshold)
+            mstore(0x20, flatFee)
+            log1(0x00, 0x40, 0x08f0774e7eb69e2d6a7cf2192cbf9c6f519a40bcfa16ff60d3f18496585e46dc) // event EconomicParametersSet(uint256 activationThreshold, uint256 flatFee)
         }
     }
 
@@ -47,6 +50,12 @@ contract CommitReveal2 is FailLogics {
             sstore(s_onChainSubmissionPeriod.slot, onChainSubmissionPeriod)
             sstore(s_offChainSubmissionPeriodPerOperator.slot, offChainSubmissionPeriodPerOperator)
             sstore(s_onChainSubmissionPeriodPerOperator.slot, onChainSubmissionPeriodPerOperator)
+            mstore(0x00, offChainSubmissionPeriod)
+            mstore(0x20, requestOrSubmitOrFailDecisionPeriod)
+            mstore(0x40, onChainSubmissionPeriod)
+            mstore(0x60, offChainSubmissionPeriodPerOperator)
+            mstore(0x80, onChainSubmissionPeriodPerOperator)
+            log1(0x00, 0xa0, 0xe0fd8eabd2cc23ea87b43a00ac588c61789ad28d3edfeb76613f623fa1f6bd08) // event PeriodsSet(uint256 offChainSubmissionPeriod, uint256 requestOrSubmitOrFailDecisionPeriod, uint256 onChainSubmissionPeriod, uint256 offChainSubmissionPeriodPerOperator, uint256 onChainSubmissionPeriodPerOperator)
         }
     }
 
