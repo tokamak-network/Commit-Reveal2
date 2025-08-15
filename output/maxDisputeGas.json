@@ -14,10 +14,10 @@
     "metrics": {
       "lastSubmitSGas": 191010,
       "requestToSubmitCvGas": 64677,
-      "requestToSubmitSGas": 468593,
+      "requestToSubmitSGas": 470738,
       "submitCvGas": 43699,
       "submitSGas": 49322,
-      "sumRequestGas": 533270
+      "sumRequestGas": 535415
     },
     "scenarioKey": "operators_32_submitCv_01"
   }

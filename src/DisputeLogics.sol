@@ -325,7 +325,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
         uint256, // packedVsForAllCvsNotOnChain
         SigRS[] calldata sigRSsForAllCvsNotOnChain,
         uint256 packedRevealOrders
-    ) external {
+    ) external onlyOwner {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             let curRound := sload(s_currentRound.slot)
