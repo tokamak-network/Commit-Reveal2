@@ -1,0 +1,24 @@
+{
+  "disputeCvCoGas": {
+    "metrics": {
+      "generateRandomNumberWhenSomeCvsAreOnChainGas": 180995,
+      "requestToSubmitCoGas": 475890,
+      "requestToSubmitCvGas": 64677,
+      "submitCoGas": 46799,
+      "submitCvGas": 43699,
+      "sumRequestGas": 540567
+    },
+    "scenarioKey": "operators_32_submitCv_01_submitCo_32"
+  },
+  "disputeSecretsGas": {
+    "metrics": {
+      "lastSubmitSGas": 191010,
+      "requestToSubmitCvGas": 64677,
+      "requestToSubmitSGas": 470417,
+      "submitCvGas": 43699,
+      "submitSGas": 49322,
+      "sumRequestGas": 535094
+    },
+    "scenarioKey": "operators_32_submitCv_01"
+  }
+}
