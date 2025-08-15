@@ -158,14 +158,14 @@ contract CommitReveal2Helper is Test {
             });
         }
         // *** Set Reveal Orders
-        uint256[] memory diffs = new uint256[](length);
+        uint256[] memory di = new uint256[](length);
         revealOrders = new uint256[](length);
         s_rv = uint256(keccak256(abi.encodePacked(s_cos)));
         for (uint256 i; i < length; i++) {
-            diffs[i] = uint256(keccak256(abi.encodePacked(_diff(s_rv, uint256(s_cvs[i])))));
+            di[i] = uint256(keccak256(abi.encodePacked(s_rv, s_cvs[i])));
             revealOrders[i] = i;
         }
-        Sort.sort(diffs, revealOrders);
+        Sort.sort(di, revealOrders);
         for (uint256 i; i < length; i++) {
             s_packedRevealOrders = s_packedRevealOrders | (revealOrders[i] << (i * 8));
         }

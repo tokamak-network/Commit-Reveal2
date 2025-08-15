@@ -306,22 +306,17 @@ contract CommitReveal2 is FailLogics {
                 mstore(add(cvs, i), keccak256(cosMemP, 0x20))
             }
             // ** verify reveal order
-            function _diff(a, b) -> c {
-                switch gt(a, b)
-                case true { c := sub(a, b) }
-                default { c := sub(b, a) }
-            }
-            let rv := keccak256(cos, activatedOperatorsLengthInBytes)
             let index := and(packedRevealOrders, 0xff) // first reveal index
             let revealBitmap := shl(index, 1)
-            mstore(0x00, _diff(rv, mload(add(cvs, shl(5, index)))))
-            let before := keccak256(0x00, 0x20)
+            mstore(0x00, keccak256(cos, activatedOperatorsLengthInBytes)) // rv
+            mstore(0x20, mload(add(cvs, shl(5, index))))
+            let before := keccak256(0x00, 0x40)
             // revealOrdersOffset = 0x44
             for { let i := 1 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
                 index := and(calldataload(sub(0x44, i)), 0xff)
                 revealBitmap := or(revealBitmap, shl(index, 1))
-                mstore(0x00, _diff(rv, mload(add(cvs, shl(5, index)))))
-                let after := keccak256(0x00, 0x20)
+                mstore(0x20, mload(add(cvs, shl(5, index))))
+                let after := keccak256(0x00, 0x40)
                 if lt(before, after) {
                     mstore(0, 0x24f1948e) // selector for RevealNotInDescendingOrder()
                     revert(0x1c, 0x04)

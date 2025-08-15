@@ -369,18 +369,13 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             }
 
             // ****
-            let cos := 0x80 // fmp
+            let cos := 0xc0
             let operatorLengthInBytes := mul(activatedOperatorsLength, 0x20)
             calldatacopy(cos, allCos.offset, operatorLengthInBytes) // allCos
-            let rv := keccak256(cos, operatorLengthInBytes) // hash of all cos
+            mstore(0x80, keccak256(cos, operatorLengthInBytes)) // rv
             let cvs := add(cos, operatorLengthInBytes) // cvs
-            let diffs := add(cvs, operatorLengthInBytes) // diffs
-            function _diff(a, b) -> c {
-                switch gt(a, b)
-                case true { c := sub(a, b) }
-                default { c := sub(b, a) }
-            }
-            let fmp := add(diffs, operatorLengthInBytes) // fmp
+            let di := add(cvs, operatorLengthInBytes) // diffs
+            let fmp := add(di, operatorLengthInBytes) // fmp
             mstore(fmp, MESSAGE_TYPEHASH_DIRECT)
             mstore(add(fmp, 0x20), curRound)
             mstore(add(fmp, 0x40), trialNum)
@@ -390,7 +385,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             for { let i } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
                 let cv := keccak256(add(cos, shl(5, i)), 0x20)
                 mstore(add(cvs, shl(5, i)), cv) // cv
-                mstore(add(diffs, shl(5, i)), _diff(rv, cv)) // diff
+                mstore(0xa0, cv)
+                mstore(add(di, shl(5, i)), keccak256(0x80, 0x40)) // hash(rv || cv)
                 switch iszero(and(zeroBitIfSubmittedCvBitmap, shl(i, 1)))
                 case 1 {
                     // cv is on-chain
@@ -436,13 +432,11 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             // ** verify reveal orders
             let index := and(packedRevealOrders, 0xff) // first reveal index
             let revealBitmap := shl(index, 1)
-            mstore(0x00, mload(add(diffs, shl(5, index))))
-            let before := keccak256(0x00, 0x20)
+            let before := mload(add(di, shl(5, index)))
             for { let i := 1 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
                 index := and(calldataload(sub(0x84, i)), 0xff) // 0x84: packedRevealOrders offset
                 revealBitmap := or(revealBitmap, shl(index, 1))
-                mstore(0x00, mload(add(diffs, shl(5, index))))
-                let after := keccak256(0x00, 0x20)
+                let after := mload(add(di, shl(5, index)))
                 if lt(before, after) {
                     mstore(0, 0x24f1948e) // RevealNotInDescendingOrder()
                     revert(0x1c, 0x04)
@@ -725,6 +719,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             // ** initialize cos and cvs arrays memory, without length data
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
             let activatedOperatorsLengthInBytes := shl(5, activatedOperatorsLength)
+
             let cos := 0x80
             let cvs := add(cos, activatedOperatorsLengthInBytes)
             let secrets := add(cvs, activatedOperatorsLengthInBytes)
@@ -739,22 +734,17 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(add(cvs, i), keccak256(cosMemP, 0x20))
             }
             // ** verify reveal order
-            function _diff(a, b) -> c {
-                switch gt(a, b)
-                case true { c := sub(a, b) }
-                default { c := sub(b, a) }
-            }
-            let rv := keccak256(cos, activatedOperatorsLengthInBytes)
+            mstore(0x00, keccak256(cos, activatedOperatorsLengthInBytes)) // rv
             let index := and(packedRevealOrders, 0xff) // first reveal index
             let revealBitmap := shl(index, 1)
-            mstore(0x00, _diff(rv, mload(add(cvs, shl(5, index)))))
-            let before := keccak256(0x00, 0x20)
+            mstore(0x20, mload(add(cvs, shl(5, index))))
+            let before := keccak256(0x00, 0x40)
             // revealOrdersOffset = 0x64
             for { let i := 1 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
                 index := and(calldataload(sub(0x64, i)), 0xff)
                 revealBitmap := or(revealBitmap, shl(index, 1))
-                mstore(0x00, _diff(rv, mload(add(cvs, shl(5, index)))))
-                let after := keccak256(0x00, 0x20)
+                mstore(0x20, mload(add(cvs, shl(5, index))))
+                let after := keccak256(0x00, 0x40)
                 if lt(before, after) {
                     mstore(0, 0x24f1948e) // selector for RevealNotInDescendingOrder()
                     revert(0x1c, 0x04)
