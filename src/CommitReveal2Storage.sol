@@ -429,4 +429,46 @@ contract CommitReveal2Storage {
         requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[round][trialNum];
         previousSSubmitTimestamp = s_previousSSubmitTimestamp[round][trialNum];
     }
+
+    function getGasParameters()
+        external
+        view
+        returns (
+            uint128,
+            uint128,
+            uint256,
+            uint48,
+            uint48,
+            uint48,
+            uint48,
+            uint48,
+            uint32,
+            uint32,
+            uint32,
+            uint32,
+            uint32,
+            uint32,
+            uint32,
+            uint32
+        )
+    {
+        return (
+            s_gasUsedMerkleRootSubAndGenRandNumA,
+            s_gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead,
+            s_maxCallbackGasLimit,
+            s_getL1UpperBoundGasUsedWhenCalldataSize4,
+            s_failToSubmitCvOrSubmitMerkleRootGasUsed,
+            s_failToSubmitMerkleRootAfterDisputeGasUsed,
+            s_failToRequestSOrGenerateRandomNumberGasUsed,
+            s_failToSubmitSGasUsed,
+            s_failToSubmitCoGasUsedBaseA,
+            s_failToSubmitCvGasUsedBaseA,
+            s_failToSubmitGasUsedBaseB,
+            s_perOperatorIncreaseGasUsedA,
+            s_perOperatorIncreaseGasUsedB,
+            s_perAdditionalDidntSubmitGasUsedA,
+            s_perAdditionalDidntSubmitGasUsedB,
+            s_perRequestedIncreaseGasUsed
+        );
+    }
 }
