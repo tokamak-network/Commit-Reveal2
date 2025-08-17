@@ -201,7 +201,7 @@ contract CommitReveal2 is FailLogics {
             mstore(0x1e0, and(shr(224, packedData), FAILTOSUBMIT_MASK))
             // clear effective timestamp after execution
             sstore(s_gasParamsEffectiveTimestamp.slot, 0)
-            log1(0x00, 0x200, 0x08f0774e7eb69e2d6a7cf2192cbf9c6f519a40bcfa16ff60d3f18496585e46dc) // event GasParametersSet(...)
+            log1(0x00, 0x200, 0x8d09171105499771f96d6d39dcdda061a70fd18e5eafd65881c2158c55f94e1d) // event GasParametersSet(...)
         }
     }
 
