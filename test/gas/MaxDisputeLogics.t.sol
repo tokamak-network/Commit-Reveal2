@@ -204,9 +204,11 @@ contract MaxDisputeLogics is BaseTest, CommitReveal2Helper {
         string memory maxScenarioKey = "";
         uint256 maxReqCv = 0;
         uint256 maxReqS = 0;
+        uint256 maxReqCo = 0;
         uint256 maxSubmitCvGas = 0;
         uint256 maxSubmitSGas = 0;
         uint256 maxLastSubmitSGas = 0;
+        uint256 maxSubmitCoGas = 0;
 
         s_numOfOperators = 32;
         uint256[] memory submitCvCandidates = new uint256[](4);
@@ -216,11 +218,14 @@ contract MaxDisputeLogics is BaseTest, CommitReveal2Helper {
         submitCvCandidates[3] = 32;
         for (uint256 a; a < submitCvCandidates.length; a++) {
             s_submitCvLength = submitCvCandidates[a];
+            s_submitCoLength = s_submitCvLength;
             _deployContracts();
             _depositAndActivateOperators(s_operatorAddresses);
 
             s_requestToSubmitCvGas = new uint256[](s_numOfTests);
             s_submitCvGas = new uint256[](s_numOfTests);
+            s_requestToSubmitCoGas = new uint256[](s_numOfTests);
+            s_submitCoGas = new uint256[](s_numOfTests);
             s_requestToSubmitSGas = new uint256[](s_numOfTests);
             s_lastSubmitSGas = new uint256[](s_numOfTests);
             s_submitSGas = new uint256[](s_numOfTests);
@@ -256,6 +261,30 @@ contract MaxDisputeLogics is BaseTest, CommitReveal2Helper {
                 s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
                 vm.stopPrank();
 
+                if (s_submitCoLength > 0) {
+                    s_tempArray = new uint256[](s_submitCoLength);
+                    for (uint256 j; j < s_submitCoLength; j++) {
+                        s_tempArray[j] = j;
+                    }
+                    _setParametersForRequestToSubmitCo(s_tempArray);
+                    vm.startPrank(LEADERNODE);
+                    s_commitReveal2.requestToSubmitCo(
+                        s_cvRSsForCvsNotOnChainAndReqToSubmitCo,
+                        s_packedVsForAllCvsNotOnChain,
+                        s_indicesLength,
+                        s_indicesFirstCvNotOnChainRestCvOnChain
+                    );
+                    s_requestToSubmitCoGas[i] = vm.lastCallGas().gasTotalUsed;
+                    vm.stopPrank();
+                }
+
+                for (uint256 j; j < s_submitCoLength; j++) {
+                    vm.startPrank(s_activatedOperators[j]);
+                    s_commitReveal2.submitCo(s_cos[j]);
+                    if (j == 0) s_submitCoGas[i] = vm.lastCallGas().gasTotalUsed;
+                    vm.stopPrank();
+                }
+
                 uint256 k = 0;
                 _setParametersForRequestToSubmitS(k, revealOrders);
                 vm.startPrank(LEADERNODE);
@@ -281,14 +310,17 @@ contract MaxDisputeLogics is BaseTest, CommitReveal2Helper {
             }
 
             uint256 reqCv = s_submitCvLength > 0 ? s_requestToSubmitCvGas[3] : 0;
+            uint256 reqCo = s_submitCoLength > 0 ? s_requestToSubmitCoGas[3] : 0;
             uint256 reqS = s_requestToSubmitSGas[3];
-            uint256 sumReq = reqCv + reqS;
+            uint256 sumReq = reqCv + reqCo + reqS;
 
             if (sumReq > maxSum) {
                 maxSum = sumReq;
                 maxReqCv = reqCv;
+                maxReqCo = reqCo;
                 maxReqS = reqS;
                 maxSubmitCvGas = s_submitCvGas[3];
+                maxSubmitCoGas = s_submitCoGas[3];
                 maxSubmitSGas = s_submitSGas[3];
                 maxLastSubmitSGas = s_lastSubmitSGas[3];
                 maxScenarioKey = string.concat(
@@ -307,6 +339,8 @@ contract MaxDisputeLogics is BaseTest, CommitReveal2Helper {
         string memory gasData = "";
         gasData = vm.serializeUint("max", "requestToSubmitCvGas", maxReqCv);
         gasData = vm.serializeUint("max", "submitCvGas", maxSubmitCvGas);
+        gasData = vm.serializeUint("max", "requestToSubmitCoGas", maxReqCo);
+        gasData = vm.serializeUint("max", "submitCoGas", maxSubmitCoGas);
         gasData = vm.serializeUint("max", "requestToSubmitSGas", maxReqS);
         gasData = vm.serializeUint("max", "submitSGas", maxSubmitSGas);
         gasData = vm.serializeUint("max", "lastSubmitSGas", maxLastSubmitSGas);

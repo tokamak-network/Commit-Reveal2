@@ -13,11 +13,13 @@
   "disputeSecretsGas": {
     "metrics": {
       "lastSubmitSGas": 191010,
+      "requestToSubmitCoGas": 75611,
       "requestToSubmitCvGas": 64677,
       "requestToSubmitSGas": 470738,
+      "submitCoGas": 46799,
       "submitCvGas": 43699,
       "submitSGas": 49322,
-      "sumRequestGas": 535415
+      "sumRequestGas": 611026
     },
     "scenarioKey": "operators_32_submitCv_01"
   }
