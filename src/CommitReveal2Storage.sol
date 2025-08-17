@@ -354,6 +354,8 @@ contract CommitReveal2Storage {
     uint256 internal constant PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET = 192;
     uint256 internal constant PERREQUESTEDINCREASEGASUSED_OFFSET = 224;
 
+    uint256 internal constant SECP256K1_CURVE_ORDER = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
+
     // Pending parameter storage and ETA for delayed execution (10 minutes timelock)
     // Economic parameters
     uint256 public s_pendingActivationThreshold;

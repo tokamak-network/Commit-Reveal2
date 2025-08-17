@@ -452,7 +452,7 @@ contract CommitReveal2 is FailLogics {
                 // signature malleability prevention
                 let rSOffset := add(secretSigRSs.offset, add(mul(i, 3), 0x20))
                 let s := calldataload(add(rSOffset, 0x20))
-                if gt(s, 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {
+                if gt(s, SECP256K1_CURVE_ORDER) {
                     mstore(0, 0xbf4bf5b8) // selector for InvalidSignatureS()
                     revert(0x1c, 0x04)
                 }
