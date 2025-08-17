@@ -365,7 +365,7 @@ contract CommitReveal2Storage {
     uint32 internal s_pendingPerAdditionalDidntSubmitGasUsedB;
     uint32 internal s_pendingPerRequestedIncreaseGasUsed;
 
-    uint256 public s_economicPrarmsEffectiveTimestamp;
+    uint256 public s_economicParamsEffectiveTimestamp;
     uint256 public s_gasParamsEffectiveTimestamp;
 
     function getPeriods()

@@ -49,7 +49,7 @@ contract ParamDelayTest is Test {
         // Verify parameters updated
         assertEq(s_commitReveal2.s_activationThreshold(), newActivation, "activationThreshold not updated");
         assertEq(s_commitReveal2.s_flatFee(), newFlatFee, "flatFee not updated");
-        assertEq(s_commitReveal2.s_economicPrarmsEffectiveTimestamp(), 0, "economic effective ts not cleared");
+        assertEq(s_commitReveal2.s_economicParamsEffectiveTimestamp(), 0, "economic effective ts not cleared");
     }
 
     function testGasParametersDelayAndExecute() public {

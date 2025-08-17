@@ -32,7 +32,7 @@ contract CommitReveal2 is FailLogics {
             sstore(s_pendingActivationThreshold.slot, activationThreshold)
             sstore(s_pendingFlatFee.slot, flatFee)
             let effectiveTimestamp := add(timestamp(), SET_DELAY_TIME)
-            sstore(s_economicPrarmsEffectiveTimestamp.slot, effectiveTimestamp)
+            sstore(s_economicParamsEffectiveTimestamp.slot, effectiveTimestamp)
             mstore(0x00, activationThreshold)
             mstore(0x20, flatFee)
             mstore(0x40, effectiveTimestamp)
@@ -42,7 +42,7 @@ contract CommitReveal2 is FailLogics {
 
     function executeSetEconomicParameters() external notInProcess {
         assembly ("memory-safe") {
-            if lt(timestamp(), sload(s_economicPrarmsEffectiveTimestamp.slot)) {
+            if lt(timestamp(), sload(s_economicParamsEffectiveTimestamp.slot)) {
                 mstore(0, 0x085de625) // selector for TooEarly()
                 revert(0x1c, 0x04)
             }
@@ -50,7 +50,7 @@ contract CommitReveal2 is FailLogics {
             let flatFee := sload(s_pendingFlatFee.slot)
             sstore(s_activationThreshold.slot, activationThreshold)
             sstore(s_flatFee.slot, flatFee)
-            sstore(s_economicPrarmsEffectiveTimestamp.slot, 0)
+            sstore(s_economicParamsEffectiveTimestamp.slot, 0)
             mstore(0x00, activationThreshold)
             mstore(0x20, flatFee)
             log1(0x00, 0x40, 0x08f0774e7eb69e2d6a7cf2192cbf9c6f519a40bcfa16ff60d3f18496585e46dc) // EconomicParametersSet
