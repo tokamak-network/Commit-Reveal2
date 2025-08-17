@@ -5,21 +5,21 @@
       "requestToSubmitCoGas": 475912,
       "requestToSubmitCvGas": 64809,
       "submitCoGas": 46821,
-      "submitCvGas": 43831,
+      "submitCvGas": 43809,
       "sumRequestGas": 540721
     },
     "scenarioKey": "operators_32_submitCv_01_submitCo_32"
   },
   "disputeSecretsGas": {
     "metrics": {
-      "lastSubmitSGas": 191076,
+      "lastSubmitSGas": 191054,
       "requestToSubmitCoGas": 75633,
       "requestToSubmitCvGas": 64809,
-      "requestToSubmitSGas": 470870,
+      "requestToSubmitSGas": 470848,
       "submitCoGas": 46821,
-      "submitCvGas": 43831,
-      "submitSGas": 49388,
-      "sumRequestGas": 611312
+      "submitCvGas": 43809,
+      "submitSGas": 49366,
+      "sumRequestGas": 611290
     },
     "scenarioKey": "operators_32_submitCv_01"
   }
