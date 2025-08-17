@@ -116,6 +116,7 @@ contract CommitReveal2Storage {
     event SSubmitted(uint256 round, uint256 trialNum, bytes32 s, uint256 index); // 0xfa070a58e2c77080acd5c2b1819669eb194bbeeca6f680a31a2076510be5a7b1
 
     event EconomicParametersSet(uint256 activationThreshold, uint256 flatFee); // 0x08f0774e7eb69e2d6a7cf2192cbf9c6f519a40bcfa16ff60d3f18496585e46dc
+    event EconomicParametersProposed(uint256 activationThreshold, uint256 flatFee, uint256 effectiveTimestamp); // 0xdcf23dfc5bc14859d1943fd156abd0fb732347e70c61c56215bbd728307234e2
     event PeriodsSet(
         uint256 offChainSubmissionPeriod,
         uint256 requestOrSubmitOrFailDecisionPeriod,
@@ -141,6 +142,25 @@ contract CommitReveal2Storage {
         uint32 perAdditionalDidntSubmitGasUsedB,
         uint32 perRequestedIncreaseGasUsed
     ); // 0x8d09171105499771f96d6d39dcdda061a70fd18e5eafd65881c2158c55f94e1d
+    event GasParametersProposed(
+        uint128 gasUsedMerkleRootSubAndGenRandNumA,
+        uint128 gasUsedMerkleRootSubAndGenRandNumB,
+        uint256 maxCallbackGasLimit,
+        uint48 getL1UpperBoundGasUsedWhenCalldataSize4,
+        uint48 failToSubmitCvOrSubmitMerkleRootGasUsed,
+        uint48 failToSubmitMerkleRootAfterDisputeGasUsed,
+        uint48 failToRequestSOrGenerateRandomNumberGasUsed,
+        uint48 failToSubmitSGasUsed,
+        uint32 failToSubmitCoGasUsedBaseA,
+        uint32 failToSubmitCvGasUsedBaseA,
+        uint32 failToSubmitGasUsedBaseB,
+        uint32 perOperatorIncreaseGasUsedA,
+        uint32 perOperatorIncreaseGasUsedB,
+        uint32 perAdditionalDidntSubmitGasUsedA,
+        uint32 perAdditionalDidntSubmitGasUsedB,
+        uint32 perRequestedIncreaseGasUsed,
+        uint256 effectiveTimestamp
+    ); // 0xac29dedddb8466e143ff09a21b0181b73354eae633cc2787fb6dd4c3b50dfbe2
 
     // * State Variables
     // ** public
@@ -320,6 +340,33 @@ contract CommitReveal2Storage {
 
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
+
+    // Pending parameter storage and ETA for delayed execution (10 minutes timelock)
+    // Economic parameters
+    uint256 public s_pendingActivationThreshold;
+    uint256 public s_pendingFlatFee;
+    uint256 public constant SET_DELAY_TIME = 10 minutes;
+
+    // Gas parameters (pending)
+    uint128 internal s_pendingGasUsedMerkleRootSubAndGenRandNumA;
+    uint128 internal s_pendingGasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead;
+    uint256 internal s_pendingMaxCallbackGasLimit;
+    uint48 internal s_pendingGetL1UpperBoundGasUsedWhenCalldataSize4;
+    uint48 internal s_pendingFailToSubmitCvOrSubmitMerkleRootGasUsed;
+    uint48 internal s_pendingFailToSubmitMerkleRootAfterDisputeGasUsed;
+    uint48 internal s_pendingFailToRequestSOrGenerateRandomNumberGasUsed;
+    uint48 internal s_pendingFailToSubmitSGasUsed;
+    uint32 internal s_pendingFailToSubmitCoGasUsedBaseA;
+    uint32 internal s_pendingFailToSubmitCvGasUsedBaseA;
+    uint32 internal s_pendingFailToSubmitGasUsedBaseB;
+    uint32 internal s_pendingPerOperatorIncreaseGasUsedA;
+    uint32 internal s_pendingPerOperatorIncreaseGasUsedB;
+    uint32 internal s_pendingPerAdditionalDidntSubmitGasUsedA;
+    uint32 internal s_pendingPerAdditionalDidntSubmitGasUsedB;
+    uint32 internal s_pendingPerRequestedIncreaseGasUsed;
+
+    uint256 public s_economicPrarmsEffectiveTimestamp;
+    uint256 public s_gasParamsEffectiveTimestamp;
 
     function getPeriods()
         external
