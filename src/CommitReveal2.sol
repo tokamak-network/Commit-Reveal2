@@ -61,7 +61,7 @@ contract CommitReveal2 is FailLogics {
 
     function setGasParameters(
         uint128 gasUsedMerkleRootSubAndGenRandNumA,
-        uint128 gasUsedMerkleRootSubAndGenRandNumB,
+        uint128 gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead,
         uint256 maxCallbackGasLimit,
         uint48 getL1UpperBoundGasUsedWhenCalldataSize4,
         uint48 failToSubmitCvOrSubmitMerkleRootGasUsed,
@@ -80,7 +80,7 @@ contract CommitReveal2 is FailLogics {
         assembly ("memory-safe") {
             sstore(
                 s_gasUsedMerkleRootSubAndGenRandNumA.slot,
-                or(shl(128, gasUsedMerkleRootSubAndGenRandNumA), gasUsedMerkleRootSubAndGenRandNumB)
+                or(shl(128, gasUsedMerkleRootSubAndGenRandNumA), gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead)
             )
             sstore(s_maxCallbackGasLimit.slot, maxCallbackGasLimit)
 
@@ -123,7 +123,7 @@ contract CommitReveal2 is FailLogics {
                 )
             )
             mstore(0x00, gasUsedMerkleRootSubAndGenRandNumA)
-            mstore(0x20, gasUsedMerkleRootSubAndGenRandNumB)
+            mstore(0x20, gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead)
             mstore(0x40, maxCallbackGasLimit)
             mstore(0x60, getL1UpperBoundGasUsedWhenCalldataSize4)
             mstore(0x80, failToSubmitCvOrSubmitMerkleRootGasUsed)
