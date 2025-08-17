@@ -73,7 +73,7 @@ contract FailLogics is DisputeLogics {
             mstore(0x40, HALTED)
             log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
         }
-        _executeSlashLeaderAndDistribute(48);
+        _executeSlashLeaderAndDistribute(FAILTOREQUESTSUBMITCV_OR_SUBMITMEKRLEROOT_OFFSET);
     }
 
     function failToSubmitMerkleRootAfterDispute() external notHalted {
@@ -116,7 +116,7 @@ contract FailLogics is DisputeLogics {
             mstore(0x40, HALTED)
             log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
         }
-        _executeSlashLeaderAndDistribute(96);
+        _executeSlashLeaderAndDistribute(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET);
     }
 
     function failToSubmitCv() external notHalted {
@@ -200,14 +200,26 @@ contract FailLogics is DisputeLogics {
                     add(
                         returnGasFee,
                         add(
-                            sub(and(dynamicFailToSubmitGasUsed, DYNAMICFAILTOSUBMIT_MASK), getL1UpperBoundGasUsed),
+                            sub(
+                                and(
+                                    shr(FAILTOSUBMITCVGASUSEDBASEA_OFFSET, dynamicFailToSubmitGasUsed),
+                                    DYNAMICFAILTOSUBMIT_MASK
+                                ),
+                                getL1UpperBoundGasUsed
+                            ),
                             add(
                                 mul(
-                                    and(shr(96, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                    and(
+                                        shr(PEROPERATORINCREASEGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
                                     activatedOperatorLength
                                 ),
                                 mul(
-                                    and(shr(160, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                    and(
+                                        shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
                                     sub(didntSubmitCvLength, 1)
                                 )
                             )
@@ -219,19 +231,34 @@ contract FailLogics is DisputeLogics {
                     add(
                         returnGasFee,
                         add(
-                            sub(and(shr(64, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK), getL1UpperBoundGasUsed),
+                            sub(
+                                and(
+                                    shr(FAILTOSUBMITGASUSEDBASEB_OFFSET, dynamicFailToSubmitGasUsed),
+                                    DYNAMICFAILTOSUBMIT_MASK
+                                ),
+                                getL1UpperBoundGasUsed
+                            ),
                             add(
                                 mul(
-                                    and(shr(128, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                    and(
+                                        shr(PEROPERATORINCREASEGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
                                     activatedOperatorLength
                                 ),
                                 add(
                                     mul(
-                                        and(shr(224, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                        and(
+                                            shr(PERREQUESTEDINCREASEGASUSED_OFFSET, dynamicFailToSubmitGasUsed),
+                                            DYNAMICFAILTOSUBMIT_MASK
+                                        ),
                                         requestedToSubmitLength
                                     ),
                                     mul(
-                                        and(shr(192, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                        and(
+                                            shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
+                                            DYNAMICFAILTOSUBMIT_MASK
+                                        ),
                                         sub(didntSubmitCvLength, 1)
                                     )
                                 )
@@ -384,11 +411,17 @@ contract FailLogics is DisputeLogics {
                             sub(and(dynamicFailToSubmitGasUsed, DYNAMICFAILTOSUBMIT_MASK), getL1UpperBoundGasUsed),
                             add(
                                 mul(
-                                    and(shr(96, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                    and(
+                                        shr(PEROPERATORINCREASEGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
                                     activatedOperatorLength
                                 ),
                                 mul(
-                                    and(shr(160, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                    and(
+                                        shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
                                     sub(didntSubmitCoLength, 1)
                                 )
                             )
@@ -400,19 +433,34 @@ contract FailLogics is DisputeLogics {
                     add(
                         returnGasFee,
                         add(
-                            sub(and(shr(64, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK), getL1UpperBoundGasUsed),
+                            sub(
+                                and(
+                                    shr(FAILTOSUBMITGASUSEDBASEB_OFFSET, dynamicFailToSubmitGasUsed),
+                                    DYNAMICFAILTOSUBMIT_MASK
+                                ),
+                                getL1UpperBoundGasUsed
+                            ),
                             add(
                                 mul(
-                                    and(shr(128, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                    and(
+                                        shr(PEROPERATORINCREASEGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
                                     activatedOperatorLength
                                 ),
                                 add(
                                     mul(
-                                        and(shr(224, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                        and(
+                                            shr(PERREQUESTEDINCREASEGASUSED_OFFSET, dynamicFailToSubmitGasUsed),
+                                            DYNAMICFAILTOSUBMIT_MASK
+                                        ),
                                         requestedToSubmitCoLength
                                     ),
                                     mul(
-                                        and(shr(192, dynamicFailToSubmitGasUsed), DYNAMICFAILTOSUBMIT_MASK),
+                                        and(
+                                            shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
+                                            DYNAMICFAILTOSUBMIT_MASK
+                                        ),
                                         sub(didntSubmitCoLength, 1)
                                     )
                                 )
@@ -505,7 +553,7 @@ contract FailLogics is DisputeLogics {
     }
 
     function failToSubmitS() external inProgress {
-        uint256 returnGasFee = _calculateFailGasFee(192);
+        uint256 returnGasFee = _calculateFailGasFee(FAILTOSUBMITS_OFFSET);
         assembly ("memory-safe") {
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
@@ -675,7 +723,7 @@ contract FailLogics is DisputeLogics {
             mstore(0x40, HALTED)
             log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
         }
-        _executeSlashLeaderAndDistribute(144);
+        _executeSlashLeaderAndDistribute(FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET);
     }
 
     function _executeSlashLeaderAndDistribute(uint256 bitsToShiftRight) internal {

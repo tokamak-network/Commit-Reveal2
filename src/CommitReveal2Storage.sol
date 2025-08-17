@@ -341,7 +341,18 @@ contract CommitReveal2Storage {
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
 
-    //uint256 internal constant FAILTOREQUESTSUBMITCV_OR
+    uint256 internal constant FAILTOREQUESTSUBMITCV_OR_SUBMITMEKRLEROOT_OFFSET = 48;
+    uint256 internal constant FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET = 96;
+    uint256 internal constant FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET = 144;
+    uint256 internal constant FAILTOSUBMITS_OFFSET = 192;
+
+    uint256 internal constant FAILTOSUBMITCVGASUSEDBASEA_OFFSET = 32;
+    uint256 internal constant FAILTOSUBMITGASUSEDBASEB_OFFSET = 64;
+    uint256 internal constant PEROPERATORINCREASEGASUSEDA_OFFSET = 96;
+    uint256 internal constant PEROPERATORINCREASEGASUSEDB_OFFSET = 128;
+    uint256 internal constant PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET = 160;
+    uint256 internal constant PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET = 192;
+    uint256 internal constant PERREQUESTEDINCREASEGASUSED_OFFSET = 224;
 
     // Pending parameter storage and ETA for delayed execution (10 minutes timelock)
     // Economic parameters

@@ -110,10 +110,16 @@ contract CommitReveal2 is FailLogics {
                 or(
                     getL1UpperBoundGasUsedWhenCalldataSize4,
                     or(
-                        shl(48, failToRequestCvOrSubmitMerkleRootGasUsed),
+                        shl(FAILTOREQUESTSUBMITCV_OR_SUBMITMEKRLEROOT_OFFSET, failToRequestCvOrSubmitMerkleRootGasUsed),
                         or(
-                            shl(96, failToSubmitMerkleRootAfterDisputeGasUsed),
-                            or(shl(144, failToRequestSOrGenerateRandomNumberGasUsed), shl(192, failToSubmitSGasUsed))
+                            shl(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET, failToSubmitMerkleRootAfterDisputeGasUsed),
+                            or(
+                                shl(
+                                    FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET,
+                                    failToRequestSOrGenerateRandomNumberGasUsed
+                                ),
+                                shl(FAILTOSUBMITS_OFFSET, failToSubmitSGasUsed)
+                            )
                         )
                     )
                 )
@@ -123,18 +129,21 @@ contract CommitReveal2 is FailLogics {
                 or(
                     failToSubmitCoGasUsedBaseA,
                     or(
-                        shl(32, failToSubmitCvGasUsedBaseA),
+                        shl(FAILTOSUBMITCVGASUSEDBASEA_OFFSET, failToSubmitCvGasUsedBaseA),
                         or(
-                            shl(64, failToSubmitGasUsedBaseB),
+                            shl(FAILTOSUBMITGASUSEDBASEB_OFFSET, failToSubmitGasUsedBaseB),
                             or(
-                                shl(96, perOperatorIncreaseGasUsedA),
+                                shl(PEROPERATORINCREASEGASUSEDA_OFFSET, perOperatorIncreaseGasUsedA),
                                 or(
-                                    shl(128, perOperatorIncreaseGasUsedB),
+                                    shl(PEROPERATORINCREASEGASUSEDB_OFFSET, perOperatorIncreaseGasUsedB),
                                     or(
-                                        shl(160, perAdditionalDidntSubmitGasUsedA),
+                                        shl(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, perAdditionalDidntSubmitGasUsedA),
                                         or(
-                                            shl(192, perAdditionalDidntSubmitGasUsedB),
-                                            shl(224, perRequestedIncreaseGasUsed)
+                                            shl(
+                                                PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET,
+                                                perAdditionalDidntSubmitGasUsedB
+                                            ),
+                                            shl(PERREQUESTEDINCREASEGASUSED_OFFSET, perRequestedIncreaseGasUsed)
                                         )
                                     )
                                 )
@@ -184,21 +193,21 @@ contract CommitReveal2 is FailLogics {
             packedData := sload(s_pendingGetL1UpperBoundGasUsedWhenCalldataSize4.slot)
             sstore(s_getL1UpperBoundGasUsedWhenCalldataSize4.slot, packedData)
             mstore(0x60, and(packedData, FAILTOSUBMIT_MASK))
-            mstore(0x80, and(shr(48, packedData), FAILTOSUBMIT_MASK))
-            mstore(0xa0, and(shr(96, packedData), FAILTOSUBMIT_MASK))
-            mstore(0xc0, and(shr(144, packedData), FAILTOSUBMIT_MASK))
-            mstore(0xe0, and(shr(192, packedData), FAILTOSUBMIT_MASK))
+            mstore(0x80, and(shr(FAILTOREQUESTSUBMITCV_OR_SUBMITMEKRLEROOT_OFFSET, packedData), FAILTOSUBMIT_MASK))
+            mstore(0xa0, and(shr(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET, packedData), FAILTOSUBMIT_MASK))
+            mstore(0xc0, and(shr(FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET, packedData), FAILTOSUBMIT_MASK))
+            mstore(0xe0, and(shr(FAILTOSUBMITS_OFFSET, packedData), FAILTOSUBMIT_MASK))
 
             packedData := sload(s_pendingFailToSubmitCoGasUsedBaseA.slot)
             sstore(s_failToSubmitCoGasUsedBaseA.slot, packedData)
             mstore(0x100, and(packedData, FAILTOSUBMIT_MASK))
-            mstore(0x120, and(shr(32, packedData), FAILTOSUBMIT_MASK))
-            mstore(0x140, and(shr(64, packedData), FAILTOSUBMIT_MASK))
-            mstore(0x160, and(shr(96, packedData), FAILTOSUBMIT_MASK))
-            mstore(0x180, and(shr(128, packedData), FAILTOSUBMIT_MASK))
-            mstore(0x1a0, and(shr(160, packedData), FAILTOSUBMIT_MASK))
-            mstore(0x1c0, and(shr(192, packedData), FAILTOSUBMIT_MASK))
-            mstore(0x1e0, and(shr(224, packedData), FAILTOSUBMIT_MASK))
+            mstore(0x120, and(shr(FAILTOSUBMITCVGASUSEDBASEA_OFFSET, packedData), FAILTOSUBMIT_MASK))
+            mstore(0x140, and(shr(FAILTOSUBMITGASUSEDBASEB_OFFSET, packedData), FAILTOSUBMIT_MASK))
+            mstore(0x160, and(shr(PEROPERATORINCREASEGASUSEDA_OFFSET, packedData), FAILTOSUBMIT_MASK))
+            mstore(0x180, and(shr(PEROPERATORINCREASEGASUSEDB_OFFSET, packedData), FAILTOSUBMIT_MASK))
+            mstore(0x1a0, and(shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, packedData), FAILTOSUBMIT_MASK))
+            mstore(0x1c0, and(shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, packedData), FAILTOSUBMIT_MASK))
+            mstore(0x1e0, and(shr(PERREQUESTEDINCREASEGASUSED_OFFSET, packedData), FAILTOSUBMIT_MASK))
             // clear effective timestamp after execution
             sstore(s_gasParamsEffectiveTimestamp.slot, 0)
             log1(0x00, 0x200, 0x8d09171105499771f96d6d39dcdda061a70fd18e5eafd65881c2158c55f94e1d) // event GasParametersSet(...)
