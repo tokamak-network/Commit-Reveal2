@@ -38,35 +38,35 @@ calldataSizeInBytes = 132 + 96 × numOfOperators
 
 ### Observed Pattern
 
-The gas usage shows a nearly linear relationship with slight variations:
+The gas usage shows a nearly linear relationship with minimal variations:
 
-- Average increment per operator: ~7,850 gas
-- Some minor fluctuations in the increment
+- Average increment per operator: ~7,791 gas
+- Extremely consistent increment across all operator counts
 
 ### Regression Model for Gas Usage
 
 ```
-gasUsed = 160,000 + 7,900 × numOfOperators
+gasUsed = 88,711 + 7,791 × numOfOperators
 ```
 
 ### Model Interpretation
 
-- Base gas cost: 160,000
-- Per operator cost: 7,900 gas
+- Base gas cost: 88,711
+- Per operator cost: 7,791 gas
 
 ### Model Accuracy
 
-This linear model provides safe overestimates for all cases, typically 0.5-1% above actual values.
+This linear model provides highly accurate predictions with errors consistently below 0.01% of actual values.
 
 ## 3. Key Findings
 
 1. **Perfect Linear Scaling for Calldata**: Each operator adds exactly 96 bytes to the calldata size, indicating a fixed-size data structure per operator.
 
-2. **Near-Linear Gas Scaling**: Gas usage increases approximately linearly with the number of operators, with an average of 7,850 gas per additional operator.
+2. **Near-Perfect Linear Gas Scaling**: Gas usage increases almost exactly linearly with the number of operators, with a consistent 7,791 gas per additional operator.
 
-3. **Predictable Resource Usage**: Both metrics follow simple linear models, making resource estimation straightforward:
+3. **Highly Predictable Resource Usage**: Both metrics follow simple linear models, making resource estimation straightforward:
    - Calldata: Exact prediction possible
-   - Gas: Accurate within 1% margin
+   - Gas: Accurate within 0.01% margin
 
 ## 4. Practical Usage
 
@@ -76,8 +76,8 @@ For implementation, you can use these formulas:
 // Calculate expected calldata size
 uint256 calldataSize = 132 + 96 * numOfOperators;
 
-// Calculate maximum gas with safety margin
-uint256 maxGas = 159500 + 7850 * numOfOperators;
+// Calculate maximum gas
+uint256 maxGas = 88711 + 7791 * numOfOperators;
 ```
 
 ### Note
