@@ -7,3 +7,6 @@
 [submodule "lib/foundry-devops"]
 	path = lib/foundry-devops
 	url = https://github.com/Cyfrin/foundry-devops
+[submodule "lib/solady"]
+	path = lib/solady
+	url = https://github.com/vectorized/solady
