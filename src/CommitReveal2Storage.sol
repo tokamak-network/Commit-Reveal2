@@ -290,8 +290,8 @@ contract CommitReveal2Storage {
     uint256 internal constant MERKLEROOTSUB_CALLDATA_BYTES_SIZE = 36;
     uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_A = 96;
     uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_B = 132;
-    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumA = 7900;
-    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead = 58131 + 91000 + 10000; // gasUsedMerkleRootSub + gasUsedGenRandNum + leaderOverhead
+    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumA = 7791;
+    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead = 58263 + 88711 + 10000; // gasUsedMerkleRootSub + gasUsedGenRandNum + leaderOverhead
     uint256 internal constant GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK = 0xffffffffffffffffffffffffffffffff;
     uint256 internal s_maxCallbackGasLimit = 2500000;
     uint256 internal constant GAS_FOR_CALL_EXACT_CHECK = 5_000;
@@ -304,38 +304,38 @@ contract CommitReveal2Storage {
     uint256 internal constant FAIL_FUNCTIONS_CALLDATA_BYTES_SIZE = 4;
 
     uint48 internal s_getL1UpperBoundGasUsedWhenCalldataSize4 = 21833; // 21833 ~ 21934
-    uint48 internal s_failToRequestCvOrSubmitMerkleRootGasUsed = 85386;
-    uint48 internal s_failToSubmitMerkleRootAfterDisputeGasUsed = 82746;
-    uint48 internal s_failToRequestSOrGenerateRandomNumberGasUsed = 86242;
-    uint48 internal s_failToSubmitSGasUsed = 122282;
+    uint48 internal s_failToRequestCvOrSubmitMerkleRootGasUsed = 85573;
+    uint48 internal s_failToSubmitMerkleRootAfterDisputeGasUsed = 82889;
+    uint48 internal s_failToRequestSOrGenerateRandomNumberGasUsed = 86275;
+    uint48 internal s_failToSubmitSGasUsed = 122304;
     uint256 internal constant FAILTOSUBMIT_MASK = 0xffffffffffff;
 
     /**
      * @dev  FailToSubmitCo GasUsed
      * if (requestedToSubmitLength == operatorsLength):
-     * gasUsage = 95,000 + 500 × operatorsLength + 15,000 × (didntSubmitLength - 1)
+     * gasUsage = 90,045 + 90 × operatorsLength + 14,886 × (didntSubmitLength - 1)
      * else:
-     * gasUsage = 110,000 + 200 × operatorsLength + 500 × requestedToSubmitLength +
-     *            24,000 × (didntSubmitLength - 1)
+     * gasUsage = 111,429 + 90 × operatorsLength + 2,500 × requestedToSubmitLength +
+     *            17,000 × (didntSubmitLength - 1)
      */
-    uint32 internal s_failToSubmitCoGasUsedBaseA = 95000;
+    uint32 internal s_failToSubmitCoGasUsedBaseA = 90045;
 
     /**
      * @dev  FailToSubmitCv GasUsed
      * if (requestedToSubmitLength == operatorsLength):
-     * gasUsage = 95,500 + 500 × operatorsLength + 15,000 × (didntSubmitLength - 1)
+     * gasUsage = 89,745 + 90 × operatorsLength + 14,886 × (didntSubmitLength - 1)
      * else:
-     * gasUsage = 110,000 + 200 × operatorsLength + 500 × requestedToSubmitLength +
-     *            24,000 × (didntSubmitLength - 1)
+     * gasUsage = 111,429 + 90 × operatorsLength + 2,500 × requestedToSubmitLength +
+     *            17,000 × (didntSubmitLength - 1)
      */
-    uint32 internal s_failToSubmitCvGasUsedBaseA = 95500; // shr(32, )
+    uint32 internal s_failToSubmitCvGasUsedBaseA = 89745; // shr(32, )
 
-    uint32 internal s_failToSubmitGasUsedBaseB = 110000; // shr(64, )
-    uint32 internal s_perOperatorIncreaseGasUsedA = 500; // shr(96, )
-    uint32 internal s_perOperatorIncreaseGasUsedB = 200; // shr(128, )
-    uint32 internal s_perAdditionalDidntSubmitGasUsedA = 15000; // shr(160, )
-    uint32 internal s_perAdditionalDidntSubmitGasUsedB = 24000; // shr(192, )
-    uint32 internal s_perRequestedIncreaseGasUsed = 500; // shr(224, )
+    uint32 internal s_failToSubmitGasUsedBaseB = 111429; // shr(64, )
+    uint32 internal s_perOperatorIncreaseGasUsedA = 90; // shr(96, )
+    uint32 internal s_perOperatorIncreaseGasUsedB = 90; // shr(128, )
+    uint32 internal s_perAdditionalDidntSubmitGasUsedA = 14886; // shr(160, )
+    uint32 internal s_perAdditionalDidntSubmitGasUsedB = 17000; // shr(192, )
+    uint32 internal s_perRequestedIncreaseGasUsed = 2500; // shr(224, )
     uint256 internal constant DYNAMICFAILTOSUBMIT_MASK = 0xffffffff;
 
     // *** functions calldata size;
