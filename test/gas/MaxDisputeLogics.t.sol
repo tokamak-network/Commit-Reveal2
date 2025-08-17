@@ -31,6 +31,12 @@ contract MaxDisputeLogics is BaseTest, CommitReveal2Helper {
 
     string internal constant OUTPUT_PATH = "output/maxDisputeGas.json";
 
+    // For failToSubmitS scan
+    uint256 public s_requestedToSubmitLength;
+    uint256 public s_didntSubmitLength;
+    uint256[] public s_failToSubmitSGas;
+    address public s_deactivatedOperator;
+
     function setUp() public override {
         BaseTest.setUp();
         if (block.chainid == 31337) vm.txGasPrice(10 gwei);
@@ -349,5 +355,103 @@ contract MaxDisputeLogics is BaseTest, CommitReveal2Helper {
         string memory payload = vm.serializeString("disputeSecretsGas", "scenarioKey", maxScenarioKey);
         payload = vm.serializeString("disputeSecretsGas", "metrics", gasData);
         vm.writeJson(payload, OUTPUT_PATH, ".disputeSecretsGas");
+    }
+
+    // Measure failToSubmitS gas with operators fixed at 32.
+    // Follows the nesting format used in NodesFailLogicsGas.t.sol:
+    // operators_XX -> requested_YY -> didntSubmit_ZZ => gas
+    function test_failToSubmitSGas_operators32() public {
+        string memory numOfoperatorGasOutput;
+        string memory numOfrequestedGasOutput;
+        string memory finalGasOutput;
+
+        s_numOfOperators = 32;
+        numOfrequestedGasOutput = "";
+        s_requestedToSubmitLength = 32;
+        finalGasOutput = "";
+        for (s_didntSubmitLength = 1; s_didntSubmitLength <= s_requestedToSubmitLength; s_didntSubmitLength++) {
+            _deployContracts();
+            _depositAndActivateOperators(s_operatorAddresses);
+            s_failToSubmitSGas = new uint256[](s_numOfTests);
+
+            uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_callbackGas, tx.gasprice);
+            vm.startPrank(s_anyAddress);
+            s_consumerExample.requestRandomNumber{value: requestFee}();
+            vm.stopPrank();
+
+            for (uint256 i; i < s_numOfTests; i++) {
+                uint256[] memory revealOrders = _setSCoCvRevealOrders(s_privateKeys);
+                vm.startPrank(LEADERNODE);
+                s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
+                uint256 k = s_numOfOperators - s_requestedToSubmitLength;
+                _setParametersForRequestToSubmitS(k, revealOrders);
+                s_commitReveal2.requestToSubmitS(
+                    s_cos,
+                    s_secretsReceivedOffchainInRevealOrder,
+                    s_packedVsForAllCvsNotOnChain,
+                    s_sigRSsForAllCvsNotOnChain,
+                    s_packedRevealOrders
+                );
+                vm.stopPrank();
+                s_deactivatedOperator = s_activatedOperators[revealOrders[k]];
+                mine(s_onChainSubmissionPeriodPerOperator);
+                vm.startPrank(s_anyAddress);
+                s_commitReveal2.failToSubmitS();
+                s_failToSubmitSGas[i] = vm.lastCallGas().gasTotalUsed;
+                mine(1);
+                vm.stopPrank();
+                s_activatedOperators = s_commitReveal2.getActivatedOperators();
+                vm.startPrank(s_deactivatedOperator);
+                s_commitReveal2.depositAndActivate{value: s_activeNetworkConfig.activationThreshold}();
+                vm.stopPrank();
+                if (s_commitReveal2.s_isInProcess() == 3) {
+                    vm.startPrank(LEADERNODE);
+                    s_commitReveal2.resume{value: s_activeNetworkConfig.activationThreshold}();
+                    vm.stopPrank();
+                }
+            }
+
+            string memory didntSubmitString = Strings.toString(s_didntSubmitLength);
+            string memory didntSubmitKey = string.concat(
+                "didntSubmit_",
+                bytes(didntSubmitString).length == 1 ? string.concat("0", didntSubmitString) : didntSubmitString
+            );
+            string memory didntSubmitObjectName = string.concat(
+                "didntSubmitObject_",
+                Strings.toString(s_numOfOperators),
+                "_",
+                Strings.toString(s_requestedToSubmitLength)
+            );
+            finalGasOutput = vm.serializeUint(didntSubmitObjectName, didntSubmitKey, s_failToSubmitSGas[3]);
+        }
+
+        string memory requestedSubmitString = Strings.toString(s_requestedToSubmitLength);
+        string memory requestedSubmitKey = string.concat(
+            "requested_",
+            bytes(requestedSubmitString).length == 1 ? string.concat("0", requestedSubmitString) : requestedSubmitString
+        );
+        string memory requestedSubmitObjectName =
+            string.concat("requestedSubmitObject_", Strings.toString(s_numOfOperators));
+        numOfrequestedGasOutput = vm.serializeString(requestedSubmitObjectName, requestedSubmitKey, finalGasOutput);
+
+        string memory numOfOperatorsString = Strings.toString(s_numOfOperators);
+        string memory operatorKey = string.concat(
+            "operators_",
+            bytes(numOfOperatorsString).length == 1 ? string.concat("0", numOfOperatorsString) : numOfOperatorsString
+        );
+        numOfoperatorGasOutput = vm.serializeString("operatorObject", operatorKey, numOfrequestedGasOutput);
+
+        string memory finalOutput = vm.serializeString("failToSubmitSGas", "scenarios", numOfoperatorGasOutput);
+        finalOutput = vm.serializeUint(
+            "failToSubmitSGas",
+            "calldataSizeInBytes",
+            abi.encodeWithSelector(s_commitReveal2.failToSubmitS.selector).length
+        );
+        finalOutput = vm.serializeString(
+            "failToSubmitSGas",
+            "description",
+            "Gas usage for failToSubmitS function by scenario: operators_XX -> requested_YY -> didntSubmit_ZZ"
+        );
+        vm.writeJson(finalOutput, OUTPUT_PATH, ".failToSubmitSGas");
     }
 }
