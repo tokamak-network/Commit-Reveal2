@@ -271,7 +271,7 @@ contract CommitReveal2Storage {
     uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_A = 96;
     uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_B = 132;
     uint128 internal s_gasUsedMerkleRootSubAndGenRandNumA = 7900;
-    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumB = 91000 + 58131;
+    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead = 58131 + 91000 + 10000; // gasUsedMerkleRootSub + gasUsedGenRandNum + leaderOverhead
     uint256 internal constant GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK = 0xffffffffffffffffffffffffffffffff;
     uint256 internal s_maxCallbackGasLimit = 2500000;
     uint256 internal constant GAS_FOR_CALL_EXACT_CHECK = 5_000;

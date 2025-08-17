@@ -105,7 +105,7 @@ contract CommitReveal2L2 is CommitReveal2 {
                                         and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
                                         numOfOperators
                                     ),
-                                    shr(128, gasUsedMerkleRootSubAndGenRandNum)
+                                    shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
                                 )
                             )
                         ),

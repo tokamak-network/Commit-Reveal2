@@ -243,7 +243,7 @@ contract CommitReveal2 is FailLogics {
                                     and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
                                     numOfOperators
                                 ),
-                                shr(128, gasUsedMerkleRootSubAndGenRandNum)
+                                shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
                             )
                         )
                     ),
