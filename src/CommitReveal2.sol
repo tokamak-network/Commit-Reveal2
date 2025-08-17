@@ -84,7 +84,7 @@ contract CommitReveal2 is FailLogics {
         uint128 gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead,
         uint256 maxCallbackGasLimit,
         uint48 getL1UpperBoundGasUsedWhenCalldataSize4,
-        uint48 failToSubmitCvOrSubmitMerkleRootGasUsed,
+        uint48 failToRequestCvOrSubmitMerkleRootGasUsed,
         uint48 failToSubmitMerkleRootAfterDisputeGasUsed,
         uint48 failToRequestSOrGenerateRandomNumberGasUsed,
         uint48 failToSubmitSGasUsed,
@@ -110,7 +110,7 @@ contract CommitReveal2 is FailLogics {
                 or(
                     getL1UpperBoundGasUsedWhenCalldataSize4,
                     or(
-                        shl(48, failToSubmitCvOrSubmitMerkleRootGasUsed),
+                        shl(48, failToRequestCvOrSubmitMerkleRootGasUsed),
                         or(
                             shl(96, failToSubmitMerkleRootAfterDisputeGasUsed),
                             or(shl(144, failToRequestSOrGenerateRandomNumberGasUsed), shl(192, failToSubmitSGasUsed))
@@ -150,7 +150,7 @@ contract CommitReveal2 is FailLogics {
             mstore(0x20, gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead)
             mstore(0x40, maxCallbackGasLimit)
             mstore(0x60, getL1UpperBoundGasUsedWhenCalldataSize4)
-            mstore(0x80, failToSubmitCvOrSubmitMerkleRootGasUsed)
+            mstore(0x80, failToRequestCvOrSubmitMerkleRootGasUsed)
             mstore(0xa0, failToSubmitMerkleRootAfterDisputeGasUsed)
             mstore(0xc0, failToRequestSOrGenerateRandomNumberGasUsed)
             mstore(0xe0, failToSubmitSGasUsed)

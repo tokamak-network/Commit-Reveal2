@@ -129,7 +129,7 @@ contract CommitReveal2Storage {
         uint128 gasUsedMerkleRootSubAndGenRandNumB,
         uint256 maxCallbackGasLimit,
         uint48 getL1UpperBoundGasUsedWhenCalldataSize4,
-        uint48 failToSubmitCvOrSubmitMerkleRootGasUsed,
+        uint48 failToRequestCvOrSubmitMerkleRootGasUsed,
         uint48 failToSubmitMerkleRootAfterDisputeGasUsed,
         uint48 failToRequestSOrGenerateRandomNumberGasUsed,
         uint48 failToSubmitSGasUsed,
@@ -147,7 +147,7 @@ contract CommitReveal2Storage {
         uint128 gasUsedMerkleRootSubAndGenRandNumB,
         uint256 maxCallbackGasLimit,
         uint48 getL1UpperBoundGasUsedWhenCalldataSize4,
-        uint48 failToSubmitCvOrSubmitMerkleRootGasUsed,
+        uint48 failToRequestCvOrSubmitMerkleRootGasUsed,
         uint48 failToSubmitMerkleRootAfterDisputeGasUsed,
         uint48 failToRequestSOrGenerateRandomNumberGasUsed,
         uint48 failToSubmitSGasUsed,
@@ -304,7 +304,7 @@ contract CommitReveal2Storage {
     uint256 internal constant FAIL_FUNCTIONS_CALLDATA_BYTES_SIZE = 4;
 
     uint48 internal s_getL1UpperBoundGasUsedWhenCalldataSize4 = 21833; // 21833 ~ 21934
-    uint48 internal s_failToSubmitCvOrSubmitMerkleRootGasUsed = 85386;
+    uint48 internal s_failToRequestCvOrSubmitMerkleRootGasUsed = 85386;
     uint48 internal s_failToSubmitMerkleRootAfterDisputeGasUsed = 82746;
     uint48 internal s_failToRequestSOrGenerateRandomNumberGasUsed = 86242;
     uint48 internal s_failToSubmitSGasUsed = 122282;
@@ -341,6 +341,8 @@ contract CommitReveal2Storage {
     // *** functions calldata size;
     uint256 internal constant NO_CALLDATA_SIZE = 4;
 
+    //uint256 internal constant FAILTOREQUESTSUBMITCV_OR
+
     // Pending parameter storage and ETA for delayed execution (10 minutes timelock)
     // Economic parameters
     uint256 public s_pendingActivationThreshold;
@@ -352,7 +354,7 @@ contract CommitReveal2Storage {
     uint128 internal s_pendingGasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead;
     uint256 internal s_pendingMaxCallbackGasLimit;
     uint48 internal s_pendingGetL1UpperBoundGasUsedWhenCalldataSize4;
-    uint48 internal s_pendingFailToSubmitCvOrSubmitMerkleRootGasUsed;
+    uint48 internal s_pendingfailToRequestCvOrSubmitMerkleRootGasUsed;
     uint48 internal s_pendingFailToSubmitMerkleRootAfterDisputeGasUsed;
     uint48 internal s_pendingFailToRequestSOrGenerateRandomNumberGasUsed;
     uint48 internal s_pendingFailToSubmitSGasUsed;
@@ -504,7 +506,7 @@ contract CommitReveal2Storage {
             s_gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead,
             s_maxCallbackGasLimit,
             s_getL1UpperBoundGasUsedWhenCalldataSize4,
-            s_failToSubmitCvOrSubmitMerkleRootGasUsed,
+            s_failToRequestCvOrSubmitMerkleRootGasUsed,
             s_failToSubmitMerkleRootAfterDisputeGasUsed,
             s_failToRequestSOrGenerateRandomNumberGasUsed,
             s_failToSubmitSGasUsed,
