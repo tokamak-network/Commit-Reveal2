@@ -75,6 +75,10 @@ contract OperatorManager is Ownable {
     function transferOwnership(address newOwner) public payable override onlyOwner {
         assembly ("memory-safe") {
             mstore(0x00, newOwner)
+            // initialize slashRewardPerOperatorPaid
+            mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
+            sstore(keccak256(0x00, 0x40), sload(s_slashRewardPerOperatorX8.slot))
+
             mstore(0x20, s_activatedOperatorIndex1Based.slot)
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0x00, 0x9279dd8e) // NewOwnerCannotBeActivatedOperator()
@@ -118,6 +122,10 @@ contract OperatorManager is Ownable {
         /// @solidity memory-safe-assembly
         assembly {
             mstore(0x00, pendingOwner)
+            // initialize slashRewardPerOperatorPaid
+            mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
+            sstore(keccak256(0x00, 0x40), sload(s_slashRewardPerOperatorX8.slot))
+
             mstore(0x20, s_activatedOperatorIndex1Based.slot)
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0x00, 0x5df6bf29) // PendingOwnerCannotBeActivatedOperator()
@@ -192,6 +200,7 @@ contract OperatorManager is Ownable {
             mstore(0x20, s_slashRewardPerOperatorPaidX8.slot) // caller is already in memory 0x00
             sstore(keccak256(0x00, 0x40), sload(s_slashRewardPerOperatorX8.slot))
             log1(0x00, 0x20, 0x0cc43938d137e7efade6a531f663e78c1fc75257b0d65ffda2fdaf70cb49cdf9)
+            // event Activated(address operator)
         }
     }
 
