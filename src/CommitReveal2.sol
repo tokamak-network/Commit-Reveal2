@@ -42,7 +42,13 @@ contract CommitReveal2 is FailLogics {
 
     function executeSetEconomicParameters() external notInProcess {
         assembly ("memory-safe") {
-            if lt(timestamp(), sload(s_economicParamsEffectiveTimestamp.slot)) {
+            let economicParamsEffectiveTimestamp := sload(s_economicParamsEffectiveTimestamp.slot)
+            // check economicParamsEffectiveTimestamp is not 0
+            if iszero(economicParamsEffectiveTimestamp) {
+                mstore(0, 0xf2a87d5e) // selector for NotProposed()
+                revert(0x1c, 0x04)
+            }
+            if lt(timestamp(), economicParamsEffectiveTimestamp) {
                 mstore(0, 0x085de625) // selector for TooEarly()
                 revert(0x1c, 0x04)
             }
@@ -178,7 +184,12 @@ contract CommitReveal2 is FailLogics {
 
     function executeSetGasParameters() external notInProcess {
         assembly ("memory-safe") {
-            if lt(timestamp(), sload(s_gasParamsEffectiveTimestamp.slot)) {
+            let gasParamsEffectiveTimestamp := sload(s_gasParamsEffectiveTimestamp.slot)
+            if iszero(gasParamsEffectiveTimestamp) {
+                mstore(0, 0xf2a87d5e) // selector for NotProposed()
+                revert(0x1c, 0x04)
+            }
+            if lt(timestamp(), gasParamsEffectiveTimestamp) {
                 mstore(0, 0x085de625) // selector for TooEarly()
                 revert(0x1c, 0x04)
             }
