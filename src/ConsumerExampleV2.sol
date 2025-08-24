@@ -41,7 +41,7 @@ contract ConsumerExampleV2 is ConsumerBase {
     }
 
     function requestRandomNumber() external payable {
-        (uint256 requestId, uint256 requestFee) = _requestRandomNumber(CALLBACK_GAS_LIMIT);
+        (uint256 requestId, uint256 requestFee) = _requestRandomNumber(CALLBACK_GAS_LIMIT, address(this).balance);
         uint256 index = s_requestCount++ % 100;
         s_requestIdToIndexPlusOne[requestId] = index + 1;
         MainInfo storage mainInfo = s_mainInfos[index];
