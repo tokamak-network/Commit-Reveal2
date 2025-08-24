@@ -48,6 +48,7 @@ contract OperatorManager is Ownable {
     error ActivatedOperatorsLimitReached(); // 0x3e8fbd5f
     error WithdrawAmountIsZero(); // 0xa393d14b
     error PendingOwnerCannotBeActivatedOperator(); // 0x5df6bf29
+    error NotAllowed();
 
     constructor() {
         _initializeOwner(msg.sender);
@@ -85,6 +86,11 @@ contract OperatorManager is Ownable {
             }
         }
         _setOwner(newOwner);
+    }
+
+    function renounceOwnership() public payable override onlyOwner {
+        // prevent it from working
+        revert NotAllowed();
     }
 
     function requestOwnershipHandover() public payable override {
