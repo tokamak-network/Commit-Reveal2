@@ -685,6 +685,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             default {
                 sstore(add(s_secrets.slot, activatedOperatorIndex), s) // store secret
                 sstore(s_requestedToSubmitSFromIndexK.slot, add(requestedToSubmitSFromIndexK, 1)) // increment index
+                sstore(previousSSubmitTimestampSlot, timestamp())
             }
         }
     }
