@@ -366,7 +366,7 @@ contract CommitReveal2 is FailLogics {
         SecretAndSigRS[] calldata secretSigRSs,
         uint256, // packedVs
         uint256 packedRevealOrders
-    ) external virtual {
+    ) external inProgress {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
@@ -496,10 +496,6 @@ contract CommitReveal2 is FailLogics {
             switch eq(nextRound, requestCount)
             case 1 {
                 // there is no next round
-                if eq(sload(s_isInProcess.slot), COMPLETED) {
-                    mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
-                    revert(0x1c, 0x04)
-                }
                 sstore(s_isInProcess.slot, COMPLETED)
                 mstore(0x00, round)
                 mstore(0x20, trialNum)
@@ -560,10 +556,6 @@ contract CommitReveal2 is FailLogics {
                         break
                     }
                     if iszero(lt(nextRound, requestCount)) {
-                        if eq(sload(s_isInProcess.slot), COMPLETED) {
-                            mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
-                            revert(0x1c, 0x04)
-                        }
                         sstore(s_isInProcess.slot, COMPLETED)
                         let lastRound := sub(requestCount, 1)
                         sstore(s_currentRound.slot, lastRound)
