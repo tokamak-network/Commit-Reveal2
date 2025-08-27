@@ -73,6 +73,7 @@ contract OperatorManager is Ownable {
 
     // ** Override Ownable Functions
     function transferOwnership(address newOwner) public payable override onlyOwner {
+        _settleSlashReward(msg.sender);
         _settleSlashReward(newOwner);
         assembly ("memory-safe") {
             mstore(0x20, s_activatedOperatorIndex1Based.slot)
@@ -115,6 +116,7 @@ contract OperatorManager is Ownable {
     }
 
     function completeOwnershipHandover(address pendingOwner) public payable override onlyOwner {
+        _settleSlashReward(owner());
         _settleSlashReward(pendingOwner);
         /// @solidity memory-safe-assembly
         assembly {
