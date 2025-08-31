@@ -1,7 +1,6 @@
 [profile.default]
 optimizer = true
-optimizer_runs = 100000000 #4294967295 
-# evm_version = 'cancun' #'cancun'
+optimizer_runs = 4294967295 #4294967295  100000000
 via_ir = true
 src = "src"
 out = "out"
