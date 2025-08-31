@@ -192,7 +192,7 @@ interface CommitReveal2 {
     /**
      * @notice Requests an on-chain reveal phase (`S`) for operators who failed to provide their secrets off-chain,
      *         while simultaneously uploading the off-chain secrets that the leader node already possesses.
-     * @dev onlyOwner(leaderNode) function, emit RequestedToSubmitSFromIndexK(uint256 startTime, uint256 indexK)
+     * @dev onlyOwner(leaderNode) function, emit RequestedToSubmitSIndexK(uint256 startTime, uint256 indexK)
      * @param allCos All C_oi must be submitted even if some operators submitted their Co in SubmitCo function, because the calldata is cheaper than `sstore` and `sload`.
      * @param secretsReceivedOffchainInRevealOrder The secrets that are received off-chain in revealOrders. [secret_k, ...], when k is the revealOrder[i]
      * @param packedVsForAllCvsNotOnChain The packed 'v's of the signatures for all operators' whose C_vi are not on-chain. The C_vi could have been submitted in SubmitCv, RequestToSubmitCo ... functions.(There is getZeroBitIfSubmittedCvOnChainBitmap() function to check if the C_vi is on-chain.). e.g. [28, 27, 27] -> 0x00000000000000000000000000000000000000000000000000000000001b1b1c
@@ -267,7 +267,7 @@ interface CommitReveal2 {
 
     /**
      * @notice Fails the current round if an operator fails to submit its secret by the on-chain deadline.
-     * @dev block.timestamp >= s_previousSSubmitTimestamp + s_onChainSubmissionPeriodPerOperator.
+     * @dev block.timestamp >= s_requestedToSubmitSTimestamp + s_onChainSubmissionPeriodPerOperator.
      *
      *   6) If more than one operator remains, resets the round’s `startTime` to `block.timestamp`
      *       If at least 2 operators remain active, the round is “restarted” by resetting its startTime to the current block.timestamp
@@ -391,7 +391,7 @@ interface CommitReveal2 {
     function s_merkleRoot() external view returns (bytes32);
     function s_merkleRootSubmittedTimestamp(uint256 startTime) external view returns (uint256);
     function s_packedRevealOrders() external view returns (uint256);
-    function s_previousSSubmitTimestamp(uint256 startTime) external view returns (uint256);
+    function s_requestedToSubmitSTimestamp(uint256 startTime) external view returns (uint256);
     function s_requestCount() external view returns (uint256);
     function s_requestInfo(uint256 round)
         external
@@ -403,7 +403,7 @@ interface CommitReveal2 {
     function s_requestedToSubmitCvLength() external view returns (uint256);
     function s_requestedToSubmitCvPackedIndicesAscFromLSB() external view returns (uint256);
     function s_requestedToSubmitCvTimestamp(uint256 startTime) external view returns (uint256);
-    function s_requestedToSubmitSFromIndexK() external view returns (uint256);
+    function s_requestedToSubmitSIndexK() external view returns (uint256);
     function s_roundBitmap(uint248 wordPos) external view returns (uint256);
     function s_secrets(uint256) external view returns (bytes32);
     function s_slashRewardPerOperatorPaidX8(address) external view returns (uint256);

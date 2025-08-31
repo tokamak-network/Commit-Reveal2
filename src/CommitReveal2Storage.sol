@@ -75,6 +75,8 @@ contract CommitReveal2Storage {
     error InvalidIndex(); // 0x63df8171
     error NewOwnerCannotBeActivatedOperator(); // 0x9279dd8e
     error DuplicateIndices(); // 0x7a69f8d3
+    error DisputeSInProgress(); // 0x40eda139
+    error AlreadyRequestedToSubmitSFirstTime(); // 0x1cd97bfa
     error WrongRevealOrder(); // 0xe3ae7cc0
     error RevealOrderHasDuplicates(); // 0x06efcba4
     error AllCvsNotSubmitted(); // 0xad029eb9
@@ -103,6 +105,8 @@ contract CommitReveal2Storage {
     error RevealNotInDescendingOrder(); // 0x24f1948e
     error CvNotSubmitted(); // 0x03798920
     error CvNotEqualHashCo(); // 0x67b3c693
+    error NoMoreOperatorsToSubmitS(); // 0x3fdba6b8
+    error AlreadyHaveAllSecrets(); // 0x5a49519d
 
     // * Events
     event Status(uint256 curRound, uint256 curTrialNum, uint256 curState); // 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813
@@ -112,7 +116,7 @@ contract CommitReveal2Storage {
     event RequestedToSubmitCo(uint256 round, uint256 trialNum, uint256 indicesLength, uint256 packedIndices); // 0xd4cc5cd95f180f10aaacba0729abc069b8080ec3a7e8e41856decb17bdc28ece
     event CvSubmitted(uint256 round, uint256 trialNum, bytes32 cv, uint256 index); // 0x6a6385c5eaed19d346ec4f9bd0010cfba4ac1d0407e2e55f959cb8fcac30f873
     event CoSubmitted(uint256 round, uint256 trialNum, bytes32 co, uint256 index); // 0xc294138987faa6e0ebef350caeac5cf5e1eff8dbbe8a158e421601f48674babd
-    event RequestedToSubmitSFromIndexK(uint256 round, uint256 trialNum, uint256 indexK); // 0x583f939e9612a50da8a140b5e7247ff7c3c899c45e4051a5ba045abea6177f08
+    event RequestedToSubmitSIndexK(uint256 round, uint256 trialNum, uint256 indexK); // 0xf5723cb602bc0d9fc4012bb4dcf4f87fc8737e73c5e3e7ac826937f61de69cd8
     event SSubmitted(uint256 round, uint256 trialNum, bytes32 s, uint256 index); // 0xfa070a58e2c77080acd5c2b1819669eb194bbeeca6f680a31a2076510be5a7b1
 
     event EconomicParametersSet(uint256 activationThreshold, uint256 flatFee); // 0x08f0774e7eb69e2d6a7cf2192cbf9c6f519a40bcfa16ff60d3f18496585e46dc
@@ -191,13 +195,14 @@ contract CommitReveal2Storage {
     uint256 public s_requestedToSubmitCoPackedIndices;
     uint256 public s_zeroBitIfSubmittedCoBitmap;
 
-    mapping(uint256 round => mapping(uint256 trialNum => uint256)) public s_previousSSubmitTimestamp;
+    mapping(uint256 round => mapping(uint256 trialNum => uint256)) public s_requestedToSubmitSTimestamp;
+    mapping(uint256 round => mapping(uint256 trialNum => bool)) public s_isSRequestedFirstTime;
     /**
      * @notice Tracks the reveal order index in `secrets` when `requestToSubmitS()` is called
      * @dev
      *   - Used in `submitS()` to verify if the current operator is next in line.
      */
-    uint256 public s_requestedToSubmitSFromIndexK;
+    uint256 public s_requestedToSubmitSIndexK;
 
     bytes32[32] public s_secrets;
     /**
@@ -399,9 +404,9 @@ contract CommitReveal2Storage {
             uint256 requestedToSubmitCoPackedIndices,
             uint256 requestedToSubmitCoLength,
             uint256 zeroBitIfSubmittedCoBitmap,
-            uint256 previousSSubmitTimestamp,
+            uint256 requestedToSubmitSTimestamp,
             uint256 packedRevealOrders,
-            uint256 requestedToSubmitSFromIndexK
+            uint256 requestedToSubmitSIndexK
         )
     {
         requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[round][trialNum];
@@ -411,9 +416,9 @@ contract CommitReveal2Storage {
         requestedToSubmitCoPackedIndices = s_requestedToSubmitCoPackedIndices;
         requestedToSubmitCoLength = s_requestedToSubmitCoLength;
         zeroBitIfSubmittedCoBitmap = s_zeroBitIfSubmittedCoBitmap;
-        previousSSubmitTimestamp = s_previousSSubmitTimestamp[round][trialNum];
+        requestedToSubmitSTimestamp = s_requestedToSubmitSTimestamp[round][trialNum];
         packedRevealOrders = s_packedRevealOrders;
-        requestedToSubmitSFromIndexK = s_requestedToSubmitSFromIndexK;
+        requestedToSubmitSIndexK = s_requestedToSubmitSIndexK;
     }
 
     function getDisputeTimestamps(uint256 round, uint256 trialNum)
@@ -422,11 +427,11 @@ contract CommitReveal2Storage {
         returns (
             uint256 requestedToSubmitCvTimestamp,
             uint256 requestedToSubmitCoTimestamp,
-            uint256 previousSSubmitTimestamp
+            uint256 requestedToSubmitSTimestamp
         )
     {
         requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[round][trialNum];
         requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[round][trialNum];
-        previousSSubmitTimestamp = s_previousSSubmitTimestamp[round][trialNum];
+        requestedToSubmitSTimestamp = s_requestedToSubmitSTimestamp[round][trialNum];
     }
 }

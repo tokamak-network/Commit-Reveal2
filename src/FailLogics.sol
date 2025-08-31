@@ -514,15 +514,18 @@ contract FailLogics is DisputeLogics {
             let trialNum := sload(trialNumSlot)
             mstore(0x00, trialNum)
             // ** Ensure S was requested
-            mstore(0x60, s_previousSSubmitTimestamp.slot)
+            mstore(0x60, s_isSRequestedFirstTime.slot)
             mstore(0x20, keccak256(0x40, 0x40))
-            let previousSSubmitTimestamp := sload(keccak256(0x00, 0x40))
-            if iszero(previousSSubmitTimestamp) {
+            let isSRequestedFirstTime := sload(keccak256(0x00, 0x40))
+            if iszero(isSRequestedFirstTime) {
                 mstore(0, 0x2d37f8d3) // SNotRequested()
                 revert(0x1c, 0x04)
             }
             // ** check time window
-            if lt(timestamp(), add(previousSSubmitTimestamp, sload(s_onChainSubmissionPeriodPerOperator.slot))) {
+            mstore(0x60, s_requestedToSubmitSTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
+            let requestedToSubmitSTimestamp := sload(keccak256(0x00, 0x40))
+            if lt(timestamp(), add(requestedToSubmitSTimestamp, sload(s_onChainSubmissionPeriodPerOperator.slot))) {
                 mstore(0, 0x085de625) // TooEarly()
                 revert(0x1c, 0x04)
             }
@@ -552,9 +555,9 @@ contract FailLogics is DisputeLogics {
                 sstore(s_slashRewardPerOperatorX8.slot, updatedSlashRewardPerOperatorX8)
             }
 
-            // ** s_revealOrders[s_requestedToSubmitSFromIndexK] is the index of the operator who didn't submit S
+            // ** s_revealOrders[s_requestedToSubmitSIndexK] is the index of the operator who didn't submit S
             mstore(0x20, sload(s_packedRevealOrders.slot))
-            let operatorToDeactivateIndex := and(mload(sub(0x20, sload(s_requestedToSubmitSFromIndexK.slot))), 0xff)
+            let operatorToDeactivateIndex := and(mload(sub(0x20, sload(s_requestedToSubmitSIndexK.slot))), 0xff)
             mstore(0x20, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x20, 0x20)
             let operatorToDeactivate := sload(add(firstActivatedOperatorSlot, operatorToDeactivateIndex))
@@ -618,7 +621,7 @@ contract FailLogics is DisputeLogics {
             let trialNum := sload(keccak256(0x40, 0x40))
             mstore(0x00, trialNum)
             // ** Ensure S was not requested
-            mstore(0x60, s_previousSSubmitTimestamp.slot)
+            mstore(0x60, s_requestedToSubmitSTimestamp.slot)
             mstore(0x20, keccak256(0x40, 0x40))
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0, 0x53489cf9) // SRequested()

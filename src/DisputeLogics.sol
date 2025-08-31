@@ -341,11 +341,14 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             // ** check if already requested to submit S
-            mstore(0x60, s_previousSSubmitTimestamp.slot)
+            mstore(0x60, s_requestedToSubmitSTimestamp.slot)
             mstore(0x20, keccak256(0x40, 0x40))
-            let previousSSubmitTimestampSlot := keccak256(0x00, 0x40)
-            if gt(sload(previousSSubmitTimestampSlot), 0) {
-                mstore(0, 0x0d934196) // AlreadyRequestedToSubmitS()
+            let requestedToSubmitSTimestampSlot := keccak256(0x00, 0x40)
+            mstore(0x60, s_isSRequestedFirstTime.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
+            let isSRequestedFirstTimeSlot := keccak256(0x00, 0x40)
+            if sload(isSRequestedFirstTimeSlot) {
+                mstore(0, 0x1cd97bfa) // AlreadyRequestedToSubmitSFirstTime()
                 revert(0x1c, 0x04)
             }
             // ** check allCos length
@@ -480,11 +483,11 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
 
             // skip updating zeroBitIfSubmittedCvBitmap because it is not used anymore
             sstore(s_packedRevealOrders.slot, packedRevealOrders) // update packedRevealOrders
-            sstore(s_requestedToSubmitSFromIndexK.slot, secretsReceivedOffchainInRevealOrder.length)
+            sstore(s_requestedToSubmitSIndexK.slot, secretsReceivedOffchainInRevealOrder.length)
             mstore(0x00, curRound)
             mstore(0x20, trialNum)
             mstore(0x40, secretsReceivedOffchainInRevealOrder.length)
-            log1(0x00, 0x60, 0x583f939e9612a50da8a140b5e7247ff7c3c899c45e4051a5ba045abea6177f08) // event RequestedToSubmitSFromIndexK(uint256 round, uint256 trialNum, uint256 indexK)
+            log1(0x00, 0x60, 0xf5723cb602bc0d9fc4012bb4dcf4f87fc8737e73c5e3e7ac826937f61de69cd8) // event RequestedToSubmitSIndexK(uint256 round, uint256 trialNum, uint256 indexK)
             // ** store secrets
             for { let i } lt(i, secretsReceivedOffchainInRevealOrder.length) { i := add(i, 1) } {
                 index := and(calldataload(sub(0x84, i)), 0xff) // 0x84: packedRevealOrders offset
@@ -498,7 +501,71 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 sstore(add(s_secrets.slot, index), secret) // store secret)
             }
             // Record the timestamp of the last S submission
-            sstore(previousSSubmitTimestampSlot, timestamp())
+            sstore(requestedToSubmitSTimestampSlot, timestamp())
+            sstore(isSRequestedFirstTimeSlot, 1) // set to 1 to indicate that S was requested first time
+        }
+    }
+
+    function reRequestToSubmitS(bytes32[] calldata secretsReceivedOffchainInRevealOrderNotOnChain) external {
+        assembly ("memory-safe") {
+            // ** check if S was requested
+            let curRound := sload(s_currentRound.slot)
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            let trialNum := sload(keccak256(0x40, 0x40))
+            mstore(0x00, trialNum)
+            mstore(0x60, s_isSRequestedFirstTime.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
+            if iszero(sload(keccak256(0x00, 0x40))) {
+                mstore(0, 0x2d37f8d3) // SNotRequested()
+                revert(0x1c, 0x04)
+            }
+            // ** check if SSubmitIsInProgress
+            mstore(0x60, s_requestedToSubmitSTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
+            let requestedToSubmitSTimestampSlot := keccak256(0x00, 0x40)
+            if gt(sload(requestedToSubmitSTimestampSlot), 0) {
+                mstore(0, 0x40eda139) // DisputeSInProgress()
+                revert(0x1c, 0x04)
+            }
+            let requestedToSubmitSIndexK := add(sload(s_requestedToSubmitSIndexK.slot), 1)
+            let activatedOperatorsLength := sload(s_activatedOperators.slot)
+            let newRequestToSubmitSIndexK :=
+                sub(
+                    add(
+                        sub(activatedOperatorsLength, requestedToSubmitSIndexK),
+                        secretsReceivedOffchainInRevealOrderNotOnChain.length
+                    ),
+                    1
+                )
+            if iszero(lt(requestedToSubmitSIndexK, activatedOperatorsLength)) {
+                mstore(0, 0x3fdba6b8) // selector for NoMoreOperatorsToSubmitS()
+                revert(0x1c, 0x04)
+            }
+            // if lastSSubmittedIndex >= activatedOperatorsLength-1
+            if iszero(lt(newRequestToSubmitSIndexK, activatedOperatorsLength)) {
+                // you already have all the secrets, just generate the random number with the secrets
+                mstore(0, 0x5a49519d) // selector for AlreadyHaveAllSecrets()
+                revert(0x1c, 0x04)
+            }
+            mstore(0x20, sload(s_packedRevealOrders.slot))
+            for { let k := requestedToSubmitSIndexK } lt(k, newRequestToSubmitSIndexK) { k := add(k, 1) } {
+                let secret := calldataload(add(secretsReceivedOffchainInRevealOrderNotOnChain.offset, shl(5, k)))
+                mstore(0x00, secret)
+                let index := and(mload(sub(0x20, k)), 0xff)
+                mstore(0x00, keccak256(0x00, 0x20)) // co
+                if iszero(eq(sload(add(s_cvs.slot, index)), keccak256(0x00, 0x20))) {
+                    mstore(0, 0x5bcc2334) // CvNotEqualDoubleHashS()
+                    revert(0x1c, 0x04)
+                }
+                sstore(add(s_secrets.slot, index), secret)
+            }
+            sstore(s_requestedToSubmitSIndexK.slot, newRequestToSubmitSIndexK)
+            sstore(requestedToSubmitSTimestampSlot, timestamp())
+            mstore(0x00, curRound)
+            mstore(0x20, trialNum)
+            mstore(0x40, newRequestToSubmitSIndexK)
+            log1(0x00, 0x60, 0xf5723cb602bc0d9fc4012bb4dcf4f87fc8737e73c5e3e7ac826937f61de69cd8) // event RequestedToSubmitSIndexK(uint256 round, uint256 trialNum, uint256 indexK)
         }
     }
 
@@ -510,10 +577,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             let trialNum := sload(keccak256(0x40, 0x40))
             mstore(0x20, trialNum) // trialNum)
             // ** check if S was requested
-            mstore(0x60, s_previousSSubmitTimestamp.slot)
+            mstore(0x60, s_requestedToSubmitSTimestamp.slot)
             mstore(0x40, keccak256(0x40, 0x40))
-            let previousSSubmitTimestampSlot := keccak256(0x20, 0x40)
-            if iszero(sload(previousSSubmitTimestampSlot)) {
+            let requestedToSubmitSTimestampSlot := keccak256(0x20, 0x40)
+            if iszero(sload(requestedToSubmitSTimestampSlot)) {
                 mstore(0, 0x2d37f8d3) // SNotRequested()
                 revert(0x1c, 0x04)
             }
@@ -527,8 +594,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             mstore(fmp, sload(s_packedRevealOrders.slot))
-            let requestedToSubmitSFromIndexK := sload(s_requestedToSubmitSFromIndexK.slot)
-            if iszero(eq(activatedOperatorIndex, and(mload(sub(fmp, requestedToSubmitSFromIndexK)), 0xff))) {
+            let requestedToSubmitSIndexK := sload(s_requestedToSubmitSIndexK.slot)
+            if iszero(eq(activatedOperatorIndex, and(mload(sub(fmp, requestedToSubmitSIndexK)), 0xff))) {
                 mstore(0, 0xe3ae7cc0) // WrongRevealOrder()
                 revert(0x1c, 0x04)
             }
@@ -546,7 +613,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
 
             // ** If msg.sender is the last revealer, finalize the random number
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
-            switch eq(requestedToSubmitSFromIndexK, sub(activatedOperatorsLength, 1))
+            switch eq(requestedToSubmitSIndexK, sub(activatedOperatorsLength, 1))
             case 1 {
                 let storedSLength := sub(activatedOperatorsLength, 1)
                 for { let i } lt(i, storedSLength) { i := add(i, 1) } {
@@ -684,7 +751,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             }
             default {
                 sstore(add(s_secrets.slot, activatedOperatorIndex), s) // store secret
-                sstore(s_requestedToSubmitSFromIndexK.slot, add(requestedToSubmitSFromIndexK, 1)) // increment index
+                sstore(requestedToSubmitSTimestampSlot, 0) // to indicate that S was submitted
             }
         }
     }
