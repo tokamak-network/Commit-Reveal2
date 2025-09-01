@@ -57,37 +57,37 @@ contract CreateMerkleRootInlineAssembly {
 
     function _createMerkleRoot(bytes32[] memory leaves) internal pure returns (bytes32 r) {
         assembly ("memory-safe") {
-            let leavesLen := mload(leaves)
-            let hashCount := sub(leavesLen, 1) // unchecked sub, check outside of this function
+            let leavesLenInBytes := shl(5, mload(leaves))
+            let hashCountInBytes := sub(leavesLenInBytes, 0x20) // unchecked sub, check outside of this function
             let hashes := mload(0x40)
-            mstore(hashes, hashCount)
-            let hashesDataPtr := add(hashes, 0x20)
-            let leavesDataPtr := add(leaves, 0x20)
-            let leafPos
-            let hashPos
-            for { let i } lt(i, hashCount) { i := add(i, 1) } {
-                switch lt(leafPos, leavesLen)
+            mstore(hashes, hashCountInBytes)
+            let hashDataPtr := add(hashes, 0x20)
+            let leafDataPtr := add(leaves, 0x20)
+            let leafPosInBytes
+            let hashPosInBytes
+            for { let i } lt(i, hashCountInBytes) { i := add(i, 0x20) } {
+                switch lt(leafPosInBytes, leavesLenInBytes)
                 case 1 {
-                    mstore(0x00, mload(add(leavesDataPtr, shl(5, leafPos))))
-                    leafPos := add(leafPos, 1)
+                    mstore(0x00, mload(add(leafDataPtr, leafPosInBytes)))
+                    leafPosInBytes := add(leafPosInBytes, 0x20)
                 }
                 default {
-                    mstore(0x00, mload(add(hashesDataPtr, shl(5, hashPos))))
-                    hashPos := add(hashPos, 1)
+                    mstore(0x00, mload(add(hashDataPtr, hashPosInBytes)))
+                    hashPosInBytes := add(hashPosInBytes, 0x20)
                 }
-                switch lt(leafPos, leavesLen)
+                switch lt(leafPosInBytes, leavesLenInBytes)
                 case 1 {
-                    mstore(0x20, mload(add(leavesDataPtr, shl(5, leafPos))))
-                    leafPos := add(leafPos, 1)
+                    mstore(0x20, mload(add(leafDataPtr, leafPosInBytes)))
+                    leafPosInBytes := add(leafPosInBytes, 0x20)
                 }
                 default {
-                    mstore(0x20, mload(add(hashesDataPtr, shl(5, hashPos))))
-                    hashPos := add(hashPos, 1)
+                    mstore(0x20, mload(add(hashDataPtr, hashPosInBytes)))
+                    hashPosInBytes := add(hashPosInBytes, 0x20)
                 }
-                mstore(add(hashesDataPtr, shl(5, i)), keccak256(0x00, 0x40))
+                mstore(add(hashDataPtr, i), keccak256(0x00, 0x40))
             }
-            mstore(0x40, add(hashesDataPtr, shl(5, hashCount))) // update the free memory pointer
-            r := mload(add(hashesDataPtr, shl(5, sub(hashCount, 1))))
+            mstore(0x40, add(hashDataPtr, hashCountInBytes)) // update the free memory pointer
+            r := mload(add(hashDataPtr, sub(hashCountInBytes, 0x20)))
         }
     }
 }
