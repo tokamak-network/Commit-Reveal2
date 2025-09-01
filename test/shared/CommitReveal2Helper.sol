@@ -342,4 +342,13 @@ contract CommitReveal2Helper is Test {
             s_secretsReceivedOffchainInRevealOrder[i] = s_secrets[revealOrders[i]];
         }
     }
+
+    function _setParametersForReRequestToSubmitS(uint256 k, uint256[] memory revealOrders) internal {
+        _getIndicesOfCvsNotOnChain();
+        uint256 requestedToSubmitSIndexK = s_commitReveal2.s_requestedToSubmitSIndexK();
+        s_secretsReceivedOffchainInRevealOrder = new bytes32[](k - requestedToSubmitSIndexK - 1);
+        for (uint256 i = requestedToSubmitSIndexK + 1; i < k; i++) {
+            s_secretsReceivedOffchainInRevealOrder[i - requestedToSubmitSIndexK - 1] = s_secrets[revealOrders[i]];
+        }
+    }
 }
