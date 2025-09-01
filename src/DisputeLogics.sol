@@ -531,13 +531,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             let requestedToSubmitSIndexK := add(sload(s_requestedToSubmitSIndexK.slot), 1)
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
             let newRequestToSubmitSIndexK :=
-                sub(
-                    add(
-                        sub(activatedOperatorsLength, requestedToSubmitSIndexK),
-                        secretsReceivedOffchainInRevealOrderNotOnChain.length
-                    ),
-                    1
-                )
+                add(requestedToSubmitSIndexK, secretsReceivedOffchainInRevealOrderNotOnChain.length)
             if iszero(lt(requestedToSubmitSIndexK, activatedOperatorsLength)) {
                 mstore(0, 0x3fdba6b8) // selector for NoMoreOperatorsToSubmitS()
                 revert(0x1c, 0x04)
@@ -550,7 +544,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             }
             mstore(0x20, sload(s_packedRevealOrders.slot))
             for { let k := requestedToSubmitSIndexK } lt(k, newRequestToSubmitSIndexK) { k := add(k, 1) } {
-                let secret := calldataload(add(secretsReceivedOffchainInRevealOrderNotOnChain.offset, shl(5, k)))
+                let secret :=
+                    calldataload(
+                        add(secretsReceivedOffchainInRevealOrderNotOnChain.offset, shl(5, sub(k, requestedToSubmitSIndexK)))
+                    )
                 mstore(0x00, secret)
                 let index := and(mload(sub(0x20, k)), 0xff)
                 mstore(0x00, keccak256(0x00, 0x20)) // co
