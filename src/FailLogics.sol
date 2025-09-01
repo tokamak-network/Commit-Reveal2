@@ -737,18 +737,24 @@ contract FailLogics is DisputeLogics {
             let activationThreshold := sload(s_activationThreshold.slot)
             mstore(0x20, sload(_OWNER_SLOT))
             // ** Distribute remainder among operators
+            let beforeSlashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
+            let afterSlashRewardPerOperatorX8 := beforeSlashRewardPerOperatorX8
             if gt(activationThreshold, returnGasFee) {
                 let delta := div(shl(8, sub(activationThreshold, returnGasFee)), sload(s_activatedOperators.slot))
-                sstore(s_slashRewardPerOperatorX8.slot, add(sload(s_slashRewardPerOperatorX8.slot), delta))
-                mstore(0x40, s_slashRewardPerOperatorPaidX8.slot)
-                let slashRewardPerOperatorPaidX8Slot := keccak256(0x20, 0x40) // owner
-                sstore(slashRewardPerOperatorPaidX8Slot, add(sload(slashRewardPerOperatorPaidX8Slot), delta))
+                afterSlashRewardPerOperatorX8 := add(afterSlashRewardPerOperatorX8, delta)
+                sstore(s_slashRewardPerOperatorX8.slot, afterSlashRewardPerOperatorX8)
             }
+            mstore(0x40, s_slashRewardPerOperatorPaidX8.slot)
+            let slashRewardPerOperatorPaidX8Slot := keccak256(0x20, 0x40) // owner
+            let accumulatedReward :=
+                shr(8, sub(beforeSlashRewardPerOperatorX8, sload(slashRewardPerOperatorPaidX8Slot)))
+            sstore(slashRewardPerOperatorPaidX8Slot, afterSlashRewardPerOperatorX8)
+
             if gt(returnGasFee, activationThreshold) { returnGasFee := activationThreshold }
             // ** slash the leadernode(owner)
             mstore(0x40, s_depositAmount.slot)
             let depositSlot := keccak256(0x20, 0x40) // owner
-            let totalAvailable := sload(depositSlot)
+            let totalAvailable := add(sload(depositSlot), accumulatedReward)
             switch gt(totalAvailable, activationThreshold)
             case 1 { sstore(depositSlot, sub(totalAvailable, activationThreshold)) }
             default { sstore(depositSlot, 0) }
