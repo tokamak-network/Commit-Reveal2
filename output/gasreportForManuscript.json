@@ -194,244 +194,244 @@
     "description": "Gas usage for participant withholding path 2: 1->5->12->15->5->11 by scenario: operators_XX",
     "scenarios": {
       "operators_03": {
-        "failToSubmitSGas": 127193,
+        "failToSubmitSGas": 129305,
         "generateRandomNumberGas": 81843,
         "requestToSubmitSGas": 146628,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58257,
-        "totalGas": 472184
+        "totalGas": 474296
       },
       "operators_04": {
-        "failToSubmitSGas": 131468,
+        "failToSubmitSGas": 133580,
         "generateRandomNumberGas": 89637,
         "requestToSubmitSGas": 165186,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 502817
+        "totalGas": 504929
       },
       "operators_05": {
-        "failToSubmitSGas": 128395,
+        "failToSubmitSGas": 130507,
         "generateRandomNumberGas": 97441,
         "requestToSubmitSGas": 183734,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 526096
+        "totalGas": 528208
       },
       "operators_06": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 105232,
         "requestToSubmitSGas": 202303,
         "submitMerkleRoot2Gas": 58254,
         "submitMerkleRootGas": 58260,
-        "totalGas": 563491
+        "totalGas": 565603
       },
       "operators_07": {
-        "failToSubmitSGas": 125898,
+        "failToSubmitSGas": 128010,
         "generateRandomNumberGas": 113017,
         "requestToSubmitSGas": 220870,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 576308
+        "totalGas": 578420
       },
       "operators_08": {
-        "failToSubmitSGas": 132670,
+        "failToSubmitSGas": 134782,
         "generateRandomNumberGas": 120815,
         "requestToSubmitSGas": 239403,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 609411
+        "totalGas": 611523
       },
       "operators_09": {
-        "failToSubmitSGas": 135167,
+        "failToSubmitSGas": 137279,
         "generateRandomNumberGas": 128606,
         "requestToSubmitSGas": 257985,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 638284
+        "totalGas": 640396
       },
       "operators_10": {
-        "failToSubmitSGas": 130892,
+        "failToSubmitSGas": 133004,
         "generateRandomNumberGas": 136436,
         "requestToSubmitSGas": 276524,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 660378
+        "totalGas": 662490
       },
       "operators_11": {
-        "failToSubmitSGas": 135167,
+        "failToSubmitSGas": 137279,
         "generateRandomNumberGas": 144240,
         "requestToSubmitSGas": 295094,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 691024
+        "totalGas": 693136
       },
       "operators_12": {
-        "failToSubmitSGas": 121623,
+        "failToSubmitSGas": 123735,
         "generateRandomNumberGas": 152056,
         "requestToSubmitSGas": 313664,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 703869
+        "totalGas": 705981
       },
       "operators_13": {
-        "failToSubmitSGas": 135167,
+        "failToSubmitSGas": 137279,
         "generateRandomNumberGas": 159839,
         "requestToSubmitSGas": 332180,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 743712
+        "totalGas": 745824
       },
       "operators_14": {
-        "failToSubmitSGas": 131468,
+        "failToSubmitSGas": 133580,
         "generateRandomNumberGas": 167618,
         "requestToSubmitSGas": 350810,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 766419
+        "totalGas": 768531
       },
       "operators_15": {
-        "failToSubmitSGas": 132670,
+        "failToSubmitSGas": 134782,
         "generateRandomNumberGas": 175428,
         "requestToSubmitSGas": 369371,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58260,
-        "totalGas": 793992
+        "totalGas": 796104
       },
       "operators_16": {
-        "failToSubmitSGas": 128395,
+        "failToSubmitSGas": 130507,
         "generateRandomNumberGas": 183229,
         "requestToSubmitSGas": 387911,
         "submitMerkleRoot2Gas": 58257,
         "submitMerkleRootGas": 58263,
-        "totalGas": 816055
+        "totalGas": 818167
       },
       "operators_17": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 191048,
         "requestToSubmitSGas": 406505,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58260,
-        "totalGas": 853515
+        "totalGas": 855627
       },
       "operators_18": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 198825,
         "requestToSubmitSGas": 425048,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 879841
+        "totalGas": 881953
       },
       "operators_19": {
-        "failToSubmitSGas": 132670,
+        "failToSubmitSGas": 134782,
         "generateRandomNumberGas": 206635,
         "requestToSubmitSGas": 443606,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 899434
+        "totalGas": 901546
       },
       "operators_20": {
-        "failToSubmitSGas": 132670,
+        "failToSubmitSGas": 134782,
         "generateRandomNumberGas": 214425,
         "requestToSubmitSGas": 462192,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 925810
+        "totalGas": 927922
       },
       "operators_21": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 222265,
         "requestToSubmitSGas": 480744,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58257,
-        "totalGas": 958971
+        "totalGas": 961083
       },
       "operators_22": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 230024,
         "requestToSubmitSGas": 499299,
         "submitMerkleRoot2Gas": 58257,
         "submitMerkleRootGas": 58263,
-        "totalGas": 985285
+        "totalGas": 987397
       },
       "operators_23": {
-        "failToSubmitSGas": 135167,
+        "failToSubmitSGas": 137279,
         "generateRandomNumberGas": 237853,
         "requestToSubmitSGas": 517825,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58260,
-        "totalGas": 1007368
+        "totalGas": 1009480
       },
       "operators_24": {
-        "failToSubmitSGas": 135167,
+        "failToSubmitSGas": 137279,
         "generateRandomNumberGas": 245630,
         "requestToSubmitSGas": 536422,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 1033745
+        "totalGas": 1035857
       },
       "operators_25": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 253456,
         "requestToSubmitSGas": 554981,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 1064405
+        "totalGas": 1066517
       },
       "operators_26": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 261242,
         "requestToSubmitSGas": 573543,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58260,
-        "totalGas": 1090750
+        "totalGas": 1092862
       },
       "operators_27": {
-        "failToSubmitSGas": 131468,
+        "failToSubmitSGas": 133580,
         "generateRandomNumberGas": 269053,
         "requestToSubmitSGas": 592104,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 1109148
+        "totalGas": 1111260
       },
       "operators_28": {
-        "failToSubmitSGas": 135167,
+        "failToSubmitSGas": 137279,
         "generateRandomNumberGas": 276852,
         "requestToSubmitSGas": 610654,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 1139196
+        "totalGas": 1141308
       },
       "operators_29": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 284665,
         "requestToSubmitSGas": 629210,
         "submitMerkleRoot2Gas": 58257,
         "submitMerkleRootGas": 58260,
-        "totalGas": 1169834
+        "totalGas": 1171946
       },
       "operators_30": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 292458,
         "requestToSubmitSGas": 647796,
         "submitMerkleRoot2Gas": 58257,
         "submitMerkleRootGas": 58263,
-        "totalGas": 1196216
+        "totalGas": 1198328
       },
       "operators_31": {
-        "failToSubmitSGas": 139442,
+        "failToSubmitSGas": 141554,
         "generateRandomNumberGas": 300197,
         "requestToSubmitSGas": 666397,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 1222559
+        "totalGas": 1224671
       },
       "operators_32": {
-        "failToSubmitSGas": 135167,
+        "failToSubmitSGas": 137279,
         "generateRandomNumberGas": 308056,
         "requestToSubmitSGas": 684950,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 1244699
+        "totalGas": 1246811
       }
     }
   },
@@ -440,13 +440,13 @@
     "scenarios": {
       "operators_02": {
         "depositAndActivateGas": 69650,
-        "failToSubmitSGas": 99448,
+        "failToSubmitSGas": 101560,
         "generateRandomNumberGas": 81837,
         "requestToSubmitSGas": 125962,
         "resumeGas": 70312,
         "submitMerkleRoot2Gas": 58257,
         "submitMerkleRootGas": 58263,
-        "totalGas": 563729
+        "totalGas": 565841
       }
     }
   },
@@ -454,252 +454,252 @@
     "description": "Gas usage for leader withholding path: 1->5->14->resume{value: activationThreshold}->5->11 by scenario: operators_XX",
     "scenarios": {
       "operators_02": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 81852,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58257,
         "submitMerkleRootGas": 58260,
-        "totalGas": 357944
+        "totalGas": 360059
       },
       "operators_03": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 89640,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58260,
-        "totalGas": 365738
+        "totalGas": 367853
       },
       "operators_04": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 97441,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58260,
-        "totalGas": 373536
+        "totalGas": 375651
       },
       "operators_05": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 105244,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58257,
         "submitMerkleRootGas": 58263,
-        "totalGas": 381339
+        "totalGas": 383454
       },
       "operators_06": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 113035,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58254,
-        "totalGas": 389127
+        "totalGas": 391242
       },
       "operators_07": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 120833,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 396934
+        "totalGas": 399049
       },
       "operators_08": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 128624,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 404725
+        "totalGas": 406840
       },
       "operators_09": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 136403,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 412504
+        "totalGas": 414619
       },
       "operators_10": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 144240,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 420341
+        "totalGas": 422456
       },
       "operators_11": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 152005,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58260,
-        "totalGas": 428103
+        "totalGas": 430218
       },
       "operators_12": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 159845,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 435946
+        "totalGas": 438061
       },
       "operators_13": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 167630,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58260,
-        "totalGas": 443728
+        "totalGas": 445843
       },
       "operators_14": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 175431,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 451532
+        "totalGas": 453647
       },
       "operators_15": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 183247,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58260,
-        "totalGas": 459342
+        "totalGas": 461457
       },
       "operators_16": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 191015,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 467113
+        "totalGas": 469228
       },
       "operators_17": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 198840,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58257,
         "submitMerkleRootGas": 58263,
-        "totalGas": 474935
+        "totalGas": 477050
       },
       "operators_18": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 206641,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 482742
+        "totalGas": 484857
       },
       "operators_19": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 214437,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 490535
+        "totalGas": 492650
       },
       "operators_20": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 222244,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 498342
+        "totalGas": 500457
       },
       "operators_21": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 230045,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58260,
-        "totalGas": 506140
+        "totalGas": 508255
       },
       "operators_22": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 237823,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58254,
-        "totalGas": 513915
+        "totalGas": 516030
       },
       "operators_23": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 245666,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 521767
+        "totalGas": 523882
       },
       "operators_24": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 253426,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58257,
-        "totalGas": 529518
+        "totalGas": 531633
       },
       "operators_25": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 261275,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58260,
-        "totalGas": 537373
+        "totalGas": 539488
       },
       "operators_26": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 269056,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 545154
+        "totalGas": 547269
       },
       "operators_27": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 276837,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58260,
-        "totalGas": 552935
+        "totalGas": 555050
       },
       "operators_28": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 284635,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58260,
-        "totalGas": 560730
+        "totalGas": 562845
       },
       "operators_29": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 292479,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 568580
+        "totalGas": 570695
       },
       "operators_30": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 300197,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 576295
+        "totalGas": 578410
       },
       "operators_31": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 308053,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 584154
+        "totalGas": 586269
       },
       "operators_32": {
-        "failToRequestSorGenerateRandomNumberGas": 86334,
+        "failToRequestSorGenerateRandomNumberGas": 88449,
         "generateRandomNumberGas": 315855,
         "resumeGas": 73241,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 591956
+        "totalGas": 594071
       }
     }
   }
