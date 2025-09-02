@@ -2,24 +2,24 @@
   "disputeCvCoGas": {
     "metrics": {
       "generateRandomNumberWhenSomeCvsAreOnChainGas": 179119,
-      "requestToSubmitCoGas": 475912,
-      "requestToSubmitCvGas": 64809,
+      "requestToSubmitCoGas": 478034,
+      "requestToSubmitCvGas": 66931,
       "submitCoGas": 46821,
       "submitCvGas": 43809,
-      "sumRequestGas": 540721
+      "sumRequestGas": 544965
     },
     "scenarioKey": "operators_32_submitCv_01_submitCo_32"
   },
   "disputeSecretsGas": {
     "metrics": {
       "lastSubmitSGas": 191059,
-      "requestToSubmitCoGas": 75633,
-      "requestToSubmitCvGas": 64809,
-      "requestToSubmitSGas": 470848,
+      "requestToSubmitCoGas": 77755,
+      "requestToSubmitCvGas": 66931,
+      "requestToSubmitSGas": 472970,
       "submitCoGas": 46821,
       "submitCvGas": 43809,
       "submitSGas": 49482,
-      "sumRequestGas": 611290
+      "sumRequestGas": 617656
     },
     "scenarioKey": "operators_32_submitCv_01"
   },
