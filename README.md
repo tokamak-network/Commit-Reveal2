@@ -14,11 +14,25 @@ Note: A journal version is planned but not yet finalized.
 - Publication is finalized; no further changes are expected.
 - Not subject to external audit.
 
+Checkout:
+
+```
+git fetch origin
+git checkout icbc2025
+```
+
 ### full-paper
 
 - Dedicated to the forthcoming journal submission (full paper).
 - Will remain under revision until acceptance; journal venue is not yet finalized.
 - Not subject to external audit.
+
+Checkout:
+
+```
+git fetch origin
+git checkout full-paper
+```
 
 ### service
 
@@ -26,10 +40,24 @@ Note: A journal version is planned but not yet finalized.
 - Acts as the integration branch used by `drb-node` for interaction.
 - Stable, integration-focused changes are merged here.
 
+Checkout:
+
+```
+git fetch origin
+git checkout service
+```
+
 ### audit/main-fixes
 
 - Working branch to resolve issues reported by the external audit.
 - All fixes will be merged back into `service` after validation.
+
+Checkout:
+
+```
+git fetch origin
+git checkout audit/main-fixes
+```
 
 ## Workflow Summary
 
