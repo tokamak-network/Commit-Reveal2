@@ -483,7 +483,7 @@ contract CommitReveal2 is FailLogics {
                 }
                 mstore(0x00, operatorAddress)
                 mstore(0x20, s_activatedOperatorIndex1Based.slot)
-                if iszero(sload(keccak256(0x00, 0x40))) {
+                if iszero(eq(sload(keccak256(0x00, 0x40)), add(shr(5, i), 1))) {
                     mstore(0x00, 0x1b256530) // selector for NotActivatedOperator()
                     revert(0x1c, 0x04)
                 }
