@@ -6,14 +6,21 @@ import {CommitReveal2Storage} from "./CommitReveal2Storage.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
+    modifier inProgress() {
+        assembly ("memory-safe") {
+            // ** check if the contract is COMPLETED or HALTED
+            if iszero(eq(sload(s_isInProcess.slot), IN_PROGRESS)) {
+                mstore(0, 0x6b4bc078) // RoundNotInProgress()
+                revert(0x1c, 0x04)
+            }
+        }
+        _;
+    }
+
     constructor(string memory name, string memory version) EIP712(name, version) {}
 
-    function requestToSubmitCv(uint256 packedIndicesAscendingFromLSB) external onlyOwner {
+    function requestToSubmitCv(uint256 packedIndicesAscendingFromLSB) external inProgress onlyOwner {
         assembly ("memory-safe") {
-            // mstore(0x00, sload(s_currentRound.slot))
-            // mstore(0x20, s_requestInfo.slot)
-            // mstore(0x00, sload(add(keccak256(0x00, 0x40), 1))) // startTime
-
             let curRound := sload(s_currentRound.slot)
             mstore(0x60, curRound)
             mstore(0x80, s_trialNum.slot)
@@ -112,7 +119,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
         uint256, // packedVsForCvsNotOnChainAndReqToSubmitCo,
         uint256 indicesLength,
         uint256 packedIndicesFirstCvNotOnChainRestCvOnChain
-    ) external onlyOwner {
+    ) external inProgress onlyOwner {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             if iszero(indicesLength) {
@@ -325,7 +332,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
         uint256, // packedVsForAllCvsNotOnChain
         SigRS[] calldata sigRSsForAllCvsNotOnChain,
         uint256 packedRevealOrders
-    ) external onlyOwner {
+    ) external inProgress onlyOwner {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             let curRound := sload(s_currentRound.slot)
