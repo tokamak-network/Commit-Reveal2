@@ -1,44 +1,37 @@
-## About
-This repository contains an implementation of the **Commit-Reveal²** protocol, as described in the paper:
+## Branch Guide
 
-Suhyeon Lee and Euisin Gee, **"Commit-Reveal²: Randomized Reveal Order Mitigates Last-Revealer Attacks in Commit-Reveal,"** *ICBC 2025 - IEEE International Conference on Blockchain and Cryptocurrency, June 2025*
+This repository contains the Commit-Reveal² implementation and is organized into purpose-specific branches.
 
-The Commit-Reveal² protocol ia a blockchain randomness generation mechanism using a two-layer commit-reveal process to reduce the last-revealer attack risk.
+### Citation (ICBC 2025)
 
-## Warning
-The code in this repository has not been audited. Use it with caution. Thoroughly review and test the code before using it in a production environment.
+Suhyeon Lee and Euisin Gee, "Commit-Reveal²: Randomized Reveal Order Mitigates Last-Revealer Attacks in Commit-Reveal," ICBC 2025 — IEEE International Conference on Blockchain and Cryptocurrency, June 2025.
 
-## Directory Structure
+Note: A journal version is planned but not yet finalized.
 
-<pre>
-├── lib: Contains dependencies managed as Git submodules.
-├── src: Main directory containing smart contracts.
-├── test: Test files for Commit-Reveal^2 implementations.
-│   ├── shared: Utility contracts, including quick sorting library.
-</pre>
+### icbc2025
 
-## Requirements
+- Dedicated to the ICBC 2025 conference paper.
+- Publication is finalized; no further changes are expected.
+- Not subject to external audit.
 
-- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-  - You'll know you did it right if you can run `git --version` and you see a response like `git version x.x.x`
-- [foundry](https://getfoundry.sh/)
-  - You'll know you did it right if you can run `forge --version` and you see a response like `forge 0.2.0 (75fc63b 2024-12-05T00:23:16.738603000Z)`
+### full-paper
 
-## Build
+- Dedicated to the forthcoming journal submission (full paper).
+- Will remain under revision until acceptance; journal venue is not yet finalized.
+- Not subject to external audit.
 
-```
-make install
-make build
-```
+### service
 
-## Test
+- Main service branch under external audit.
+- Acts as the integration branch used by `drb-node` for interaction.
+- Stable, integration-focused changes are merged here.
 
-```
-make test
-```
+### audit/main-fixes
 
-Test results will be logged to the console.
-Alternatively, you can review the results in the following JSON files:
+- Working branch to resolve issues reported by the external audit.
+- All fixes will be merged back into `service` after validation.
 
-- commitreveal2hybrid.json
-- commitreveal2onchain.json
+## Workflow Summary
+
+- Research branches: `icbc2025` and `full-paper` are for the paper(s) and are excluded from audit.
+- Service branches: `audit/main-fixes` is where audit findings are addressed; validated fixes will be merged into `service` for integration and operation.
