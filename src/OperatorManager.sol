@@ -5,6 +5,16 @@ pragma solidity ^0.8.30;
 import {Ownable} from "@solady/src/auth/Ownable.sol";
 
 contract OperatorManager is Ownable {
+    modifier NotInProgress() {
+        assembly ("memory-safe") {
+            // ** check if the contract is COMPLETED or HALTED
+            if eq(sload(s_isInProcess.slot), IN_PROGRESS) {
+                mstore(0, 0x8a902655) // ShouldNotBeInProgress()
+                revert(0x1c, 0x04)
+            }
+        }
+        _;
+    }
     // * State Variables
 
     mapping(address operator => uint256) public s_depositAmount;
@@ -49,6 +59,7 @@ contract OperatorManager is Ownable {
     error WithdrawAmountIsZero(); // 0xa393d14b
     error PendingOwnerCannotBeActivatedOperator(); // 0x5df6bf29
     error NotAllowed();
+    error ShouldNotBeInProgress(); // 0x8a902655
 
     constructor() {
         _initializeOwner(msg.sender);
@@ -72,7 +83,7 @@ contract OperatorManager is Ownable {
     }
 
     // ** Override Ownable Functions
-    function transferOwnership(address newOwner) public payable override onlyOwner {
+    function transferOwnership(address newOwner) public payable override NotInProgress onlyOwner {
         _settleSlashReward(msg.sender);
         _settleSlashReward(newOwner);
         assembly ("memory-safe") {
@@ -115,7 +126,7 @@ contract OperatorManager is Ownable {
         }
     }
 
-    function completeOwnershipHandover(address pendingOwner) public payable override onlyOwner {
+    function completeOwnershipHandover(address pendingOwner) public payable override NotInProgress onlyOwner {
         _settleSlashReward(owner());
         _settleSlashReward(pendingOwner);
         /// @solidity memory-safe-assembly
