@@ -4,33 +4,9 @@ pragma solidity ^0.8.30;
 import {DisputeLogics} from "./DisputeLogics.sol";
 
 contract FailLogics is DisputeLogics {
-    // if eq(sload(s_isInProcess.slot), HALTED) {
-    modifier notHalted() {
-        assembly ("memory-safe") {
-            // ** check if the contract is HALTED
-            if eq(sload(s_isInProcess.slot), HALTED) {
-                mstore(0, 0xd6c912e6) // selector for AlreadyHalted()
-                revert(0x1c, 0x04)
-            }
-        }
-        _;
-    }
-
-    //  if iszero(eq(sload(s_isInProcess.slot), IN_PROGRESS)) {
-    modifier inProgress() {
-        assembly ("memory-safe") {
-            // ** check if the contract is COMPLETED or HALTED
-            if iszero(eq(sload(s_isInProcess.slot), IN_PROGRESS)) {
-                mstore(0, 0x6b4bc078) // RoundNotInProgress()
-                revert(0x1c, 0x04)
-            }
-        }
-        _;
-    }
-
     constructor(string memory name, string memory version) DisputeLogics(name, version) {}
 
-    function failToRequestSubmitCvOrSubmitMerkleRoot() external notHalted {
+    function failToRequestSubmitCvOrSubmitMerkleRoot() external inProgress {
         assembly ("memory-safe") {
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
@@ -76,7 +52,7 @@ contract FailLogics is DisputeLogics {
         _executeSlashLeaderAndDistribute(FAILTOREQUESTSUBMITCV_OR_SUBMITMEKRLEROOT_OFFSET);
     }
 
-    function failToSubmitMerkleRootAfterDispute() external notHalted {
+    function failToSubmitMerkleRootAfterDispute() external inProgress {
         assembly ("memory-safe") {
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
@@ -119,7 +95,7 @@ contract FailLogics is DisputeLogics {
         _executeSlashLeaderAndDistribute(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET);
     }
 
-    function failToSubmitCv() external notHalted {
+    function failToSubmitCv() external inProgress {
         uint256 returnGasFee = _getL1FeeUpperBoundOfFailFunction();
         uint256 getL1UpperBoundGasUsed = _getGetL1UpperBoundGasUsed();
         assembly ("memory-safe") {
