@@ -1,7 +1,7 @@
 {
   "disputeCvCoGas": {
     "metrics": {
-      "generateRandomNumberWhenSomeCvsAreOnChainGas": 179119,
+      "generateRandomNumberWhenSomeCvsAreOnChainGas": 179092,
       "requestToSubmitCoGas": 478034,
       "requestToSubmitCvGas": 66931,
       "submitCoGas": 46821,
@@ -12,7 +12,7 @@
   },
   "disputeSecretsGas": {
     "metrics": {
-      "lastSubmitSGas": 191059,
+      "lastSubmitSGas": 191032,
       "requestToSubmitCoGas": 77755,
       "requestToSubmitCvGas": 66931,
       "requestToSubmitSGas": 472970,
