@@ -347,7 +347,7 @@ contract CommitReveal2 is FailLogics {
         }
     }
 
-    function submitMerkleRoot(bytes32 merkleRoot) external onlyOwner {
+    function submitMerkleRoot(bytes32 merkleRoot) external inProgress onlyOwner {
         assembly ("memory-safe") {
             // * get trialNum
             let curRound := sload(s_currentRound.slot)
