@@ -104,6 +104,7 @@ contract CommitReveal2Storage {
     error RevealNotInDescendingOrder(); // 0x24f1948e
     error CvNotSubmitted(); // 0x03798920
     error CvNotEqualHashCo(); // 0x67b3c693
+    error CvAlreadySubmitted(); // 0x9ed7466a
 
     // * Events
     event Status(uint256 curRound, uint256 curTrialNum, uint256 curState); // 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813

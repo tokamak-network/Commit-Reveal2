@@ -5,7 +5,7 @@
       "requestToSubmitCoGas": 478034,
       "requestToSubmitCvGas": 66931,
       "submitCoGas": 46821,
-      "submitCvGas": 43809,
+      "submitCvGas": 43834,
       "sumRequestGas": 544965
     },
     "scenarioKey": "operators_32_submitCv_01_submitCo_32"
@@ -17,7 +17,7 @@
       "requestToSubmitCvGas": 66931,
       "requestToSubmitSGas": 472970,
       "submitCoGas": 46821,
-      "submitCvGas": 43809,
+      "submitCvGas": 43834,
       "submitSGas": 49482,
       "sumRequestGas": 617656
     },

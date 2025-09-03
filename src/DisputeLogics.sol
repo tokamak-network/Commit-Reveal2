@@ -90,6 +90,12 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0x998cf22e) // CvNotRequestedForThisOperator()
                 revert(0x1c, 0x04)
             }
+            // check if already submitted cv using zeroBitIfSubmittedCv_bitmap
+            let mask := shl(activatedOperatorIndex, 1)
+            if iszero(and(bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2, mask)) {
+                mstore(0, 0x9ed7466a) // CvAlreadySubmitted()
+                revert(0x1c, 0x04)
+            }
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
@@ -105,7 +111,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             sstore(add(s_cvs.slot, activatedOperatorIndex), cv)
             sstore(
                 s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot,
-                and(bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2, not(shl(activatedOperatorIndex, 1)))
+                and(bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2, not(mask))
             ) // set to zero
             mstore(0x00, curRound) // 0x20 already has trialNum
             mstore(0x40, cv)
