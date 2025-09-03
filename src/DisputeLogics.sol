@@ -70,7 +70,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
         }
     }
 
-    function submitCv(bytes32 cv) external {
+    function submitCv(bytes32 cv) external inProgress {
         assembly ("memory-safe") {
             mstore(0x00, caller())
             mstore(0x20, s_activatedOperatorIndex1Based.slot)
@@ -286,7 +286,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
         }
     }
 
-    function submitCo(bytes32 co) external {
+    function submitCo(bytes32 co) external inProgress {
         assembly ("memory-safe") {
             // ** check co status
             let curRound := sload(s_currentRound.slot)
@@ -515,7 +515,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
         }
     }
 
-    function submitS(bytes32 s) external {
+    function submitS(bytes32 s) external inProgress {
         assembly ("memory-safe") {
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
@@ -571,10 +571,6 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 let requestCount := sload(s_requestCount.slot)
                 switch eq(nextRound, requestCount)
                 case 1 {
-                    if eq(sload(s_isInProcess.slot), COMPLETED) {
-                        mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
-                        revert(0x1c, 0x04)
-                    }
                     sstore(s_isInProcess.slot, COMPLETED)
                     // 0x00 already has curRound, 0x20 already has trialNum
                     mstore(0x40, COMPLETED)
@@ -636,10 +632,6 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                             break
                         }
                         if iszero(lt(nextRound, requestCount)) {
-                            if eq(sload(s_isInProcess.slot), COMPLETED) {
-                                mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
-                                revert(0x1c, 0x04)
-                            }
                             sstore(s_isInProcess.slot, COMPLETED)
                             let lastRound := sub(requestCount, 1)
                             sstore(s_currentRound.slot, lastRound)
