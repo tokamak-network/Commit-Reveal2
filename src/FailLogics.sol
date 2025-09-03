@@ -249,30 +249,9 @@ contract FailLogics is DisputeLogics {
                     )
             }
             let activationThreshold := sload(s_activationThreshold.slot)
-            if gt(returnGasFee, activationThreshold) { returnGasFee := activationThreshold } // if returnGasFee is greater than one operator's activationThreshold, set returnGasFee to activationThreshold
-            mstore(0x20, caller())
-            mstore(0x40, s_depositAmount.slot)
-            let depositSlot := keccak256(0x20, 0x40) // msg.sender
-            sstore(depositSlot, add(sload(depositSlot), returnGasFee))
-
             // ** cache slash rewards
             let slashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
-            let distributeAmount := sub(mul(activationThreshold, didntSubmitCvLength), returnGasFee)
-            let updatedSlashRewardPerOperatorX8 := slashRewardPerOperatorX8
-            if gt(distributeAmount, 0) {
-                // if distributeAmount is not zero
-                updatedSlashRewardPerOperatorX8 :=
-                    add(
-                        slashRewardPerOperatorX8,
-                        div(
-                            shl(8, distributeAmount),
-                            add(sub(activatedOperatorLength, didntSubmitCvLength), 1) // 1 for owner
-                        )
-                    )
-                // ** update global slash reward
-                sstore(s_slashRewardPerOperatorX8.slot, updatedSlashRewardPerOperatorX8)
-            }
-
+            let distributeAmount
             // ** update slash reward and deactivate for non cv submitters
             let fmp := add(addressToDeactivatesPtr, shl(5, didntSubmitCvLength)) // traverse in reverse order
             for { let i } lt(i, didntSubmitCvLength) { i := add(i, 1) } {
@@ -281,14 +260,19 @@ contract FailLogics is DisputeLogics {
                 mstore(fmp, s_slashRewardPerOperatorPaidX8.slot)
                 let slotToUpdate := keccak256(addressToDeactivatesPtr, 0x40) // s_slashRewardPerOperatorPaidX8[operator]
                 let accumulatedReward := shr(8, sub(slashRewardPerOperatorX8, sload(slotToUpdate)))
-                sstore(slotToUpdate, updatedSlashRewardPerOperatorX8)
                 // ** update deposit Amount
                 mstore(fmp, s_depositAmount.slot)
                 slotToUpdate := keccak256(addressToDeactivatesPtr, 0x40) // s_depositAmount[operator]
                 let totalAvailable := add(sload(slotToUpdate), accumulatedReward)
                 switch gt(totalAvailable, activationThreshold)
-                case 1 { sstore(slotToUpdate, sub(totalAvailable, activationThreshold)) }
-                default { sstore(slotToUpdate, 0) }
+                case 1 {
+                    sstore(slotToUpdate, sub(totalAvailable, activationThreshold))
+                    distributeAmount := add(distributeAmount, activationThreshold)
+                }
+                default {
+                    sstore(slotToUpdate, 0)
+                    distributeAmount := add(distributeAmount, totalAvailable)
+                }
 
                 // ** deactivate operator
                 mstore(fmp, s_activatedOperatorIndex1Based.slot)
@@ -309,6 +293,24 @@ contract FailLogics is DisputeLogics {
 
                 // ** update addressToDeactivatesPtr
                 fmp := sub(fmp, 0x20)
+            }
+            if gt(returnGasFee, distributeAmount) { returnGasFee := distributeAmount }
+            mstore(0x20, caller())
+            mstore(0x40, s_depositAmount.slot)
+            let depositSlot := keccak256(0x20, 0x40) // msg.sender
+            sstore(depositSlot, add(sload(depositSlot), returnGasFee))
+            distributeAmount := sub(distributeAmount, returnGasFee)
+            if gt(distributeAmount, 0) {
+                sstore(
+                    s_slashRewardPerOperatorX8.slot,
+                    add(
+                        slashRewardPerOperatorX8,
+                        div(
+                            shl(8, distributeAmount),
+                            add(activatedOperatorLength, 1) // 1 for owner
+                        )
+                    )
+                )
             }
             // ** update activatedOperators
             sstore(s_activatedOperators.slot, activatedOperatorLength)
@@ -460,29 +462,9 @@ contract FailLogics is DisputeLogics {
                     )
             }
             let activationThreshold := sload(s_activationThreshold.slot)
-            if gt(returnGasFee, activationThreshold) { returnGasFee := activationThreshold } // if returnGasFee is greater than one operator's activationThreshold, set returnGasFee to activationThreshold
-            mstore(0x20, caller())
-            mstore(0x40, s_depositAmount.slot)
-            let depositSlot := keccak256(0x20, 0x40) // msg.sender
-            sstore(depositSlot, add(sload(depositSlot), returnGasFee))
-
             // ** cache slash rewards
             let slashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
-            let distributeAmount := sub(mul(activationThreshold, didntSubmitCoLength), returnGasFee)
-            let updatedSlashRewardPerOperatorX8 := slashRewardPerOperatorX8
-            if gt(distributeAmount, 0) {
-                updatedSlashRewardPerOperatorX8 :=
-                    add(
-                        slashRewardPerOperatorX8,
-                        div(
-                            shl(8, sub(mul(activationThreshold, didntSubmitCoLength), returnGasFee)),
-                            add(sub(activatedOperatorLength, didntSubmitCoLength), 1) // 1 for owner
-                        )
-                    )
-            }
-            // ** update global slash reward
-            sstore(s_slashRewardPerOperatorX8.slot, updatedSlashRewardPerOperatorX8)
-
+            let distributeAmount
             // ** update slash reward and deactivate for non co submitters
             let fmp := add(addressToDeactivatesPtr, shl(5, didntSubmitCoLength)) // traverse in reverse order
             for { let i } lt(i, didntSubmitCoLength) { i := add(i, 1) } {
@@ -491,14 +473,19 @@ contract FailLogics is DisputeLogics {
                 mstore(fmp, s_slashRewardPerOperatorPaidX8.slot)
                 let slotToUpdate := keccak256(addressToDeactivatesPtr, 0x40) // s_slashRewardPerOperatorPaidX8[operator]
                 let accumulatedReward := shr(8, sub(slashRewardPerOperatorX8, sload(slotToUpdate)))
-                sstore(slotToUpdate, updatedSlashRewardPerOperatorX8)
                 // ** update deposit Amount
                 mstore(fmp, s_depositAmount.slot)
                 slotToUpdate := keccak256(addressToDeactivatesPtr, 0x40) // s_depositAmount[operator]
                 let totalAvailable := add(sload(slotToUpdate), accumulatedReward)
                 switch gt(totalAvailable, activationThreshold)
-                case 1 { sstore(slotToUpdate, sub(totalAvailable, activationThreshold)) }
-                default { sstore(slotToUpdate, 0) }
+                case 1 {
+                    sstore(slotToUpdate, sub(totalAvailable, activationThreshold))
+                    distributeAmount := add(distributeAmount, activationThreshold)
+                }
+                default {
+                    sstore(slotToUpdate, 0)
+                    distributeAmount := add(distributeAmount, totalAvailable)
+                }
 
                 // ** deactivate operator
                 mstore(fmp, s_activatedOperatorIndex1Based.slot)
@@ -519,6 +506,24 @@ contract FailLogics is DisputeLogics {
 
                 // ** update addressToDeactivatesPtr
                 fmp := sub(fmp, 0x20)
+            }
+            if gt(returnGasFee, distributeAmount) { returnGasFee := distributeAmount }
+            mstore(0x20, caller())
+            mstore(0x40, s_depositAmount.slot)
+            let depositSlot := keccak256(0x20, 0x40) // msg.sender
+            sstore(depositSlot, add(sload(depositSlot), returnGasFee))
+            distributeAmount := sub(distributeAmount, returnGasFee)
+            if gt(distributeAmount, 0) {
+                sstore(
+                    s_slashRewardPerOperatorX8.slot,
+                    add(
+                        slashRewardPerOperatorX8,
+                        div(
+                            shl(8, distributeAmount),
+                            add(activatedOperatorLength, 1) // 1 for owner
+                        )
+                    )
+                )
             }
             // ** update activatedOperatorLength
             sstore(s_activatedOperators.slot, activatedOperatorLength)

@@ -194,20 +194,20 @@
     "description": "Gas usage for participant withholding path 2: 1->5->12->15->5->11 by scenario: operators_XX",
     "scenarios": {
       "operators_03": {
-        "failToSubmitSGas": 129305,
+        "failToSubmitSGas": 129304,
         "generateRandomNumberGas": 81816,
         "requestToSubmitSGas": 146628,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58257,
-        "totalGas": 474269
+        "totalGas": 474268
       },
       "operators_04": {
-        "failToSubmitSGas": 133580,
+        "failToSubmitSGas": 133579,
         "generateRandomNumberGas": 89610,
         "requestToSubmitSGas": 165186,
         "submitMerkleRoot2Gas": 58263,
         "submitMerkleRootGas": 58263,
-        "totalGas": 504902
+        "totalGas": 504901
       },
       "operators_05": {
         "failToSubmitSGas": 130507,
@@ -282,12 +282,12 @@
         "totalGas": 745797
       },
       "operators_14": {
-        "failToSubmitSGas": 133580,
+        "failToSubmitSGas": 133579,
         "generateRandomNumberGas": 167591,
         "requestToSubmitSGas": 350810,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 768504
+        "totalGas": 768503
       },
       "operators_15": {
         "failToSubmitSGas": 134782,
@@ -386,12 +386,12 @@
         "totalGas": 1092835
       },
       "operators_27": {
-        "failToSubmitSGas": 133580,
+        "failToSubmitSGas": 133579,
         "generateRandomNumberGas": 269026,
         "requestToSubmitSGas": 592104,
         "submitMerkleRoot2Gas": 58260,
         "submitMerkleRootGas": 58263,
-        "totalGas": 1111233
+        "totalGas": 1111232
       },
       "operators_28": {
         "failToSubmitSGas": 137279,
