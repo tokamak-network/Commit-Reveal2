@@ -707,7 +707,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
         SigRS[] calldata sigRSsForAllCvsNotOnChain,
         uint256, // packedVsForAllCvsNotOnChain
         uint256 packedRevealOrders
-    ) external {
+    ) external inProgress {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             // ** check if some cvs are on-chain
@@ -855,10 +855,6 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             switch eq(nextRound, requestCount)
             case 1 {
                 // there is no next round
-                if eq(sload(s_isInProcess.slot), COMPLETED) {
-                    mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
-                    revert(0x1c, 0x04)
-                }
                 sstore(s_isInProcess.slot, COMPLETED)
                 mstore(0x00, curRound)
                 mstore(0x20, trialNum)
@@ -918,10 +914,6 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                         break
                     }
                     if iszero(lt(nextRound, requestCount)) {
-                        if eq(sload(s_isInProcess.slot), COMPLETED) {
-                            mstore(0x00, 0x195332a5) // selector for AlreadyCompleted()
-                            revert(0x1c, 0x04)
-                        }
                         sstore(s_isInProcess.slot, COMPLETED)
                         let lastRound := sub(requestCount, 1)
                         sstore(s_currentRound.slot, lastRound)
