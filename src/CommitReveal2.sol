@@ -4,6 +4,16 @@ pragma solidity ^0.8.30;
 import {FailLogics} from "./FailLogics.sol";
 
 contract CommitReveal2 is FailLogics {
+    modifier onlyWhenCompleted() {
+        assembly ("memory-safe") {
+            if iszero(eq(sload(s_isInProcess.slot), COMPLETED)) {
+                mstore(0, 0x644a8033) // selector for NotCompletedStatus()
+                revert(0x1c, 0x04)
+            }
+        }
+        _;
+    }
+
     constructor(
         uint256 activationThreshold,
         uint256 flatFee,
@@ -40,7 +50,7 @@ contract CommitReveal2 is FailLogics {
         }
     }
 
-    function executeSetEconomicParameters() external notInProcess {
+    function executeSetEconomicParameters() external onlyWhenCompleted {
         assembly ("memory-safe") {
             let economicParamsEffectiveTimestamp := sload(s_economicParamsEffectiveTimestamp.slot)
             // check economicParamsEffectiveTimestamp is not 0
@@ -182,7 +192,7 @@ contract CommitReveal2 is FailLogics {
         }
     }
 
-    function executeSetGasParameters() external notInProcess {
+    function executeSetGasParameters() external onlyWhenCompleted {
         assembly ("memory-safe") {
             let gasParamsEffectiveTimestamp := sload(s_gasParamsEffectiveTimestamp.slot)
             if iszero(gasParamsEffectiveTimestamp) {
