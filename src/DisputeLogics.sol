@@ -21,22 +21,23 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
 
     function requestToSubmitCv(uint256 packedIndicesAscendingFromLSB) external inProgress onlyOwner {
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let curRound := sload(s_currentRound.slot)
-            mstore(0x60, curRound)
-            mstore(0x80, s_trialNum.slot)
-            mstore(0x20, sload(keccak256(0x60, 0x40))) // trialNum
+            mstore(0x40, curRound)
+            mstore(0x60, s_trialNum.slot)
+            mstore(0x00, sload(keccak256(0x40, 0x40))) // trialNum
             // * get requestedToSubmitCvTimestamp
-            mstore(0x80, s_requestedToSubmitCvTimestamp.slot)
-            mstore(0x40, keccak256(0x60, 0x40))
-            let requestedToSubmitCvTimestampSlot := keccak256(0x20, 0x40)
+            mstore(0x60, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
+            let requestedToSubmitCvTimestampSlot := keccak256(0x00, 0x40)
             if gt(sload(requestedToSubmitCvTimestampSlot), 0) {
                 mstore(0, 0x899a05f2) // AlreadyRequestedToSubmitCv()
                 revert(0x1c, 0x04)
             }
             // * get merkleRootSubmittedTimestamp
-            mstore(0x80, s_merkleRootSubmittedTimestamp.slot)
-            mstore(0x40, keccak256(0x60, 0x40))
-            if gt(sload(keccak256(0x20, 0x40)), 0) {
+            mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
+            if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0, 0xf6b442ac) // MerkleRootIsSubmitted()
                 revert(0x1c, 0x04)
             }
@@ -57,6 +58,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 }
                 if iszero(gt(currentIndex, previousIndex)) { break }
                 bitSetIfRequestedToSubmitCv := or(bitSetIfRequestedToSubmitCv, shl(currentIndex, 1))
+                if eq(currentIndex, maxIndex) { break }
                 previousIndex := currentIndex
             }
             sstore(requestedToSubmitCvTimestampSlot, timestamp())
@@ -65,13 +67,17 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot,
                 or(shl(128, bitSetIfRequestedToSubmitCv), 0xffffffff)
             ) // set zeroBitIfSubmittedCvBitmap all bits to 1
+            mstore(0x20, mload(0x00)) // trialNum
             mstore(0x00, curRound) // 0x20 already has trialNum, 0x40 already has packedIndicesAscendingFromLSB
             log1(0x00, 0x60, 0x16759d80d11394de93184cfeb4e91cf57282cef239f68ed141c496600454f757) // event RequestedToSubmitCv(uint256 round, uint256 trialNum, uint256 packedIndicesAscendingFromLSB)
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 
     function submitCv(bytes32 cv) external inProgress {
         assembly ("memory-safe") {
+            let m := mload(0x40)
             mstore(0x00, caller())
             mstore(0x20, s_activatedOperatorIndex1Based.slot)
             let activatedOperatorIndex := sub(sload(keccak256(0x00, 0x40)), 1) // overflows when s_activatedOperatorIndex1Based is 0
@@ -117,6 +123,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             mstore(0x40, cv)
             mstore(0x60, activatedOperatorIndex)
             log1(0x00, 0x80, 0x6a6385c5eaed19d346ec4f9bd0010cfba4ac1d0407e2e55f959cb8fcac30f873) // event CvSubmitted(uint256 round, uint256 trialNum, bytes32 cv, uint256 index)
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 
@@ -128,6 +136,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
     ) external inProgress onlyOwner {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
+            let m := mload(0x40)
             if iszero(indicesLength) {
                 mstore(0, 0xbf557497) // ZeroLength()
                 revert(0x1c, 0x04)
@@ -193,7 +202,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             let maxIndex := sub(operatorsLength, 1) // max index
             let checkDuplicate
 
-            let fmp := 0x80 // fmp
+            let fmp := m // fmp
             mstore(fmp, MESSAGE_TYPEHASH_DIRECT)
             mstore(add(fmp, 0x20), curRound)
             mstore(add(fmp, 0x40), trialNum)
@@ -283,11 +292,14 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             mstore(0x40, indicesLength)
             mstore(0x60, packedIndicesFirstCvNotOnChainRestCvOnChain)
             log1(0x00, 0x80, 0xd4cc5cd95f180f10aaacba0729abc069b8080ec3a7e8e41856decb17bdc28ece) // event RequestedToSubmitCo(uint256 round, uint256 trialNum, uint256 indicesLength, uint256 packedIndices);
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 
     function submitCo(bytes32 co) external inProgress {
         assembly ("memory-safe") {
+            let m := mload(0x40)
             // ** check co status
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
@@ -329,6 +341,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             mstore(0x00, curRound) // 0x20 already has trialNum, 0x40 already has co
             mstore(0x60, activatedOperatorIndex)
             log1(0x00, 0x80, 0xc294138987faa6e0ebef350caeac5cf5e1eff8dbbe8a158e421601f48674babd) // event CoSubmitted(uint256 round, uint256 trialNum, bytes32 co, uint256 index)
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 
@@ -341,6 +355,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
     ) external inProgress onlyOwner {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
@@ -382,10 +397,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             }
 
             // ****
-            let cos := 0xc0
+            let cos := add(m, 0x40)
             let operatorLengthInBytes := mul(activatedOperatorsLength, 0x20)
             calldatacopy(cos, allCos.offset, operatorLengthInBytes) // allCos
-            mstore(0x80, keccak256(cos, operatorLengthInBytes)) // rv
+            mstore(m, keccak256(cos, operatorLengthInBytes)) // rv
             let cvs := add(cos, operatorLengthInBytes) // cvs
             let di := add(cvs, operatorLengthInBytes) // diffs
             let fmp := add(di, operatorLengthInBytes) // fmp
@@ -398,8 +413,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             for { let i } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
                 let cv := keccak256(add(cos, shl(5, i)), 0x20)
                 mstore(add(cvs, shl(5, i)), cv) // cv
-                mstore(0xa0, cv)
-                mstore(add(di, shl(5, i)), keccak256(0x80, 0x40)) // hash(rv || cv)
+                mstore(add(m, 0x20), cv)
+                mstore(add(di, shl(5, i)), keccak256(m, 0x40)) // hash(rv || cv)
                 switch iszero(and(zeroBitIfSubmittedCvBitmap, shl(i, 1)))
                 case 1 {
                     // cv is on-chain
@@ -512,11 +527,14 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             }
             // Record the timestamp of the last S submission
             sstore(previousSSubmitTimestampSlot, timestamp())
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 
     function submitS(bytes32 s) external inProgress {
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
@@ -691,6 +709,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 sstore(s_requestedToSubmitSFromIndexK.slot, add(requestedToSubmitSFromIndexK, 1)) // increment index
                 sstore(previousSSubmitTimestampSlot, timestamp())
             }
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 
@@ -702,6 +722,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
     ) external inProgress {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
+            let m := mload(0x40)
             // ** check if some cvs are on-chain
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
@@ -725,7 +746,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
             let activatedOperatorsLengthInBytes := shl(5, activatedOperatorsLength)
 
-            let cos := 0x80
+            let cos := m
             let cvs := add(cos, activatedOperatorsLengthInBytes)
             let secrets := add(cvs, activatedOperatorsLengthInBytes)
             mstore(0x40, add(secrets, activatedOperatorsLengthInBytes)) // update the free memory pointer
@@ -966,6 +987,8 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
                 pop(call(callbackGasLimit, consumer, 0, 0x1c, 0x44, 0, 0))
             }
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 }

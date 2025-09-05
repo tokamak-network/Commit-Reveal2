@@ -8,6 +8,7 @@ contract FailLogics is DisputeLogics {
 
     function failToRequestSubmitCvOrSubmitMerkleRoot() external inProgress {
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
@@ -48,12 +49,15 @@ contract FailLogics is DisputeLogics {
             mstore(0x20, trialNum)
             mstore(0x40, HALTED)
             log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
         _executeSlashLeaderAndDistribute(FAILTOREQUESTSUBMITCV_OR_SUBMITMEKRLEROOT_OFFSET);
     }
 
     function failToSubmitMerkleRootAfterDispute() external inProgress {
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
@@ -91,6 +95,8 @@ contract FailLogics is DisputeLogics {
             sstore(s_isInProcess.slot, HALTED)
             mstore(0x40, HALTED)
             log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
         _executeSlashLeaderAndDistribute(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET);
     }
@@ -99,6 +105,7 @@ contract FailLogics is DisputeLogics {
         uint256 returnGasFee = _getL1FeeUpperBoundOfFailFunction();
         uint256 getL1UpperBoundGasUsed = _getGetL1UpperBoundGasUsed();
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
@@ -128,7 +135,7 @@ contract FailLogics is DisputeLogics {
 
             // ** who didn't submit cv even though requested
             let didntSubmitCvLength
-            let addressToDeactivatesPtr := 0x80 // fmp
+            let addressToDeactivatesPtr := m // fmp
             let zeroBitIfSubmittedCvBitmap := sload(s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot)
             mstore(0x20, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x20, 0x20)
@@ -335,6 +342,8 @@ contract FailLogics is DisputeLogics {
                 mstore(0x40, HALTED)
                 log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 
@@ -342,6 +351,7 @@ contract FailLogics is DisputeLogics {
         uint256 returnGasFee = _getL1FeeUpperBoundOfFailFunction();
         uint256 getL1UpperBoundGasUsed = _getGetL1UpperBoundGasUsed();
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
@@ -365,7 +375,7 @@ contract FailLogics is DisputeLogics {
             // ** who didn't submit co even though requested
             let requestedToSubmitCoLength := sload(s_requestedToSubmitCoLength.slot)
             let didntSubmitCoLength
-            let addressToDeactivatesPtr := 0x80 // fmp
+            let addressToDeactivatesPtr := m // fmp
             let zeroBitIfSubmittedCoBitmap := sload(s_zeroBitIfSubmittedCoBitmap.slot)
             mstore(0x20, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x20, 0x20)
@@ -548,12 +558,15 @@ contract FailLogics is DisputeLogics {
                 mstore(0x40, HALTED)
                 log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // emit Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 
     function failToSubmitS() external inProgress {
         uint256 returnGasFee = _calculateFailGasFee(FAILTOSUBMITS_OFFSET);
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
@@ -647,11 +660,14 @@ contract FailLogics is DisputeLogics {
                 mstore(0x40, HALTED)
                 log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
             }
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
     }
 
     function failToRequestSorGenerateRandomNumber() external inProgress {
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
@@ -714,6 +730,8 @@ contract FailLogics is DisputeLogics {
             mstore(0x20, trialNum)
             mstore(0x40, HALTED)
             log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
+            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x60, 0) // Restore the zero slot.
         }
         _executeSlashLeaderAndDistribute(FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET);
     }
@@ -721,6 +739,7 @@ contract FailLogics is DisputeLogics {
     function _executeSlashLeaderAndDistribute(uint256 bitsToShiftRight) internal {
         uint256 returnGasFee = _calculateFailGasFee(bitsToShiftRight);
         assembly ("memory-safe") {
+            let m := mload(0x40)
             let activationThreshold := sload(s_activationThreshold.slot)
             let beforeSlashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
             mstore(0x20, sload(_OWNER_SLOT))
@@ -754,6 +773,7 @@ contract FailLogics is DisputeLogics {
                 sstore(s_slashRewardPerOperatorX8.slot, afterSlashRewardPerOperatorX8)
                 sstore(slashRewardPerOperatorPaidX8Slot, afterSlashRewardPerOperatorX8)
             }
+            mstore(0x40, m) // Restore the free memory pointer
         }
     }
 
