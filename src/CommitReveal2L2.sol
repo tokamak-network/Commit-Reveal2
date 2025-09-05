@@ -75,9 +75,10 @@ contract CommitReveal2L2 is CommitReveal2 {
         returns (uint256 requestFee)
     {
         assembly ("memory-safe") {
+            let m := mload(0x40)
             mstore(0x00, 0xf1c7a58b) // selector for "getL1FeeUpperBound(uint256 _unsignedTxSize) external view returns (uint256)"
             mstore(0x20, add(MERKLEROOTSUB_CALLDATA_BYTES_SIZE, L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
-            if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x80, 0x20)) {
+            if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, m, 0x20)) {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
             }
@@ -111,8 +112,9 @@ contract CommitReveal2L2 is CommitReveal2 {
                         ),
                         sload(s_flatFee.slot)
                     ), // l2GasFee
-                    div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x80))), 100) // L1GasFee
+                    div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(m))), 100) // L1GasFee
                 )
+            mstore(0x40, m) // Restore the free memory pointer
         }
     }
 
