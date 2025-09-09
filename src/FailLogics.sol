@@ -619,6 +619,7 @@ contract FailLogics is DisputeLogics {
             // ** activatedOperatorIndex1Based = 0
             mstore(0x40, s_activatedOperatorIndex1Based.slot)
             sstore(keccak256(0x20, 0x40), 0)
+            log1(0x20, 0x20, 0x5d10eb48d8c00fb4cc9120533a99e2eac5eb9d0f8ec06216b2e4d5b1ff175a4d) // `DeActivated(address operator)`.
             if iszero(eq(lastOperatorAddress, operatorToDeactivate)) {
                 sstore(add(firstActivatedOperatorSlot, operatorToDeactivateIndex), lastOperatorAddress)
                 mstore(0x20, lastOperatorAddress)
