@@ -268,6 +268,11 @@ contract CommitReveal2 is FailLogics {
         );
         assembly ("memory-safe") {
             let m := mload(0x40)
+            // ** check if the contract is halted (moved upfront for gas optimization)
+            if eq(sload(s_isInProcess.slot), HALTED) {
+                mstore(0, 0x2caa910c) // selector for CannotRequestWhenHalted()
+                revert(0x1c, 0x04)
+            }
             // ** check if the callbackGasLimit is within the limit
             if gt(callbackGasLimit, sload(s_maxCallbackGasLimit.slot)) {
                 mstore(0, 0x1cf7ab79) // selector for ExceedCallbackGasLimit()
@@ -306,10 +311,6 @@ contract CommitReveal2 is FailLogics {
             // ** check if the current round is completed
             // ** if the current round is completed, start a new round
             let currentState := sload(s_isInProcess.slot)
-            if eq(currentState, HALTED) {
-                mstore(0, 0x2caa910c) // selector for CannotRequestWhenHalted()
-                revert(0x1c, 0x04)
-            }
             if eq(currentState, COMPLETED) {
                 startTime := timestamp()
                 sstore(s_currentRound.slot, newRound)
