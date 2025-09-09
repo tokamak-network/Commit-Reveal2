@@ -805,7 +805,6 @@ contract CommitReveal2 is FailLogics {
                 }
                 nextRound := add(nextRound, 1)
             }
-            sstore(s_currentRound.slot, nextRound)
             mstore(0x40, m) // Restore the free memory pointer
         }
     }
