@@ -235,8 +235,12 @@ contract CommitReveal2 is FailLogics {
             mstore(add(m, 0x140), and(shr(FAILTOSUBMITGASUSEDBASEB_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
             mstore(add(m, 0x160), and(shr(PEROPERATORINCREASEGASUSEDA_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
             mstore(add(m, 0x180), and(shr(PEROPERATORINCREASEGASUSEDB_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
-            mstore(add(m, 0x1a0), and(shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
-            mstore(add(m, 0x1c0), and(shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
+            mstore(
+                add(m, 0x1a0), and(shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK)
+            )
+            mstore(
+                add(m, 0x1c0), and(shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK)
+            )
             mstore(add(m, 0x1e0), and(shr(PERREQUESTEDINCREASEGASUSED_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
             // clear effective timestamp after execution
             sstore(s_gasParamsEffectiveTimestamp.slot, 0)
@@ -269,7 +273,8 @@ contract CommitReveal2 is FailLogics {
         assembly ("memory-safe") {
             let m := mload(0x40)
             // ** check if the contract is halted (moved upfront for gas optimization)
-            if eq(sload(s_isInProcess.slot), HALTED) {
+            let currentState := sload(s_isInProcess.slot)
+            if eq(currentState, HALTED) {
                 mstore(0, 0x2caa910c) // selector for CannotRequestWhenHalted()
                 revert(0x1c, 0x04)
             }
@@ -310,7 +315,6 @@ contract CommitReveal2 is FailLogics {
             let startTime
             // ** check if the current round is completed
             // ** if the current round is completed, start a new round
-            let currentState := sload(s_isInProcess.slot)
             if eq(currentState, COMPLETED) {
                 startTime := timestamp()
                 sstore(s_currentRound.slot, newRound)
