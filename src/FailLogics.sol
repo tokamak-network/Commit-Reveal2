@@ -177,13 +177,15 @@ contract FailLogics is DisputeLogics {
 
             // ** return gas fee to the caller()
             let dynamicFailToSubmitGasUsed := sload(s_failToSubmitCoGasUsedBaseA.slot)
+            let gasPrice := sload(s_maxGasPrice.slot)
+            if gt(gasPrice, gasprice()) { gasPrice := gasprice() }
             switch eq(requestedToSubmitLength, activatedOperatorLength)
             case 1 {
                 returnGasFee :=
                     add(
                         returnGasFee,
                         mul(
-                            gasprice(),
+                            gasPrice,
                             add(
                                 sub(
                                     and(
@@ -217,7 +219,7 @@ contract FailLogics is DisputeLogics {
                     add(
                         returnGasFee,
                         mul(
-                            gasprice(),
+                            gasPrice,
                             add(
                                 sub(
                                     and(
@@ -399,13 +401,15 @@ contract FailLogics is DisputeLogics {
             // ** return gas fee to the caller()
             let activatedOperatorLength := sload(s_activatedOperators.slot)
             let dynamicFailToSubmitGasUsed := sload(s_failToSubmitCoGasUsedBaseA.slot)
+            let gasPrice := sload(s_maxGasPrice.slot)
+            if gt(gasPrice, gasprice()) { gasPrice := gasprice() }
             switch eq(requestedToSubmitCoLength, activatedOperatorLength)
             case 1 {
                 returnGasFee :=
                     add(
                         returnGasFee,
                         mul(
-                            gasprice(),
+                            gasPrice,
                             add(
                                 sub(and(dynamicFailToSubmitGasUsed, DYNAMICFAILTOSUBMIT_MASK), getL1UpperBoundGasUsed),
                                 add(
@@ -433,7 +437,7 @@ contract FailLogics is DisputeLogics {
                     add(
                         returnGasFee,
                         mul(
-                            gasprice(),
+                            gasPrice,
                             add(
                                 sub(
                                     and(
@@ -780,9 +784,11 @@ contract FailLogics is DisputeLogics {
     function _calculateFailGasFee(uint256 bitsToShiftRight) internal view virtual returns (uint256 gasFee) {
         assembly ("memory-safe") {
             let failgasUsed := sload(s_getL1UpperBoundGasUsedWhenCalldataSize4.slot)
+            let gasPrice := sload(s_maxGasPrice.slot)
+            if gt(gasPrice, gasprice()) { gasPrice := gasprice() }
             gasFee :=
                 mul(
-                    gasprice(),
+                    gasPrice,
                     sub(and(shr(bitsToShiftRight, failgasUsed), FAILTOSUBMIT_MASK), and(failgasUsed, FAILTOSUBMIT_MASK))
                 )
         }

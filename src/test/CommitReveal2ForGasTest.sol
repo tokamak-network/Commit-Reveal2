@@ -13,7 +13,8 @@ contract CommitReveal2ForGasTest is CommitReveal2L2 {
         uint256 requestOrSubmitOrFailDecisionPeriod,
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
-        uint256 onChainSubmissionPeriodPerOperator
+        uint256 onChainSubmissionPeriodPerOperator,
+        uint256 maxGasPrice
     )
         payable
         CommitReveal2L2(
@@ -25,7 +26,8 @@ contract CommitReveal2ForGasTest is CommitReveal2L2 {
             requestOrSubmitOrFailDecisionPeriod,
             onChainSubmissionPeriod,
             offChainSubmissionPeriodPerOperator,
-            onChainSubmissionPeriodPerOperator
+            onChainSubmissionPeriodPerOperator,
+            maxGasPrice
         )
     {}
 
