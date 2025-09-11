@@ -21,9 +21,20 @@ contract ParamDelayTest is Test {
     // Custom error selectors
     bytes4 private constant TOO_EARLY = 0x085de625;
 
+    uint256 maxGasPrice = 20 gwei;
+
     function setUp() public {
         s_commitReveal2 = new CommitReveal2{value: ACTIVATION_THRESHOLD}(
-            ACTIVATION_THRESHOLD, FLAT_FEE, NAME, VERSION, OFFCHAIN, DECISION, ONCHAIN, OFFCHAIN_PER_OP, ONCHAIN_PER_OP
+            ACTIVATION_THRESHOLD,
+            FLAT_FEE,
+            NAME,
+            VERSION,
+            OFFCHAIN,
+            DECISION,
+            ONCHAIN,
+            OFFCHAIN_PER_OP,
+            ONCHAIN_PER_OP,
+            maxGasPrice
         );
     }
 
@@ -88,7 +99,8 @@ contract ParamDelayTest is Test {
             perOpB,
             perDidntA,
             perDidntB,
-            perReq
+            perReq,
+            maxGasPrice
         );
 
         // Execute too early should revert
@@ -135,6 +147,7 @@ contract ParamDelayTest is Test {
         assertEq(rPerDidntA, perDidntA, "perDidntA mismatch");
         assertEq(rPerDidntB, perDidntB, "perDidntB mismatch");
         assertEq(rPerReq, perReq, "perReq mismatch");
+        assertEq(s_commitReveal2.s_maxGasPrice(), maxGasPrice, "maxGasPrice mismatch");
         assertEq(s_commitReveal2.s_gasParamsEffectiveTimestamp(), 0, "gas effective ts not cleared");
     }
 }

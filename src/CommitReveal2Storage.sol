@@ -143,8 +143,9 @@ contract CommitReveal2Storage {
         uint32 perOperatorIncreaseGasUsedB,
         uint32 perAdditionalDidntSubmitGasUsedA,
         uint32 perAdditionalDidntSubmitGasUsedB,
-        uint32 perRequestedIncreaseGasUsed
-    ); // 0x8d09171105499771f96d6d39dcdda061a70fd18e5eafd65881c2158c55f94e1d
+        uint32 perRequestedIncreaseGasUsed,
+        uint256 maxGasPrice
+    ); // 0xeb624bc1c126e8a8e5b3b848dc36ed397e8f707ceba869c4cca058dbe4abf5d7
     event GasParametersProposed(
         uint128 gasUsedMerkleRootSubAndGenRandNumA,
         uint128 gasUsedMerkleRootSubAndGenRandNumB,
@@ -162,9 +163,10 @@ contract CommitReveal2Storage {
         uint32 perAdditionalDidntSubmitGasUsedA,
         uint32 perAdditionalDidntSubmitGasUsedB,
         uint32 perRequestedIncreaseGasUsed,
-        uint256 effectiveTimestamp
-    ); // 0xac29dedddb8466e143ff09a21b0181b73354eae633cc2787fb6dd4c3b50dfbe2
-
+        uint256 effectiveTimestamp,
+        uint256 maxGasPrice
+    );
+    // 0x3fdaf13122b997bf0388b0bf45df533647a2ff56c32aed869f0630ea422ce4a1
     // * State Variables
     // ** public
 
@@ -385,6 +387,8 @@ contract CommitReveal2Storage {
 
     uint256 public s_economicParamsEffectiveTimestamp;
     uint256 public s_gasParamsEffectiveTimestamp;
+    uint256 public s_pendingMaxGasPrice;
+    uint256 public s_maxGasPrice;
 
     function getPeriods()
         external

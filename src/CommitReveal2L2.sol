@@ -30,7 +30,8 @@ contract CommitReveal2L2 is CommitReveal2 {
         uint256 requestOrSubmitOrFailDecisionPeriod,
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
-        uint256 onChainSubmissionPeriodPerOperator
+        uint256 onChainSubmissionPeriodPerOperator,
+        uint256 maxGasPrice
     )
         payable
         CommitReveal2(
@@ -42,7 +43,8 @@ contract CommitReveal2L2 is CommitReveal2 {
             requestOrSubmitOrFailDecisionPeriod,
             onChainSubmissionPeriod,
             offChainSubmissionPeriodPerOperator,
-            onChainSubmissionPeriodPerOperator
+            onChainSubmissionPeriodPerOperator,
+            maxGasPrice
         )
     {}
 
@@ -126,10 +128,12 @@ contract CommitReveal2L2 is CommitReveal2 {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
             }
+            let gasPrice := sload(s_maxGasPrice.slot)
+            if gt(gasPrice, gasprice()) { gasPrice := gasprice() }
             gasFee :=
                 add(
                     mul(
-                        gasprice(),
+                        gasPrice,
                         and(shr(bitsToShiftRight, sload(s_getL1UpperBoundGasUsedWhenCalldataSize4.slot)), FAILTOSUBMIT_MASK)
                     ),
                     div(mul(sload(s_l1FeeCoefficient.slot), mload(0x00)), 100)
