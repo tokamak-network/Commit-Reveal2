@@ -23,7 +23,8 @@ contract CommitReveal2 is FailLogics {
         uint256 requestOrSubmitOrFailDecisionPeriod,
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
-        uint256 onChainSubmissionPeriodPerOperator
+        uint256 onChainSubmissionPeriodPerOperator,
+        uint256 maxGasPrice
     ) payable FailLogics(name, version) {
         require(msg.value >= activationThreshold);
         s_depositAmount[msg.sender] = msg.value;
@@ -35,6 +36,7 @@ contract CommitReveal2 is FailLogics {
         s_offChainSubmissionPeriodPerOperator = offChainSubmissionPeriodPerOperator;
         s_onChainSubmissionPeriodPerOperator = onChainSubmissionPeriodPerOperator;
         s_isInProcess = COMPLETED;
+        s_maxGasPrice = maxGasPrice;
     }
 
     function proposeEconomicParameters(uint256 activationThreshold, uint256 flatFee) external onlyOwner {
@@ -115,7 +117,8 @@ contract CommitReveal2 is FailLogics {
         uint32 perOperatorIncreaseGasUsedB,
         uint32 perAdditionalDidntSubmitGasUsedA,
         uint32 perAdditionalDidntSubmitGasUsedB,
-        uint32 perRequestedIncreaseGasUsed
+        uint32 perRequestedIncreaseGasUsed,
+        uint256 maxGasPrice
     ) external onlyOwner {
         assembly ("memory-safe") {
             let m := mload(0x40)
@@ -175,6 +178,7 @@ contract CommitReveal2 is FailLogics {
             )
             let effectiveTimestamp := add(timestamp(), SET_DELAY_TIME)
             sstore(s_gasParamsEffectiveTimestamp.slot, effectiveTimestamp)
+            sstore(s_pendingMaxGasPrice.slot, maxGasPrice)
 
             mstore(m, gasUsedMerkleRootSubAndGenRandNumA)
             mstore(add(m, 0x20), gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead)
@@ -193,7 +197,8 @@ contract CommitReveal2 is FailLogics {
             mstore(add(m, 0x1c0), perAdditionalDidntSubmitGasUsedB)
             mstore(add(m, 0x1e0), perRequestedIncreaseGasUsed)
             mstore(add(m, 0x200), effectiveTimestamp)
-            log1(m, 0x220, 0xac29dedddb8466e143ff09a21b0181b73354eae633cc2787fb6dd4c3b50dfbe2) // event GasParametersProposed(...)
+            mstore(add(m, 0x220), maxGasPrice)
+            log1(m, 0x240, 0x3fdaf13122b997bf0388b0bf45df533647a2ff56c32aed869f0630ea422ce4a1) // event GasParametersProposed(...)
             mstore(0x40, m) // Restore the free memory pointer
         }
     }
@@ -244,7 +249,11 @@ contract CommitReveal2 is FailLogics {
             mstore(add(m, 0x1e0), and(shr(PERREQUESTEDINCREASEGASUSED_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
             // clear effective timestamp after execution
             sstore(s_gasParamsEffectiveTimestamp.slot, 0)
-            log1(m, 0x200, 0x8d09171105499771f96d6d39dcdda061a70fd18e5eafd65881c2158c55f94e1d) // event GasParametersSet(...)
+            packedData := sload(s_pendingMaxGasPrice.slot)
+            sstore(s_maxGasPrice.slot, packedData)
+            mstore(add(m, 0x200), packedData)
+
+            log1(m, 0x220, 0xeb624bc1c126e8a8e5b3b848dc36ed397e8f707ceba869c4cca058dbe4abf5d7) // event GasParametersSet(...)
             mstore(0x40, m) // Restore the free memory pointer
         }
     }

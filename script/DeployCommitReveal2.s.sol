@@ -26,7 +26,8 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                     activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
                     activeNetworkConfig.onChainSubmissionPeriod,
                     activeNetworkConfig.offChainSubmissionPeriodPerOperator,
-                    activeNetworkConfig.onChainSubmissionPeriodPerOperator
+                    activeNetworkConfig.onChainSubmissionPeriodPerOperator,
+                    activeNetworkConfig.maxGasPrice
                 )
             );
         } else {
@@ -40,7 +41,8 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                     activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
                     activeNetworkConfig.onChainSubmissionPeriod,
                     activeNetworkConfig.offChainSubmissionPeriodPerOperator,
-                    activeNetworkConfig.onChainSubmissionPeriodPerOperator
+                    activeNetworkConfig.onChainSubmissionPeriodPerOperator,
+                    activeNetworkConfig.maxGasPrice
                 )
             );
         }
@@ -61,7 +63,8 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                 activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
                 activeNetworkConfig.onChainSubmissionPeriod,
                 activeNetworkConfig.offChainSubmissionPeriodPerOperator,
-                activeNetworkConfig.onChainSubmissionPeriodPerOperator
+                activeNetworkConfig.onChainSubmissionPeriodPerOperator,
+                activeNetworkConfig.maxGasPrice
             )
         );
         DeployMockGasPriceOracle mockGasPriceOracle = new DeployMockGasPriceOracle();
@@ -85,7 +88,8 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                 activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
                 activeNetworkConfig.onChainSubmissionPeriod,
                 activeNetworkConfig.offChainSubmissionPeriodPerOperator,
-                activeNetworkConfig.onChainSubmissionPeriodPerOperator
+                activeNetworkConfig.onChainSubmissionPeriodPerOperator,
+                activeNetworkConfig.maxGasPrice
             )
         );
         DeployMockGasPriceOracle mockGasPriceOracle = new DeployMockGasPriceOracle();

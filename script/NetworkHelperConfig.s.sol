@@ -23,6 +23,7 @@ contract NetworkHelperConfig is Script, BaseTest {
         uint256 offChainSubmissionPeriodPerOperator;
         uint256 onChainSubmissionPeriodPerOperator;
         address deployer;
+        uint256 maxGasPrice;
     }
 
     NetworkConfig private activeNetworkConfig;
@@ -69,7 +70,8 @@ contract NetworkHelperConfig is Script, BaseTest {
             onChainSubmissionPeriod: 60,
             offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 30,
-            deployer: s_deployer
+            deployer: s_deployer,
+            maxGasPrice: 15 gwei
         });
     }
 
@@ -88,7 +90,8 @@ contract NetworkHelperConfig is Script, BaseTest {
             onChainSubmissionPeriod: 60,
             offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 30,
-            deployer: s_deployer
+            deployer: s_deployer,
+            maxGasPrice: 2 gwei
         });
     }
 
@@ -107,7 +110,8 @@ contract NetworkHelperConfig is Script, BaseTest {
             onChainSubmissionPeriod: 120,
             offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 40,
-            deployer: s_deployer
+            deployer: s_deployer,
+            maxGasPrice: 15 gwei
         });
     }
 
@@ -126,7 +130,8 @@ contract NetworkHelperConfig is Script, BaseTest {
             onChainSubmissionPeriod: 60,
             offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 30,
-            deployer: s_deployer
+            deployer: s_deployer,
+            maxGasPrice: 2 gwei
         });
     }
 }
