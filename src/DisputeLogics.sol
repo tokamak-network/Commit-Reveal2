@@ -145,6 +145,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0x12466af8) // LengthExceedsMax()
                 revert(0x1c, 0x04)
             }
+            if lt(indicesLength, cvRSsForCvsNotOnChainAndReqToSubmitCo.length) {
+                mstore(0, 0x947d5a84) // InvalidLength()
+                revert(0x1c, 0x04)
+            }
 
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
