@@ -386,6 +386,11 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0x15467973) // AllCosNotSubmitted()
                 revert(0x1c, 0x04)
             }
+            // ** check secretsReceivedOffchainInRevealOrder length
+            if gt(secretsReceivedOffchainInRevealOrder.length, sub(activatedOperatorsLength, 1)) {
+                mstore(0, 0xbce4a361) // AllSecretsReceivedOffchain()
+                revert(0x1c, 0x04)
+            }
             // ** check cv status
             mstore(0x60, s_requestedToSubmitCvTimestamp.slot)
             mstore(0x20, keccak256(0x40, 0x40))

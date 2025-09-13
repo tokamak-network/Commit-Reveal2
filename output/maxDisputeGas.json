@@ -15,11 +15,11 @@
       "lastSubmitSGas": 191076,
       "requestToSubmitCoGas": 77869,
       "requestToSubmitCvGas": 67026,
-      "requestToSubmitSGas": 472908,
+      "requestToSubmitSGas": 472936,
       "submitCoGas": 48965,
       "submitCvGas": 46022,
       "submitSGas": 51648,
-      "sumRequestGas": 617803
+      "sumRequestGas": 617831
     },
     "scenarioKey": "operators_32_submitCv_01"
   },
