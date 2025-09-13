@@ -170,7 +170,7 @@ The protocol operates in three main phases:
 2. Verify: `hash(Cₒ,ᵢ) = Cᵥ,ᵢ`
 3. Calculate reveal order:
    - `Ωᵥ = hash(Cₒ,₁||...||Cₒ,ₙ)`
-   - `dᵢ = hash(|Ωᵥ - Cᵥ,ᵢ|)`
+   - `dᵢ = hash(|Ωᵥ || Cᵥ,ᵢ|)`
    - Sort by descending `dᵢ` values
 
 ### Phase 3: Reveal-2
