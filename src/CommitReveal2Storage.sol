@@ -107,6 +107,7 @@ contract CommitReveal2Storage {
     error CvAlreadySubmitted(); // 0x9ed7466a
     error NotCompletedStatus(); // 0x644a8033
     error InvalidLength(); // 0x947d5a84
+    error AllSecretsReceivedOffchain(); // 0xbce4a361
 
     // * Events
     event Status(uint256 curRound, uint256 curTrialNum, uint256 curState); // 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813
