@@ -58,7 +58,7 @@ Our protocol employs a dual-phase approach:
 
 - 🛡️ **Provably Secure**: Cryptographically secure against manipulation attempts
 - ⚡ **Gas Efficient**: Hybrid off-chain/on-chain model reduces gas costs
-- 🔄 **Randomized Reveal Order**: Uses `dᵢ = hash(|Ωᵥ - cᵥ,ᵢ|)` to determine reveal sequence
+- 🔄 **Randomized Reveal Order**: Uses `dᵢ = hash(Ωᵥ || cᵥ,ᵢ)` to determine reveal sequence
 - 📝 **Signatures**: Secure, replay-resistant authentication
 - 🚨 **Comprehensive Dispute Resolution**: Handles participant and leader failures gracefully
 - 💰 **Economic Incentives**: Deposit requirements and slashing mechanisms
@@ -161,13 +161,13 @@ The protocol operates in three main phases:
 1. Generate secret: `Sᵢ = Gen()`
 2. Create commitments:
    - `Cₒ,ᵢ = hash(Sᵢ)`
-   - `Cᵥ,ᵢ = hash(Cₒ,ᵢ)`
+   - `Cᵥ,ᵢ = hash(Cₒ,ᵢ || i)` where `i` is the operator's index
 3. Submit Merkle Root (leader)
 
 ### Phase 2: Reveal-1
 
 1. Broadcast `Cₒ,ᵢ`
-2. Verify: `hash(Cₒ,ᵢ) = Cᵥ,ᵢ`
+2. Verify: `hash(Cₒ,ᵢ || i) = Cᵥ,ᵢ` where `i` is the operator's index
 3. Calculate reveal order:
    - `Ωᵥ = hash(Cₒ,₁||...||Cₒ,ₙ)`
    - `dᵢ = hash(|Ωᵥ || Cᵥ,ᵢ|)`
