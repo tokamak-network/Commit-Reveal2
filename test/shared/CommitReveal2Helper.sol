@@ -114,10 +114,13 @@ contract CommitReveal2Helper is Test {
         }
     }
 
-    function _generateSCoCv(uint256 startTimestamp) internal returns (bytes32 s, bytes32 co, bytes32 cv) {
+    function _generateSCoCv(uint256 startTimestamp, uint256 index)
+        internal
+        returns (bytes32 s, bytes32 co, bytes32 cv)
+    {
         s = keccak256(abi.encodePacked(s_nonce++, startTimestamp));
         co = keccak256(abi.encodePacked(s));
-        cv = keccak256(abi.encodePacked(co));
+        cv = keccak256(abi.encodePacked(co, uint8(index)));
     }
 
     function _setSCoCvRevealOrders(mapping(address => uint256) storage privatekeys)
@@ -147,7 +150,7 @@ contract CommitReveal2Helper is Test {
         s_packedRevealOrders = 0;
 
         for (uint256 i; i < length; i++) {
-            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv(s_startTimestamp);
+            (s_secrets[i], s_cos[i], s_cvs[i]) = _generateSCoCv(s_startTimestamp, i);
             (s_vs[i], s_rs[i], s_ss[i]) =
                 vm.sign(privatekeys[i], _getTypedDataHashV4(s_currentRound, s_currentTrialNum, s_cvs[i]));
             uint256 v = uint256(s_vs[i]);

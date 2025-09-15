@@ -418,7 +418,7 @@ contract CommitReveal2 is FailLogics {
             // ** initialize cos and cvs arrays memory, without length data
             let activatedOperatorsLengthInBytes := shl(5, activatedOperatorsLength)
             let cos := m
-            let cvs := add(cos, activatedOperatorsLengthInBytes)
+            let cvs := add(add(cos, activatedOperatorsLengthInBytes), 1) // add 1 for the index
             let secrets := add(cvs, activatedOperatorsLengthInBytes)
             mstore(0x40, add(secrets, activatedOperatorsLengthInBytes)) // update the free memory pointer
 
@@ -427,8 +427,9 @@ contract CommitReveal2 is FailLogics {
                 let secretMemP := add(secrets, i)
                 mstore(secretMemP, calldataload(add(secretSigRSs.offset, mul(i, 3)))) // secret
                 let cosMemP := add(cos, i)
+                mstore(add(cosMemP, 1), shr(5, i))
                 mstore(cosMemP, keccak256(secretMemP, 0x20))
-                mstore(add(cvs, i), keccak256(cosMemP, 0x20))
+                mstore(add(cvs, i), keccak256(cosMemP, 0x21))
             }
             // ** verify reveal order
             let index := and(packedRevealOrders, 0xff) // first reveal index
