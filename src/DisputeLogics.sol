@@ -330,8 +330,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 mstore(0, 0x03798920) // CvNotSubmitted()
                 revert(0x1c, 0x04)
             }
+            mstore(0x41, activatedOperatorIndex)
             mstore(0x40, co)
-            if iszero(eq(sload(add(s_cvs.slot, activatedOperatorIndex)), keccak256(0x40, 0x20))) {
+            if iszero(eq(sload(add(s_cvs.slot, activatedOperatorIndex)), keccak256(0x40, 0x21))) {
                 mstore(0, 0x67b3c693) // CvNotEqualHashCo()
                 revert(0x1c, 0x04)
             }
@@ -420,7 +421,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             mstore(add(fmp, 0x82), domainSeparator)
             let sigCounter
             for { let i } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
-                let cv := keccak256(add(cos, shl(5, i)), 0x20)
+                mstore(0x01, i)
+                mstore(0x00, mload(add(cos, shl(5, i))))
+                let cv := keccak256(0x00, 0x21)
                 mstore(add(cvs, shl(5, i)), cv) // cv
                 mstore(add(m, 0x20), cv)
                 mstore(add(di, shl(5, i)), keccak256(m, 0x40)) // hash(rv || cv)
@@ -526,9 +529,10 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             for { let i } lt(i, secretsReceivedOffchainInRevealOrder.length) { i := add(i, 1) } {
                 index := and(calldataload(sub(0x84, i)), 0xff) // 0x84: packedRevealOrders offset
                 let secret := calldataload(add(secretsReceivedOffchainInRevealOrder.offset, shl(5, i)))
+                mstore(0x01, index)
                 mstore(0x00, secret)
                 mstore(0x00, keccak256(0x00, 0x20)) // co
-                if iszero(eq(mload(add(cvs, shl(5, index))), keccak256(0x00, 0x20))) {
+                if iszero(eq(mload(add(cvs, shl(5, index))), keccak256(0x00, 0x21))) {
                     mstore(0, 0x5bcc2334) // CvNotEqualDoubleHashS()
                     revert(0x1c, 0x04)
                 }
@@ -573,14 +577,17 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 revert(0x1c, 0x04)
             }
             // ** check cv = doubleHashS
-            mstore(0x40, s)
-            mstore(0x60, keccak256(0x40, 0x20)) // co
-            if iszero(eq(sload(add(s_cvs.slot, activatedOperatorIndex)), keccak256(0x60, 0x20))) {
+            mstore(0x20, s)
+            mstore(0x41, activatedOperatorIndex)
+            mstore(0x40, keccak256(0x20, 0x20)) // co
+            if iszero(eq(sload(add(s_cvs.slot, activatedOperatorIndex)), keccak256(0x40, 0x21))) {
                 mstore(0, 0x5bcc2334) // CvNotEqualDoubleHashS()
                 revert(0x1c, 0x04)
             }
             // ** store S and emit event
-            mstore(0x00, curRound) // 0x20 already has trialNum, 0x40 already has s
+            mstore(0x00, curRound) //
+            mstore(0x20, trialNum)
+            mstore(0x40, s)
             mstore(0x60, activatedOperatorIndex)
             log1(0x00, 0x80, 0xfa070a58e2c77080acd5c2b1819669eb194bbeeca6f680a31a2076510be5a7b1) // event SSubmitted(uint256 round, uint256 trialNum, bytes32 s, uint256 index)
 
@@ -756,7 +763,7 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             let activatedOperatorsLengthInBytes := shl(5, activatedOperatorsLength)
 
             let cos := m
-            let cvs := add(cos, activatedOperatorsLengthInBytes)
+            let cvs := add(add(cos, activatedOperatorsLengthInBytes), 1) // add 1 for the index
             let secrets := add(cvs, activatedOperatorsLengthInBytes)
             mstore(0x40, add(secrets, activatedOperatorsLengthInBytes)) // update the free memory pointer
 
@@ -765,8 +772,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 let secretMemP := add(secrets, i)
                 mstore(secretMemP, calldataload(add(allSecrets.offset, i))) // secret
                 let cosMemP := add(cos, i)
+                mstore(add(cosMemP, 1), shr(5, i))
                 mstore(cosMemP, keccak256(secretMemP, 0x20))
-                mstore(add(cvs, i), keccak256(cosMemP, 0x20))
+                mstore(add(cvs, i), keccak256(cosMemP, 0x21))
             }
             // ** verify reveal order
             mstore(0x00, keccak256(cos, activatedOperatorsLengthInBytes)) // rv

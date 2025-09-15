@@ -1,25 +1,25 @@
 {
   "disputeCvCoGas": {
     "metrics": {
-      "generateRandomNumberWhenSomeCvsAreOnChainGas": 178698,
-      "requestToSubmitCoGas": 478985,
+      "generateRandomNumberWhenSomeCvsAreOnChainGas": 180634,
+      "requestToSubmitCoGas": 479021,
       "requestToSubmitCvGas": 67026,
-      "submitCoGas": 48965,
+      "submitCoGas": 48980,
       "submitCvGas": 46022,
-      "sumRequestGas": 546011
+      "sumRequestGas": 546047
     },
     "scenarioKey": "operators_32_submitCv_01_submitCo_32"
   },
   "disputeSecretsGas": {
     "metrics": {
-      "lastSubmitSGas": 191076,
+      "lastSubmitSGas": 191115,
       "requestToSubmitCoGas": 77869,
       "requestToSubmitCvGas": 67026,
-      "requestToSubmitSGas": 472936,
-      "submitCoGas": 48965,
+      "requestToSubmitSGas": 473736,
+      "submitCoGas": 48980,
       "submitCvGas": 46022,
-      "submitSGas": 51648,
-      "sumRequestGas": 617831
+      "submitSGas": 51675,
+      "sumRequestGas": 618631
     },
     "scenarioKey": "operators_32_submitCv_01"
   },
@@ -39,7 +39,7 @@
           "didntSubmit_08": 104823,
           "didntSubmit_09": 104823,
           "didntSubmit_10": 104823,
-          "didntSubmit_11": 94836,
+          "didntSubmit_11": 104823,
           "didntSubmit_12": 104823,
           "didntSubmit_13": 104823,
           "didntSubmit_14": 104823,
@@ -54,12 +54,12 @@
           "didntSubmit_23": 104823,
           "didntSubmit_24": 104823,
           "didntSubmit_25": 104823,
-          "didntSubmit_26": 94836,
+          "didntSubmit_26": 104823,
           "didntSubmit_27": 104823,
           "didntSubmit_28": 104823,
           "didntSubmit_29": 104823,
           "didntSubmit_30": 104823,
-          "didntSubmit_31": 94836,
+          "didntSubmit_31": 104823,
           "didntSubmit_32": 104823
         }
       }
