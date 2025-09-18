@@ -1257,690 +1257,690 @@
     "description": "Gas usage for dispute logic path 12-13: 1->2->3->5->12->13 by scenario: operators_XX_submitCv_YY",
     "scenarios": {
       "operators_02_submitCv_00": {
-        "lastSubmitSGas": 125713,
+        "lastSubmitSGas": 123614,
         "requestToSubmitSGas": 113424,
         "submitSGas": 68787
       },
       "operators_02_submitCv_01": {
-        "lastSubmitSGas": 125713,
+        "lastSubmitSGas": 123614,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 86021,
         "submitCvGas": 46022,
         "submitSGas": 68775
       },
       "operators_02_submitCv_02": {
-        "lastSubmitSGas": 125713,
+        "lastSubmitSGas": 123614,
         "requestToSubmitCvGas": 67064,
         "requestToSubmitSGas": 79319,
         "submitCvGas": 46022,
         "submitSGas": 85875
       },
       "operators_03_submitCv_00": {
-        "lastSubmitSGas": 127893,
+        "lastSubmitSGas": 125794,
         "requestToSubmitSGas": 129035,
         "submitSGas": 51687
       },
       "operators_03_submitCv_01": {
-        "lastSubmitSGas": 127893,
+        "lastSubmitSGas": 125794,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 101668,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_03_submitCv_02": {
-        "lastSubmitSGas": 127893,
+        "lastSubmitSGas": 125794,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 92181,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_03_submitCv_03": {
-        "lastSubmitSGas": 127893,
+        "lastSubmitSGas": 125794,
         "requestToSubmitCvGas": 67208,
         "requestToSubmitSGas": 79879,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_04_submitCv_00": {
-        "lastSubmitSGas": 130073,
+        "lastSubmitSGas": 127974,
         "requestToSubmitSGas": 141902,
         "submitSGas": 51687
       },
       "operators_04_submitCv_01": {
-        "lastSubmitSGas": 130073,
+        "lastSubmitSGas": 127974,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 114487,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_04_submitCv_02": {
-        "lastSubmitSGas": 130073,
+        "lastSubmitSGas": 127974,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 105000,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_04_submitCv_03": {
-        "lastSubmitSGas": 130073,
+        "lastSubmitSGas": 127974,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 95525,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_04_submitCv_04": {
-        "lastSubmitSGas": 130073,
+        "lastSubmitSGas": 127974,
         "requestToSubmitCvGas": 67352,
         "requestToSubmitSGas": 86023,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_05_submitCv_00": {
-        "lastSubmitSGas": 132253,
+        "lastSubmitSGas": 130154,
         "requestToSubmitSGas": 154724,
         "submitSGas": 51687
       },
       "operators_05_submitCv_01": {
-        "lastSubmitSGas": 132253,
+        "lastSubmitSGas": 130154,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 127297,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_05_submitCv_02": {
-        "lastSubmitSGas": 132253,
+        "lastSubmitSGas": 130154,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 117810,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_05_submitCv_03": {
-        "lastSubmitSGas": 132253,
+        "lastSubmitSGas": 130154,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 108335,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_05_submitCv_04": {
-        "lastSubmitSGas": 132253,
+        "lastSubmitSGas": 130154,
         "requestToSubmitCvGas": 67458,
         "requestToSubmitSGas": 98848,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_05_submitCv_05": {
-        "lastSubmitSGas": 132253,
+        "lastSubmitSGas": 130154,
         "requestToSubmitCvGas": 67496,
         "requestToSubmitSGas": 89346,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_06_submitCv_00": {
-        "lastSubmitSGas": 134433,
+        "lastSubmitSGas": 132334,
         "requestToSubmitSGas": 167520,
         "submitSGas": 51687
       },
       "operators_06_submitCv_01": {
-        "lastSubmitSGas": 134433,
+        "lastSubmitSGas": 132334,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 140105,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_06_submitCv_02": {
-        "lastSubmitSGas": 134433,
+        "lastSubmitSGas": 132334,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 130642,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_06_submitCv_03": {
-        "lastSubmitSGas": 134433,
+        "lastSubmitSGas": 132334,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 121155,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_06_submitCv_04": {
-        "lastSubmitSGas": 134421,
+        "lastSubmitSGas": 132322,
         "requestToSubmitCvGas": 67458,
         "requestToSubmitSGas": 111668,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_06_submitCv_05": {
-        "lastSubmitSGas": 134433,
+        "lastSubmitSGas": 132334,
         "requestToSubmitCvGas": 67602,
         "requestToSubmitSGas": 102193,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_06_submitCv_06": {
-        "lastSubmitSGas": 134433,
+        "lastSubmitSGas": 132334,
         "requestToSubmitCvGas": 67640,
         "requestToSubmitSGas": 92715,
         "submitCvGas": 45998,
         "submitSGas": 51687
       },
       "operators_07_submitCv_00": {
-        "lastSubmitSGas": 136613,
+        "lastSubmitSGas": 134514,
         "requestToSubmitSGas": 180342,
         "submitSGas": 51687
       },
       "operators_07_submitCv_01": {
-        "lastSubmitSGas": 136613,
+        "lastSubmitSGas": 134514,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 152987,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_07_submitCv_02": {
-        "lastSubmitSGas": 136613,
+        "lastSubmitSGas": 134514,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 143488,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_07_submitCv_03": {
-        "lastSubmitSGas": 136613,
+        "lastSubmitSGas": 134514,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 133977,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_07_submitCv_04": {
-        "lastSubmitSGas": 136613,
+        "lastSubmitSGas": 134514,
         "requestToSubmitCvGas": 67458,
         "requestToSubmitSGas": 124514,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_07_submitCv_05": {
-        "lastSubmitSGas": 136601,
+        "lastSubmitSGas": 134502,
         "requestToSubmitCvGas": 67602,
         "requestToSubmitSGas": 115039,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_07_submitCv_06": {
-        "lastSubmitSGas": 136613,
+        "lastSubmitSGas": 134514,
         "requestToSubmitCvGas": 67746,
         "requestToSubmitSGas": 105564,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_07_submitCv_07": {
-        "lastSubmitSGas": 136613,
+        "lastSubmitSGas": 134514,
         "requestToSubmitCvGas": 67784,
         "requestToSubmitSGas": 96050,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_08_submitCv_00": {
-        "lastSubmitSGas": 138793,
+        "lastSubmitSGas": 136694,
         "requestToSubmitSGas": 193222,
         "submitSGas": 51687
       },
       "operators_08_submitCv_01": {
-        "lastSubmitSGas": 138793,
+        "lastSubmitSGas": 136694,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 165819,
         "submitCvGas": 46010,
         "submitSGas": 51687
       },
       "operators_08_submitCv_02": {
-        "lastSubmitSGas": 138793,
+        "lastSubmitSGas": 136694,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 156272,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_08_submitCv_03": {
-        "lastSubmitSGas": 138793,
+        "lastSubmitSGas": 136694,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 146821,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_08_submitCv_04": {
-        "lastSubmitSGas": 138793,
+        "lastSubmitSGas": 136694,
         "requestToSubmitCvGas": 67458,
         "requestToSubmitSGas": 137370,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_08_submitCv_05": {
-        "lastSubmitSGas": 138793,
+        "lastSubmitSGas": 136694,
         "requestToSubmitCvGas": 67602,
         "requestToSubmitSGas": 127835,
         "submitCvGas": 46010,
         "submitSGas": 51687
       },
       "operators_08_submitCv_06": {
-        "lastSubmitSGas": 138793,
+        "lastSubmitSGas": 136694,
         "requestToSubmitCvGas": 67746,
         "requestToSubmitSGas": 118384,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_08_submitCv_07": {
-        "lastSubmitSGas": 138793,
+        "lastSubmitSGas": 136694,
         "requestToSubmitCvGas": 67890,
         "requestToSubmitSGas": 108897,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_08_submitCv_08": {
-        "lastSubmitSGas": 138793,
+        "lastSubmitSGas": 136694,
         "requestToSubmitCvGas": 67928,
         "requestToSubmitSGas": 99386,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_09_submitCv_00": {
-        "lastSubmitSGas": 140961,
+        "lastSubmitSGas": 138862,
         "requestToSubmitSGas": 206011,
         "submitSGas": 51675
       },
       "operators_09_submitCv_01": {
-        "lastSubmitSGas": 140973,
+        "lastSubmitSGas": 138874,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 178632,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_09_submitCv_02": {
-        "lastSubmitSGas": 140961,
+        "lastSubmitSGas": 138862,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 169145,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_09_submitCv_03": {
-        "lastSubmitSGas": 140973,
+        "lastSubmitSGas": 138874,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 159658,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_09_submitCv_04": {
-        "lastSubmitSGas": 140973,
+        "lastSubmitSGas": 138874,
         "requestToSubmitCvGas": 67458,
         "requestToSubmitSGas": 150159,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_09_submitCv_05": {
-        "lastSubmitSGas": 140973,
+        "lastSubmitSGas": 138874,
         "requestToSubmitCvGas": 67602,
         "requestToSubmitSGas": 140684,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_09_submitCv_06": {
-        "lastSubmitSGas": 140973,
+        "lastSubmitSGas": 138874,
         "requestToSubmitCvGas": 67746,
         "requestToSubmitSGas": 131197,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_09_submitCv_07": {
-        "lastSubmitSGas": 140973,
+        "lastSubmitSGas": 138874,
         "requestToSubmitCvGas": 67890,
         "requestToSubmitSGas": 121722,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_09_submitCv_08": {
-        "lastSubmitSGas": 140973,
+        "lastSubmitSGas": 138874,
         "requestToSubmitCvGas": 68034,
         "requestToSubmitSGas": 112235,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_09_submitCv_09": {
-        "lastSubmitSGas": 140973,
+        "lastSubmitSGas": 138874,
         "requestToSubmitCvGas": 68072,
         "requestToSubmitSGas": 102712,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_00": {
-        "lastSubmitSGas": 143153,
+        "lastSubmitSGas": 141054,
         "requestToSubmitSGas": 218834,
         "submitSGas": 51687
       },
       "operators_10_submitCv_01": {
-        "lastSubmitSGas": 143153,
+        "lastSubmitSGas": 141054,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 191467,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_02": {
-        "lastSubmitSGas": 143153,
+        "lastSubmitSGas": 141054,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 181968,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_03": {
-        "lastSubmitSGas": 143153,
+        "lastSubmitSGas": 141054,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 172481,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_04": {
-        "lastSubmitSGas": 143153,
+        "lastSubmitSGas": 141054,
         "requestToSubmitCvGas": 67458,
         "requestToSubmitSGas": 162982,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_05": {
-        "lastSubmitSGas": 143141,
+        "lastSubmitSGas": 141042,
         "requestToSubmitCvGas": 67602,
         "requestToSubmitSGas": 153483,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_06": {
-        "lastSubmitSGas": 143141,
+        "lastSubmitSGas": 141042,
         "requestToSubmitCvGas": 67746,
         "requestToSubmitSGas": 144008,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_07": {
-        "lastSubmitSGas": 143153,
+        "lastSubmitSGas": 141054,
         "requestToSubmitCvGas": 67890,
         "requestToSubmitSGas": 134521,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_08": {
-        "lastSubmitSGas": 143153,
+        "lastSubmitSGas": 141054,
         "requestToSubmitCvGas": 68034,
         "requestToSubmitSGas": 125070,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_09": {
-        "lastSubmitSGas": 143153,
+        "lastSubmitSGas": 141054,
         "requestToSubmitCvGas": 68178,
         "requestToSubmitSGas": 115583,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_10_submitCv_10": {
-        "lastSubmitSGas": 143153,
+        "lastSubmitSGas": 141054,
         "requestToSubmitCvGas": 68216,
         "requestToSubmitSGas": 106084,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_11_submitCv_00": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitSGas": 231732,
         "submitSGas": 51675
       },
       "operators_11_submitCv_01": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 204305,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_11_submitCv_02": {
-        "lastSubmitSGas": 145321,
+        "lastSubmitSGas": 143222,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 194842,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_11_submitCv_03": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 185331,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_11_submitCv_04": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 67458,
         "requestToSubmitSGas": 175868,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_11_submitCv_05": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 67602,
         "requestToSubmitSGas": 166369,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_11_submitCv_06": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 67746,
         "requestToSubmitSGas": 156894,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_11_submitCv_07": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 67890,
         "requestToSubmitSGas": 147395,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_11_submitCv_08": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 68034,
         "requestToSubmitSGas": 137896,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_11_submitCv_09": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 68178,
         "requestToSubmitSGas": 128409,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_11_submitCv_10": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 68322,
         "requestToSubmitSGas": 118922,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_11_submitCv_11": {
-        "lastSubmitSGas": 145333,
+        "lastSubmitSGas": 143234,
         "requestToSubmitCvGas": 68360,
         "requestToSubmitSGas": 109459,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_00": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitSGas": 244495,
         "submitSGas": 51675
       },
       "operators_12_submitCv_01": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 217116,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_12_submitCv_02": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 207677,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_03": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 198166,
         "submitCvGas": 46010,
         "submitSGas": 51687
       },
       "operators_12_submitCv_04": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 67458,
         "requestToSubmitSGas": 188631,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_05": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 67602,
         "requestToSubmitSGas": 179156,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_06": {
-        "lastSubmitSGas": 147501,
+        "lastSubmitSGas": 145402,
         "requestToSubmitCvGas": 67746,
         "requestToSubmitSGas": 169729,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_07": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 67890,
         "requestToSubmitSGas": 160218,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_08": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 68034,
         "requestToSubmitSGas": 150743,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_09": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 68178,
         "requestToSubmitSGas": 141256,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_10": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 68322,
         "requestToSubmitSGas": 131781,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_11": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 68466,
         "requestToSubmitSGas": 122294,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_12_submitCv_12": {
-        "lastSubmitSGas": 147513,
+        "lastSubmitSGas": 145414,
         "requestToSubmitCvGas": 68504,
         "requestToSubmitSGas": 112795,
         "submitCvGas": 46010,
         "submitSGas": 51687
       },
       "operators_13_submitCv_00": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitSGas": 257345,
         "submitSGas": 51687
       },
       "operators_13_submitCv_01": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 67026,
         "requestToSubmitSGas": 229990,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_13_submitCv_02": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 67170,
         "requestToSubmitSGas": 220503,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_13_submitCv_03": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 67314,
         "requestToSubmitSGas": 211004,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_13_submitCv_04": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 67458,
         "requestToSubmitSGas": 201493,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_13_submitCv_05": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 67602,
         "requestToSubmitSGas": 191994,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_13_submitCv_06": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 67746,
         "requestToSubmitSGas": 182555,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_13_submitCv_07": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 67890,
         "requestToSubmitSGas": 173056,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_13_submitCv_08": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 68034,
         "requestToSubmitSGas": 163581,
         "submitCvGas": 46022,
         "submitSGas": 51675
       },
       "operators_13_submitCv_09": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 68178,
         "requestToSubmitSGas": 154118,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_13_submitCv_10": {
-        "lastSubmitSGas": 149681,
+        "lastSubmitSGas": 147582,
         "requestToSubmitCvGas": 68322,
         "requestToSubmitSGas": 144619,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_13_submitCv_11": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 68466,
         "requestToSubmitSGas": 135108,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_13_submitCv_12": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 68610,
         "requestToSubmitSGas": 125633,
         "submitCvGas": 46022,
         "submitSGas": 51687
       },
       "operators_13_submitCv_13": {
-        "lastSubmitSGas": 149693,
+        "lastSubmitSGas": 147594,
         "requestToSubmitCvGas": 68648,
         "requestToSubmitSGas": 116122,
         "submitCvGas": 46022,

@@ -12,7 +12,7 @@
   },
   "disputeSecretsGas": {
     "metrics": {
-      "lastSubmitSGas": 191115,
+      "lastSubmitSGas": 189016,
       "requestToSubmitCoGas": 77869,
       "requestToSubmitCvGas": 67026,
       "requestToSubmitSGas": 473736,

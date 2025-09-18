@@ -18,13 +18,13 @@ abstract contract ConsumerBase {
     error InsufficientFee();
     /// @dev The RNGCoordinator contract
 
-    ICommitReveal2 internal s_commitreveal2;
+    ICommitReveal2 internal immutable i_commitreveal2;
 
     /**
      * @param rngCoordinator The address of the RNGCoordinator contract
      */
     constructor(address rngCoordinator) {
-        s_commitreveal2 = ICommitReveal2(rngCoordinator);
+        i_commitreveal2 = ICommitReveal2(rngCoordinator);
     }
 
     receive() external payable virtual {}
@@ -34,14 +34,14 @@ abstract contract ConsumerBase {
      * @dev Request Randomness to the Coordinator
      */
     function _requestRandomNumber(uint32 callbackGasLimit, uint256 feeLimitWei) internal returns (uint256, uint256) {
-        uint256 requestFee = s_commitreveal2.estimateRequestPrice(callbackGasLimit, tx.gasprice);
+        uint256 requestFee = i_commitreveal2.estimateRequestPrice(callbackGasLimit, tx.gasprice);
         require(requestFee <= feeLimitWei, InsufficientFee());
-        uint256 requestId = s_commitreveal2.requestRandomNumber{value: requestFee}(callbackGasLimit);
+        uint256 requestId = i_commitreveal2.requestRandomNumber{value: requestFee}(callbackGasLimit);
         return (requestId, requestFee);
     }
 
     function _refund(uint256 round) internal {
-        s_commitreveal2.refund(round);
+        i_commitreveal2.refund(round);
     }
 
     /**
@@ -57,7 +57,7 @@ abstract contract ConsumerBase {
      * @dev Callback function for the Coordinator to call after the request is fulfilled. This function is called by the Coordinator, 0x00fc98b8
      */
     function rawFulfillRandomNumber(uint256 round, uint256 randomNumber) external {
-        require(msg.sender == address(s_commitreveal2), OnlyCoordinatorCanFulfill(msg.sender, address(s_commitreveal2)));
+        require(msg.sender == address(i_commitreveal2), OnlyCoordinatorCanFulfill(msg.sender, address(i_commitreveal2)));
         fulfillRandomRandomNumber(round, randomNumber);
     }
 }

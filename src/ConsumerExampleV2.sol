@@ -30,7 +30,7 @@ contract ConsumerExampleV2 is ConsumerBase {
     constructor(address coordinator) ConsumerBase(coordinator) {}
 
     receive() external payable override {
-        if (msg.sender == address(s_commitreveal2)) {
+        if (msg.sender == address(i_commitreveal2)) {
             assembly ("memory-safe") {
                 if iszero(call(gas(), tload(TSLOT), callvalue(), 0x00, 0x00, 0x00, 0x00)) {
                     mstore(0x00, 0xb12d13eb) // `ETHTransferFailed()`.
@@ -82,7 +82,7 @@ contract ConsumerExampleV2 is ConsumerBase {
     // ** getters
 
     function getCommitReveal2Address() external view returns (address) {
-        return address(s_commitreveal2);
+        return address(i_commitreveal2);
     }
 
     function getMainInfos() external view returns (uint256 requestCount, MainInfo[100] memory) {
