@@ -33,7 +33,7 @@ contract OperatorManager is Ownable {
     uint256 public s_slashRewardPerOperatorX8;
     mapping(address => uint256) public s_slashRewardPerOperatorPaidX8;
 
-    uint256 public s_isInProcess = COMPLETED;
+    uint256 public s_isInProcess;
     uint256 public s_activationThreshold;
 
     // ** internal variables
