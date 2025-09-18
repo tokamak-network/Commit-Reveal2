@@ -48,7 +48,7 @@ contract ConsumerExample is ConsumerBase {
     }
 
     function getCommitReveal2Address() external view returns (address) {
-        return address(s_commitreveal2);
+        return address(i_commitreveal2);
     }
 
     function withdraw() external {
