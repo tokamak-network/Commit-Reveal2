@@ -5,11 +5,21 @@ pragma solidity ^0.8.30;
 import {Ownable} from "@solady/src/auth/Ownable.sol";
 
 contract OperatorManager is Ownable {
-    modifier NotInProgress() {
+    modifier notInProgress() {
         assembly ("memory-safe") {
             // ** check if the contract is COMPLETED or HALTED
             if eq(sload(s_isInProcess.slot), IN_PROGRESS) {
                 mstore(0, 0x8a902655) // ShouldNotBeInProgress()
+                revert(0x1c, 0x04)
+            }
+        }
+        _;
+    }
+
+    modifier noNativeTokenSent() {
+        assembly ("memory-safe") {
+            if iszero(eq(callvalue(), 0)) {
+                mstore(0, 0x1a131e57) // NativeTokenSent()
                 revert(0x1c, 0x04)
             }
         }
@@ -59,6 +69,7 @@ contract OperatorManager is Ownable {
     error WithdrawAmountIsZero(); // 0xa393d14b
     error PendingOwnerCannotBeActivatedOperator(); // 0x5df6bf29
     error NotAllowed();
+    error NativeTokenSent(); // 0x1a131e57
     error ShouldNotBeInProgress(); // 0x8a902655
 
     constructor() {
@@ -83,7 +94,7 @@ contract OperatorManager is Ownable {
     }
 
     // ** Override Ownable Functions
-    function transferOwnership(address newOwner) public payable override NotInProgress onlyOwner {
+    function transferOwnership(address newOwner) public payable override noNativeTokenSent notInProgress onlyOwner {
         _settleSlashReward(msg.sender);
         assembly ("memory-safe") {
             mstore(0x00, newOwner)
@@ -109,7 +120,7 @@ contract OperatorManager is Ownable {
         revert NotAllowed();
     }
 
-    function requestOwnershipHandover() public payable override {
+    function requestOwnershipHandover() public payable override noNativeTokenSent {
         unchecked {
             uint256 expires = block.timestamp + _ownershipHandoverValidFor();
             /// @solidity memory-safe-assembly
@@ -130,7 +141,14 @@ contract OperatorManager is Ownable {
         }
     }
 
-    function completeOwnershipHandover(address pendingOwner) public payable override NotInProgress onlyOwner {
+    function completeOwnershipHandover(address pendingOwner)
+        public
+        payable
+        override
+        noNativeTokenSent
+        notInProgress
+        onlyOwner
+    {
         _settleSlashReward(owner());
         /// @solidity memory-safe-assembly
         assembly {
