@@ -644,13 +644,19 @@ contract CommitReveal2 is FailLogics {
             // as we do not want to provide them with less, however that check itself costs
             // gas. GAS_FOR_CALL_EXACT_CHECK ensures we have at least enough gas to be able to revert
             // if gasAmount > 63//64*gas available.
-            if lt(g, GAS_FOR_CALL_EXACT_CHECK) { revert(0, 0) }
+            if lt(g, GAS_FOR_CALL_EXACT_CHECK) {
+                mstore(0, 0xcea2d914) // NotEnoughGasToRevert()
+                revert(0x1c, 0x04)
+            }
             g := sub(g, GAS_FOR_CALL_EXACT_CHECK)
             let consumerAndCallbackGasLimitPacked := sload(currentRequestInfoSlot)
             let callbackGasLimit := and(consumerAndCallbackGasLimitPacked, 0xffffffff)
             // if g - g//64 <= gas
             // we subtract g//64 because of EIP-150
-            if iszero(gt(sub(g, div(g, 64)), callbackGasLimit)) { revert(0, 0) }
+            if iszero(gt(sub(g, div(g, 64)), callbackGasLimit)) {
+                mstore(0, 0xc5b54909) // NotEnoughGasToCallback()
+                revert(0x1c, 0x04)
+            }
             // solidity calls check that a contract actually exists at the destination, so we do the same
             let consumer := shr(96, consumerAndCallbackGasLimitPacked)
             if gt(extcodesize(consumer), 0) {
