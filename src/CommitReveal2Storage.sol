@@ -84,6 +84,7 @@ contract CommitReveal2Storage {
     error SRequested(); // 0x53489cf9
     error AlreadyRefunded(); // 0xa85e6f1a
     error AlreadyCompleted(); // 0x195332a5
+    error NotEnoughGasToCallback(); // 0xc5b54909
     error AlreadySubmittedMerkleRoot(); // 0x1c044d8b
     error AlreadyRequestedToSubmitS(); // 0x0d934196
     error AlreadyRequestedToSubmitCv(); // 0x899a05f2
@@ -96,6 +97,7 @@ contract CommitReveal2Storage {
     error AllSubmittedCo(); // 0x1c7f7cc9
     error ZeroLength(); // 0xbf557497
     error LeaderLowDeposit(); // 0xc0013a5a
+    error NotEnoughGasToRevert(); // 0xcea2d914
     error CoNotRequested(); // 0x11974969
     error SNotRequested(); // 0x2d37f8d3
     error AlreadySubmittedS();
