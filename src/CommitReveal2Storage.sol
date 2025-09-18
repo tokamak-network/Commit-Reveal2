@@ -303,7 +303,6 @@ contract CommitReveal2Storage {
     uint256 internal s_maxCallbackGasLimit = 2500000;
     uint256 internal constant GAS_FOR_CALL_EXACT_CHECK = 5_000;
 
-    bytes32 internal constant MESSAGE_TYPEHASH = keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)");
     bytes32 internal constant MESSAGE_TYPEHASH_DIRECT =
         0x7c90823f4ccd06a00814473b1ad932d6313680c6d946963ecf1d30094346c24e; // keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)");
 
@@ -346,8 +345,6 @@ contract CommitReveal2Storage {
     uint256 internal constant DYNAMICFAILTOSUBMIT_MASK = 0xffffffff;
 
     // *** functions calldata size;
-    uint256 internal constant NO_CALLDATA_SIZE = 4;
-
     uint256 internal constant FAILTOREQUESTSUBMITCV_OR_SUBMITMEKRLEROOT_OFFSET = 48;
     uint256 internal constant FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET = 96;
     uint256 internal constant FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET = 144;
