@@ -15,10 +15,15 @@ contract CommitReveal2L2 is CommitReveal2 {
     /// @dev L1 fee coefficient is used to account for the impact of data compression on the l1 fee
     /// getL1FeeUpperBound returns the upper bound of l1 fee so this configurable coefficient will help
     /// charge a predefined percentage of the upper bound.
+    uint8 public s_pendingL1FeeCoefficient = 100;
     uint8 public s_l1FeeCoefficient = 100;
+    uint256 public s_pendingL1FeeCoefficientEffectiveTimestamp;
 
     error InvalidL1FeeCoefficient(uint8 coefficient);
+    error L1FeeCalculationNotProposed();
+    error L1FeeCalculationNotEffective();
 
+    event L1FeeCalculationProposed(uint8 coefficient);
     event L1FeeCalculationSet(uint8 coefficient);
 
     constructor(
@@ -48,12 +53,25 @@ contract CommitReveal2L2 is CommitReveal2 {
         )
     {}
 
-    function setL1FeeCoefficient(uint8 coefficient) external onlyOwner notInProcess {
+    function proposeL1FeeCoefficient(uint8 coefficient) external onlyOwner {
         if (coefficient == 0 || coefficient > 100) {
             revert InvalidL1FeeCoefficient(coefficient);
         }
-        s_l1FeeCoefficient = coefficient;
-        emit L1FeeCalculationSet(coefficient);
+        s_pendingL1FeeCoefficient = coefficient;
+        s_pendingL1FeeCoefficientEffectiveTimestamp = block.timestamp + SET_DELAY_TIME;
+        emit L1FeeCalculationProposed(coefficient);
+    }
+
+    function executeSetL1FeeCoefficient() external onlyWhenCompleted {
+        if (s_pendingL1FeeCoefficientEffectiveTimestamp == 0) {
+            revert L1FeeCalculationNotProposed();
+        }
+        if (block.timestamp < s_pendingL1FeeCoefficientEffectiveTimestamp) {
+            revert L1FeeCalculationNotEffective();
+        }
+        s_l1FeeCoefficient = s_pendingL1FeeCoefficient;
+        s_pendingL1FeeCoefficientEffectiveTimestamp = 0;
+        emit L1FeeCalculationSet(s_pendingL1FeeCoefficient);
     }
 
     /**
