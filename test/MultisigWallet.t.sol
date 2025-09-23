@@ -191,7 +191,7 @@ contract MultisigWalletTest is Test {
     }
 
     function testL1FeeCoefficientGovernance() public {
-        uint8 newCoefficient = 75;
+        uint256 newCoefficient = 75;
 
         bytes memory callData =
             abi.encodeWithSelector(ICommitReveal2L2Governance.setL1FeeCoefficient.selector, newCoefficient);
