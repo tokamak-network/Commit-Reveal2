@@ -43,10 +43,10 @@ contract ParamDelayTest is Test {
         // Should revert when called by non-governance address
         uint256 newActivation = 2 ether;
         uint256 newFlatFee = 0.02 ether;
-        
+
         vm.expectRevert(); // UnauthorizedGovernance error
         s_commitReveal2.setEconomicParameters(newActivation, newFlatFee);
-        
+
         // Parameters should remain unchanged
         assertEq(s_commitReveal2.s_activationThreshold(), ACTIVATION_THRESHOLD, "activationThreshold should not change");
         assertEq(s_commitReveal2.s_flatFee(), FLAT_FEE, "flatFee should not change");
@@ -92,7 +92,7 @@ contract ParamDelayTest is Test {
             perReq,
             maxGasPrice
         );
-        
+
         // Gas parameters should remain unchanged since the call should have reverted
     }
 }

@@ -6,14 +6,14 @@ import {ICommitReveal2Governance} from "./governance/ICommitReveal2Governance.so
 
 contract CommitReveal2 is FailLogics, ICommitReveal2Governance {
     address public governanceMultisig;
-    
+
     error UnauthorizedGovernance();
-    
+
     modifier onlyGovernance() {
         if (msg.sender != governanceMultisig) revert UnauthorizedGovernance();
         _;
     }
-    
+
     modifier onlyWhenCompleted() {
         assembly ("memory-safe") {
             if iszero(eq(sload(s_isInProcess.slot), COMPLETED)) {
@@ -62,7 +62,6 @@ contract CommitReveal2 is FailLogics, ICommitReveal2Governance {
             mstore(0x40, m) // Restore the free memory pointer
         }
     }
-
 
     function setPeriods(
         uint256 offChainSubmissionPeriod,
@@ -123,7 +122,10 @@ contract CommitReveal2 is FailLogics, ICommitReveal2Governance {
                         or(
                             shl(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET, failToSubmitMerkleRootAfterDisputeGasUsed),
                             or(
-                                shl(FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET, failToRequestSOrGenerateRandomNumberGasUsed),
+                                shl(
+                                    FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET,
+                                    failToRequestSOrGenerateRandomNumberGasUsed
+                                ),
                                 shl(FAILTOSUBMITS_OFFSET, failToSubmitSGasUsed)
                             )
                         )
@@ -145,7 +147,10 @@ contract CommitReveal2 is FailLogics, ICommitReveal2Governance {
                                     or(
                                         shl(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, perAdditionalDidntSubmitGasUsedA),
                                         or(
-                                            shl(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, perAdditionalDidntSubmitGasUsedB),
+                                            shl(
+                                                PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET,
+                                                perAdditionalDidntSubmitGasUsedB
+                                            ),
                                             shl(PERREQUESTEDINCREASEGASUSED_OFFSET, perRequestedIncreaseGasUsed)
                                         )
                                     )
@@ -178,7 +183,6 @@ contract CommitReveal2 is FailLogics, ICommitReveal2Governance {
             maxGasPrice
         );
     }
-
 
     function estimateRequestPrice(uint32 callbackGasLimit, uint256 gasPrice) external view returns (uint256) {
         uint256 activatedOperatorsLength = s_activatedOperators.length;
@@ -751,5 +755,4 @@ contract CommitReveal2 is FailLogics, ICommitReveal2Governance {
             mstore(0x40, m) // Restore the free memory pointer
         }
     }
-
 }
