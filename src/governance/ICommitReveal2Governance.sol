@@ -3,7 +3,7 @@ pragma solidity ^0.8.30;
 
 interface ICommitReveal2Governance {
     function setEconomicParameters(uint256 activationThreshold, uint256 flatFee) external;
-    
+
     function setPeriods(
         uint256 offChainSubmissionPeriod,
         uint256 requestOrSubmitOrFailDecisionPeriod,
@@ -11,7 +11,7 @@ interface ICommitReveal2Governance {
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator
     ) external;
-    
+
     function setGasParameters(
         uint128 gasUsedMerkleRootSubAndGenRandNumA,
         uint128 gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead,
