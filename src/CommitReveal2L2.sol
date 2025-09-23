@@ -2,8 +2,9 @@
 pragma solidity ^0.8.30;
 
 import {CommitReveal2} from "./CommitReveal2.sol";
+import {ICommitReveal2L2Governance} from "./governance/ICommitReveal2Governance.sol";
 
-contract CommitReveal2L2 is CommitReveal2 {
+contract CommitReveal2L2 is CommitReveal2, ICommitReveal2L2Governance {
     /// @dev This is the padding size for unsigned RLP-encoded transaction without the signature data
     /// @dev The padding size was estimated based on hypothetical max RLP-encoded transaction size
     /// @dev Reference: https://github.com/smartcontractkit/chainlink/blob/develop/contracts/src/v0.8/vrf/dev/OptimismL1Fees.sol
@@ -36,7 +37,8 @@ contract CommitReveal2L2 is CommitReveal2 {
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator,
-        uint256 maxGasPrice
+        uint256 maxGasPrice,
+        address _governanceMultisig
     )
         payable
         CommitReveal2(
@@ -49,29 +51,17 @@ contract CommitReveal2L2 is CommitReveal2 {
             onChainSubmissionPeriod,
             offChainSubmissionPeriodPerOperator,
             onChainSubmissionPeriodPerOperator,
-            maxGasPrice
+            maxGasPrice,
+            _governanceMultisig
         )
     {}
 
-    function proposeL1FeeCoefficient(uint8 coefficient) external onlyOwner {
+    function setL1FeeCoefficient(uint8 coefficient) external onlyGovernance {
         if (coefficient == 0 || coefficient > 100) {
             revert InvalidL1FeeCoefficient(coefficient);
         }
-        s_pendingL1FeeCoefficient = coefficient;
-        s_pendingL1FeeCoefficientEffectiveTimestamp = block.timestamp + SET_DELAY_TIME;
-        emit L1FeeCalculationProposed(coefficient);
-    }
-
-    function executeSetL1FeeCoefficient() external onlyWhenCompleted {
-        if (s_pendingL1FeeCoefficientEffectiveTimestamp == 0) {
-            revert L1FeeCalculationNotProposed();
-        }
-        if (block.timestamp < s_pendingL1FeeCoefficientEffectiveTimestamp) {
-            revert L1FeeCalculationNotEffective();
-        }
-        s_l1FeeCoefficient = s_pendingL1FeeCoefficient;
-        s_pendingL1FeeCoefficientEffectiveTimestamp = 0;
-        emit L1FeeCalculationSet(s_pendingL1FeeCoefficient);
+        s_l1FeeCoefficient = coefficient;
+        emit L1FeeCalculationSet(coefficient);
     }
 
     /**

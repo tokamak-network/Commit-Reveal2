@@ -2,8 +2,18 @@
 pragma solidity ^0.8.30;
 
 import {FailLogics} from "./FailLogics.sol";
+import {ICommitReveal2Governance} from "./governance/ICommitReveal2Governance.sol";
 
-contract CommitReveal2 is FailLogics {
+contract CommitReveal2 is FailLogics, ICommitReveal2Governance {
+    address public governanceMultisig;
+    
+    error UnauthorizedGovernance();
+    
+    modifier onlyGovernance() {
+        if (msg.sender != governanceMultisig) revert UnauthorizedGovernance();
+        _;
+    }
+    
     modifier onlyWhenCompleted() {
         assembly ("memory-safe") {
             if iszero(eq(sload(s_isInProcess.slot), COMPLETED)) {
@@ -24,7 +34,8 @@ contract CommitReveal2 is FailLogics {
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator,
-        uint256 maxGasPrice
+        uint256 maxGasPrice,
+        address _governanceMultisig
     ) payable FailLogics(name, version) {
         require(msg.value >= activationThreshold);
         s_depositAmount[msg.sender] = msg.value;
@@ -37,45 +48,21 @@ contract CommitReveal2 is FailLogics {
         s_onChainSubmissionPeriodPerOperator = onChainSubmissionPeriodPerOperator;
         s_isInProcess = COMPLETED;
         s_maxGasPrice = maxGasPrice;
+        governanceMultisig = _governanceMultisig;
     }
 
-    function proposeEconomicParameters(uint256 activationThreshold, uint256 flatFee) external onlyOwner {
+    function setEconomicParameters(uint256 activationThreshold, uint256 flatFee) external onlyGovernance {
         assembly ("memory-safe") {
             let m := mload(0x40)
-            sstore(s_pendingActivationThreshold.slot, activationThreshold)
-            sstore(s_pendingFlatFee.slot, flatFee)
-            let effectiveTimestamp := add(timestamp(), SET_DELAY_TIME)
-            sstore(s_economicParamsEffectiveTimestamp.slot, effectiveTimestamp)
-            mstore(0x00, activationThreshold)
-            mstore(0x20, flatFee)
-            mstore(0x40, effectiveTimestamp)
-            log1(0x00, 0x60, 0xdcf23dfc5bc14859d1943fd156abd0fb732347e70c61c56215bbd728307234e2) // EconomicParametersProposed(uint256 activationThreshold, uint256 flatFee, uint256 effectiveTimestamp)
+            sstore(s_activationThreshold.slot, activationThreshold)
+            sstore(s_flatFee.slot, flatFee)
+            mstore(m, activationThreshold)
+            mstore(add(m, 0x20), flatFee)
+            log1(m, 0x40, 0x08f0774e7eb69e2d6a7cf2192cbf9c6f519a40bcfa16ff60d3f18496585e46dc) // EconomicParametersSet
             mstore(0x40, m) // Restore the free memory pointer
         }
     }
 
-    function executeSetEconomicParameters() external onlyWhenCompleted {
-        assembly ("memory-safe") {
-            let economicParamsEffectiveTimestamp := sload(s_economicParamsEffectiveTimestamp.slot)
-            // check economicParamsEffectiveTimestamp is not 0
-            if iszero(economicParamsEffectiveTimestamp) {
-                mstore(0, 0xf2a87d5e) // selector for NotProposed()
-                revert(0x1c, 0x04)
-            }
-            if lt(timestamp(), economicParamsEffectiveTimestamp) {
-                mstore(0, 0x085de625) // selector for TooEarly()
-                revert(0x1c, 0x04)
-            }
-            let activationThreshold := sload(s_pendingActivationThreshold.slot)
-            let flatFee := sload(s_pendingFlatFee.slot)
-            sstore(s_activationThreshold.slot, activationThreshold)
-            sstore(s_flatFee.slot, flatFee)
-            sstore(s_economicParamsEffectiveTimestamp.slot, 0)
-            mstore(0x00, activationThreshold)
-            mstore(0x20, flatFee)
-            log1(0x00, 0x40, 0x08f0774e7eb69e2d6a7cf2192cbf9c6f519a40bcfa16ff60d3f18496585e46dc) // EconomicParametersSet
-        }
-    }
 
     function setPeriods(
         uint256 offChainSubmissionPeriod,
@@ -83,7 +70,7 @@ contract CommitReveal2 is FailLogics {
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator
-    ) external onlyOwner notInProcess {
+    ) external onlyGovernance notInProcess {
         assembly ("memory-safe") {
             let m := mload(0x40)
             sstore(s_offChainSubmissionPeriod.slot, offChainSubmissionPeriod)
@@ -101,7 +88,7 @@ contract CommitReveal2 is FailLogics {
         }
     }
 
-    function proposeGasParameters(
+    function setGasParameters(
         uint128 gasUsedMerkleRootSubAndGenRandNumA,
         uint128 gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead,
         uint256 maxCallbackGasLimit,
@@ -119,18 +106,16 @@ contract CommitReveal2 is FailLogics {
         uint32 perAdditionalDidntSubmitGasUsedB,
         uint32 perRequestedIncreaseGasUsed,
         uint256 maxGasPrice
-    ) external onlyOwner {
+    ) external onlyGovernance {
         assembly ("memory-safe") {
-            let m := mload(0x40)
-            // Pack as: low 128 bits = A, high 128 bits = B
             sstore(
-                s_pendingGasUsedMerkleRootSubAndGenRandNumA.slot,
+                s_gasUsedMerkleRootSubAndGenRandNumA.slot,
                 or(gasUsedMerkleRootSubAndGenRandNumA, shl(128, gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead))
             )
-            sstore(s_pendingMaxCallbackGasLimit.slot, maxCallbackGasLimit)
+            sstore(s_maxCallbackGasLimit.slot, maxCallbackGasLimit)
 
             sstore(
-                s_pendingGetL1UpperBoundGasUsedWhenCalldataSize4.slot,
+                s_getL1UpperBoundGasUsedWhenCalldataSize4.slot,
                 or(
                     getL1UpperBoundGasUsedWhenCalldataSize4,
                     or(
@@ -138,10 +123,7 @@ contract CommitReveal2 is FailLogics {
                         or(
                             shl(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET, failToSubmitMerkleRootAfterDisputeGasUsed),
                             or(
-                                shl(
-                                    FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET,
-                                    failToRequestSOrGenerateRandomNumberGasUsed
-                                ),
+                                shl(FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET, failToRequestSOrGenerateRandomNumberGasUsed),
                                 shl(FAILTOSUBMITS_OFFSET, failToSubmitSGasUsed)
                             )
                         )
@@ -149,7 +131,7 @@ contract CommitReveal2 is FailLogics {
                 )
             )
             sstore(
-                s_pendingFailToSubmitCoGasUsedBaseA.slot,
+                s_failToSubmitCoGasUsedBaseA.slot,
                 or(
                     failToSubmitCoGasUsedBaseA,
                     or(
@@ -163,10 +145,7 @@ contract CommitReveal2 is FailLogics {
                                     or(
                                         shl(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, perAdditionalDidntSubmitGasUsedA),
                                         or(
-                                            shl(
-                                                PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET,
-                                                perAdditionalDidntSubmitGasUsedB
-                                            ),
+                                            shl(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, perAdditionalDidntSubmitGasUsedB),
                                             shl(PERREQUESTEDINCREASEGASUSED_OFFSET, perRequestedIncreaseGasUsed)
                                         )
                                     )
@@ -176,87 +155,30 @@ contract CommitReveal2 is FailLogics {
                     )
                 )
             )
-            let effectiveTimestamp := add(timestamp(), SET_DELAY_TIME)
-            sstore(s_gasParamsEffectiveTimestamp.slot, effectiveTimestamp)
-            sstore(s_pendingMaxGasPrice.slot, maxGasPrice)
-
-            mstore(m, gasUsedMerkleRootSubAndGenRandNumA)
-            mstore(add(m, 0x20), gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead)
-            mstore(add(m, 0x40), maxCallbackGasLimit)
-            mstore(add(m, 0x60), getL1UpperBoundGasUsedWhenCalldataSize4)
-            mstore(add(m, 0x80), failToRequestCvOrSubmitMerkleRootGasUsed)
-            mstore(add(m, 0xa0), failToSubmitMerkleRootAfterDisputeGasUsed)
-            mstore(add(m, 0xc0), failToRequestSOrGenerateRandomNumberGasUsed)
-            mstore(add(m, 0xe0), failToSubmitSGasUsed)
-            mstore(add(m, 0x100), failToSubmitCoGasUsedBaseA)
-            mstore(add(m, 0x120), failToSubmitCvGasUsedBaseA)
-            mstore(add(m, 0x140), failToSubmitGasUsedBaseB)
-            mstore(add(m, 0x160), perOperatorIncreaseGasUsedA)
-            mstore(add(m, 0x180), perOperatorIncreaseGasUsedB)
-            mstore(add(m, 0x1a0), perAdditionalDidntSubmitGasUsedA)
-            mstore(add(m, 0x1c0), perAdditionalDidntSubmitGasUsedB)
-            mstore(add(m, 0x1e0), perRequestedIncreaseGasUsed)
-            mstore(add(m, 0x200), effectiveTimestamp)
-            mstore(add(m, 0x220), maxGasPrice)
-            log1(m, 0x240, 0x3fdaf13122b997bf0388b0bf45df533647a2ff56c32aed869f0630ea422ce4a1) // event GasParametersProposed(...)
-            mstore(0x40, m) // Restore the free memory pointer
+            sstore(s_maxGasPrice.slot, maxGasPrice)
         }
+
+        emit GasParametersSet(
+            gasUsedMerkleRootSubAndGenRandNumA,
+            gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead,
+            maxCallbackGasLimit,
+            getL1UpperBoundGasUsedWhenCalldataSize4,
+            failToRequestCvOrSubmitMerkleRootGasUsed,
+            failToSubmitMerkleRootAfterDisputeGasUsed,
+            failToRequestSOrGenerateRandomNumberGasUsed,
+            failToSubmitSGasUsed,
+            failToSubmitCoGasUsedBaseA,
+            failToSubmitCvGasUsedBaseA,
+            failToSubmitGasUsedBaseB,
+            perOperatorIncreaseGasUsedA,
+            perOperatorIncreaseGasUsedB,
+            perAdditionalDidntSubmitGasUsedA,
+            perAdditionalDidntSubmitGasUsedB,
+            perRequestedIncreaseGasUsed,
+            maxGasPrice
+        );
     }
 
-    function executeSetGasParameters() external onlyWhenCompleted {
-        assembly ("memory-safe") {
-            let m := mload(0x40)
-            let gasParamsEffectiveTimestamp := sload(s_gasParamsEffectiveTimestamp.slot)
-            if iszero(gasParamsEffectiveTimestamp) {
-                mstore(0, 0xf2a87d5e) // selector for NotProposed()
-                revert(0x1c, 0x04)
-            }
-            if lt(timestamp(), gasParamsEffectiveTimestamp) {
-                mstore(0, 0x085de625) // selector for TooEarly()
-                revert(0x1c, 0x04)
-            }
-            let packedData := sload(s_pendingGasUsedMerkleRootSubAndGenRandNumA.slot)
-            sstore(s_gasUsedMerkleRootSubAndGenRandNumA.slot, packedData)
-            mstore(m, and(packedData, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK))
-            mstore(add(m, 0x20), shr(128, packedData))
-            packedData := sload(s_pendingMaxCallbackGasLimit.slot)
-            sstore(s_maxCallbackGasLimit.slot, packedData)
-            mstore(add(m, 0x40), packedData)
-
-            packedData := sload(s_pendingGetL1UpperBoundGasUsedWhenCalldataSize4.slot)
-            sstore(s_getL1UpperBoundGasUsedWhenCalldataSize4.slot, packedData)
-            mstore(add(m, 0x60), and(packedData, FAILTOSUBMIT_MASK))
-            mstore(
-                add(m, 0x80), and(shr(FAILTOREQUESTSUBMITCV_OR_SUBMITMEKRLEROOT_OFFSET, packedData), FAILTOSUBMIT_MASK)
-            )
-            mstore(add(m, 0xa0), and(shr(FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET, packedData), FAILTOSUBMIT_MASK))
-            mstore(add(m, 0xc0), and(shr(FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET, packedData), FAILTOSUBMIT_MASK))
-            mstore(add(m, 0xe0), and(shr(FAILTOSUBMITS_OFFSET, packedData), FAILTOSUBMIT_MASK))
-
-            packedData := sload(s_pendingFailToSubmitCoGasUsedBaseA.slot)
-            sstore(s_failToSubmitCoGasUsedBaseA.slot, packedData)
-            mstore(add(m, 0x100), and(packedData, DYNAMICFAILTOSUBMIT_MASK))
-            mstore(add(m, 0x120), and(shr(FAILTOSUBMITCVGASUSEDBASEA_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
-            mstore(add(m, 0x140), and(shr(FAILTOSUBMITGASUSEDBASEB_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
-            mstore(add(m, 0x160), and(shr(PEROPERATORINCREASEGASUSEDA_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
-            mstore(add(m, 0x180), and(shr(PEROPERATORINCREASEGASUSEDB_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
-            mstore(
-                add(m, 0x1a0), and(shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK)
-            )
-            mstore(
-                add(m, 0x1c0), and(shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK)
-            )
-            mstore(add(m, 0x1e0), and(shr(PERREQUESTEDINCREASEGASUSED_OFFSET, packedData), DYNAMICFAILTOSUBMIT_MASK))
-            // clear effective timestamp after execution
-            sstore(s_gasParamsEffectiveTimestamp.slot, 0)
-            packedData := sload(s_pendingMaxGasPrice.slot)
-            sstore(s_maxGasPrice.slot, packedData)
-            mstore(add(m, 0x200), packedData)
-
-            log1(m, 0x220, 0xeb624bc1c126e8a8e5b3b848dc36ed397e8f707ceba869c4cca058dbe4abf5d7) // event GasParametersSet(...)
-            mstore(0x40, m) // Restore the free memory pointer
-        }
-    }
 
     function estimateRequestPrice(uint32 callbackGasLimit, uint256 gasPrice) external view returns (uint256) {
         uint256 activatedOperatorsLength = s_activatedOperators.length;
@@ -829,4 +751,5 @@ contract CommitReveal2 is FailLogics {
             mstore(0x40, m) // Restore the free memory pointer
         }
     }
+
 }

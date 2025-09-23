@@ -34,36 +34,25 @@ contract ParamDelayTest is Test {
             ONCHAIN,
             OFFCHAIN_PER_OP,
             ONCHAIN_PER_OP,
-            maxGasPrice
+            maxGasPrice,
+            address(0) // TODO: Deploy MultisigTimelock first
         );
     }
 
-    function testEconomicParametersDelayAndExecute() public {
-        // Propose new economic parameters
+    function testEconomicParametersGovernanceOnly() public {
+        // Should revert when called by non-governance address
         uint256 newActivation = 2 ether;
         uint256 newFlatFee = 0.02 ether;
-        s_commitReveal2.proposeEconomicParameters(newActivation, newFlatFee);
-
-        // Should revert if executed before delay
-        vm.expectRevert(TOO_EARLY);
-        s_commitReveal2.executeSetEconomicParameters();
-
-        // Move time forward just before the delay; still too early
-        vm.warp(block.timestamp + s_commitReveal2.SET_DELAY_TIME() - 1);
-        vm.expectRevert(TOO_EARLY);
-        s_commitReveal2.executeSetEconomicParameters();
-
-        // Move past the delay and execute
-        vm.warp(block.timestamp + 2);
-        s_commitReveal2.executeSetEconomicParameters();
-
-        // Verify parameters updated
-        assertEq(s_commitReveal2.s_activationThreshold(), newActivation, "activationThreshold not updated");
-        assertEq(s_commitReveal2.s_flatFee(), newFlatFee, "flatFee not updated");
-        assertEq(s_commitReveal2.s_economicParamsEffectiveTimestamp(), 0, "economic effective ts not cleared");
+        
+        vm.expectRevert(); // UnauthorizedGovernance error
+        s_commitReveal2.setEconomicParameters(newActivation, newFlatFee);
+        
+        // Parameters should remain unchanged
+        assertEq(s_commitReveal2.s_activationThreshold(), ACTIVATION_THRESHOLD, "activationThreshold should not change");
+        assertEq(s_commitReveal2.s_flatFee(), FLAT_FEE, "flatFee should not change");
     }
 
-    function testGasParametersDelayAndExecute() public {
+    function testGasParametersGovernanceOnly() public {
         // Prepare gas parameters
         uint128 a = 12345;
         uint128 b = 67890;
@@ -82,8 +71,9 @@ contract ParamDelayTest is Test {
         uint32 perDidntB = 24000;
         uint32 perReq = 500;
 
-        // Propose
-        s_commitReveal2.proposeGasParameters(
+        // Should revert when called by non-governance address
+        vm.expectRevert(); // UnauthorizedGovernance error
+        s_commitReveal2.setGasParameters(
             a,
             b,
             maxCb,
@@ -102,52 +92,7 @@ contract ParamDelayTest is Test {
             perReq,
             maxGasPrice
         );
-
-        // Execute too early should revert
-        vm.expectRevert(TOO_EARLY);
-        s_commitReveal2.executeSetGasParameters();
-
-        // Warp past delay and execute
-        vm.warp(block.timestamp + s_commitReveal2.SET_DELAY_TIME() + 1);
-        s_commitReveal2.executeSetGasParameters();
-
-        (
-            uint128 ra,
-            uint128 rb,
-            uint256 rMaxCb,
-            uint48 rL1Upper,
-            uint48 rFailCvOrRoot,
-            uint48 rFailRootAfter,
-            uint48 rFailReqSOrGen,
-            uint48 rFailS,
-            uint32 rFailCoBaseA,
-            uint32 rFailCvBaseA,
-            uint32 rFailBaseB,
-            uint32 rPerOpA,
-            uint32 rPerOpB,
-            uint32 rPerDidntA,
-            uint32 rPerDidntB,
-            uint32 rPerReq
-        ) = s_commitReveal2.getGasParameters();
-
-        // Verify gas parameters updated
-        assertEq(ra, a, "gas A mismatch");
-        assertEq(rb, b, "gas B mismatch");
-        assertEq(rMaxCb, maxCb, "maxCallbackGasLimit mismatch");
-        assertEq(rL1Upper, l1Upper, "l1Upper mismatch");
-        assertEq(rFailCvOrRoot, failCvOrRoot, "failCvOrRoot mismatch");
-        assertEq(rFailRootAfter, failRootAfter, "failRootAfter mismatch");
-        assertEq(rFailReqSOrGen, failReqSOrGen, "failReqSOrGen mismatch");
-        assertEq(rFailS, failS, "failS mismatch");
-        assertEq(rFailCoBaseA, failCoBaseA, "failCoBaseA mismatch");
-        assertEq(rFailCvBaseA, failCvBaseA, "failCvBaseA mismatch");
-        assertEq(rFailBaseB, failBaseB, "failBaseB mismatch");
-        assertEq(rPerOpA, perOpA, "perOpA mismatch");
-        assertEq(rPerOpB, perOpB, "perOpB mismatch");
-        assertEq(rPerDidntA, perDidntA, "perDidntA mismatch");
-        assertEq(rPerDidntB, perDidntB, "perDidntB mismatch");
-        assertEq(rPerReq, perReq, "perReq mismatch");
-        assertEq(s_commitReveal2.s_maxGasPrice(), maxGasPrice, "maxGasPrice mismatch");
-        assertEq(s_commitReveal2.s_gasParamsEffectiveTimestamp(), 0, "gas effective ts not cleared");
+        
+        // Gas parameters should remain unchanged since the call should have reverted
     }
 }

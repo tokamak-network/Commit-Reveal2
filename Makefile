@@ -48,7 +48,7 @@ NO_SIMULATION := --rpc-url 127.0.0.1:8545 --private-key $(DEFAULT_ANVIL_KEY) --b
 
 
 ifeq ($(findstring --network sepolia,$(ARGS)), --network sepolia)
-	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --retries 20 --etherscan-api-key $(ETHERSCAN_API_KEY) -vv --verifier-url https://api-sepolia.etherscan.io/api
+	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier etherscan --retries 20 --etherscan-api-key $(ETHERSCAN_API_KEY) -vv
 endif
 ifeq ($(findstring --network sepolianoverify,$(ARGS)), --network sepolianoverify)
 	NETWORK_ARGS := --rpc-url $(SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast -vv
@@ -69,7 +69,7 @@ ifeq ($(findstring --network testmainnet,$(ARGS)), --network testmainnet)
 	NETWORK_ARGS := --rpc-url $(MAINNET_RPC_URL)  --private-key $(PRIVATE_KEY) -vvv
 endif
 ifeq ($(findstring --network opsepolia,$(ARGS)), --network opsepolia)
-	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --etherscan-api-key $(OP_ETHERSCAN_API_KEY) -vv --retries 20 --verifier-url https://api-sepolia-optimistic.etherscan.io/api 
+	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast --verify --verifier etherscan --etherscan-api-key $(OP_ETHERSCAN_API_KEY) -vv --retries 20
 endif
 ifeq ($(findstring --network opsepolianoverify,$(ARGS)), --network opsepolianoverify)
 	NETWORK_ARGS := --rpc-url $(OP_SEPOLIA_RPC_URL) --private-key $(PRIVATE_KEY) --broadcast -vv
