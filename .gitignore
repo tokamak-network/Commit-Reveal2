@@ -16,3 +16,6 @@ docs/
 
 # Dotenv file
 .env
+
+# Claude
+/.claude/

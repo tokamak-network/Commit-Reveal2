@@ -27,7 +27,8 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                     activeNetworkConfig.onChainSubmissionPeriod,
                     activeNetworkConfig.offChainSubmissionPeriodPerOperator,
                     activeNetworkConfig.onChainSubmissionPeriodPerOperator,
-                    activeNetworkConfig.maxGasPrice
+                    activeNetworkConfig.maxGasPrice,
+                    address(0) // TODO: Deploy MultisigTimelock first
                 )
             );
         } else {
@@ -42,7 +43,8 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                     activeNetworkConfig.onChainSubmissionPeriod,
                     activeNetworkConfig.offChainSubmissionPeriodPerOperator,
                     activeNetworkConfig.onChainSubmissionPeriodPerOperator,
-                    activeNetworkConfig.maxGasPrice
+                    activeNetworkConfig.maxGasPrice,
+                    address(0) // TODO: Deploy MultisigTimelock first
                 )
             );
         }
@@ -64,7 +66,8 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                 activeNetworkConfig.onChainSubmissionPeriod,
                 activeNetworkConfig.offChainSubmissionPeriodPerOperator,
                 activeNetworkConfig.onChainSubmissionPeriodPerOperator,
-                activeNetworkConfig.maxGasPrice
+                activeNetworkConfig.maxGasPrice,
+                address(0) // TODO: Deploy MultisigTimelock first
             )
         );
         DeployMockGasPriceOracle mockGasPriceOracle = new DeployMockGasPriceOracle();
@@ -89,7 +92,8 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
                 activeNetworkConfig.onChainSubmissionPeriod,
                 activeNetworkConfig.offChainSubmissionPeriodPerOperator,
                 activeNetworkConfig.onChainSubmissionPeriodPerOperator,
-                activeNetworkConfig.maxGasPrice
+                activeNetworkConfig.maxGasPrice,
+                address(0) // TODO: Deploy MultisigTimelock first
             )
         );
         DeployMockGasPriceOracle mockGasPriceOracle = new DeployMockGasPriceOracle();
