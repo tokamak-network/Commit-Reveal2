@@ -2,9 +2,8 @@
 pragma solidity ^0.8.30;
 
 import {FailLogics} from "./FailLogics.sol";
-import {ICommitReveal2Governance} from "./governance/ICommitReveal2Governance.sol";
 
-contract CommitReveal2 is FailLogics, ICommitReveal2Governance {
+contract CommitReveal2 is FailLogics {
     address public governanceMultisig;
 
     error UnauthorizedGovernance();

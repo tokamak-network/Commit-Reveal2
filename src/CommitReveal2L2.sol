@@ -2,9 +2,8 @@
 pragma solidity ^0.8.30;
 
 import {CommitReveal2} from "./CommitReveal2.sol";
-import {ICommitReveal2L2Governance} from "./governance/ICommitReveal2Governance.sol";
 
-contract CommitReveal2L2 is CommitReveal2, ICommitReveal2L2Governance {
+contract CommitReveal2L2 is CommitReveal2 {
     /// @dev This is the padding size for unsigned RLP-encoded transaction without the signature data
     /// @dev The padding size was estimated based on hypothetical max RLP-encoded transaction size
     /// @dev Reference: https://github.com/smartcontractkit/chainlink/blob/develop/contracts/src/v0.8/vrf/dev/OptimismL1Fees.sol
@@ -16,16 +15,14 @@ contract CommitReveal2L2 is CommitReveal2, ICommitReveal2L2Governance {
     /// @dev L1 fee coefficient is used to account for the impact of data compression on the l1 fee
     /// getL1FeeUpperBound returns the upper bound of l1 fee so this configurable coefficient will help
     /// charge a predefined percentage of the upper bound.
-    uint8 public s_pendingL1FeeCoefficient = 100;
-    uint8 public s_l1FeeCoefficient = 100;
-    uint256 public s_pendingL1FeeCoefficientEffectiveTimestamp;
+    uint256 public s_l1FeeCoefficient = 100;
 
-    error InvalidL1FeeCoefficient(uint8 coefficient);
+    error InvalidL1FeeCoefficient(uint256 coefficient);
     error L1FeeCalculationNotProposed();
     error L1FeeCalculationNotEffective();
 
-    event L1FeeCalculationProposed(uint8 coefficient);
-    event L1FeeCalculationSet(uint8 coefficient);
+    event L1FeeCalculationProposed(uint256 coefficient);
+    event L1FeeCalculationSet(uint256 coefficient);
 
     constructor(
         uint256 activationThreshold,
@@ -56,7 +53,7 @@ contract CommitReveal2L2 is CommitReveal2, ICommitReveal2L2Governance {
         )
     {}
 
-    function setL1FeeCoefficient(uint8 coefficient) external onlyGovernance {
+    function setL1FeeCoefficient(uint256 coefficient) external onlyGovernance {
         if (coefficient == 0 || coefficient > 100) {
             revert InvalidL1FeeCoefficient(coefficient);
         }
@@ -104,6 +101,7 @@ contract CommitReveal2L2 is CommitReveal2, ICommitReveal2L2Governance {
                 revert(0x1c, 0x04)
             }
             let gasUsedMerkleRootSubAndGenRandNum := sload(s_gasUsedMerkleRootSubAndGenRandNumA.slot)
+
             requestFee :=
                 add(
                     add(

@@ -34,5 +34,5 @@ interface ICommitReveal2Governance {
 }
 
 interface ICommitReveal2L2Governance {
-    function setL1FeeCoefficient(uint8 coefficient) external;
+    function setL1FeeCoefficient(uint256 coefficient) external;
 }

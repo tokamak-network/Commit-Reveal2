@@ -362,33 +362,6 @@ contract CommitReveal2Storage {
 
     uint256 internal constant SECP256K1_CURVE_ORDER = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
 
-    // Pending parameter storage and ETA for delayed execution (10 minutes timelock)
-    // Economic parameters
-    uint256 public s_pendingActivationThreshold;
-    uint256 public s_pendingFlatFee;
-    uint256 public constant SET_DELAY_TIME = 10 minutes;
-
-    // Gas parameters (pending)
-    uint128 internal s_pendingGasUsedMerkleRootSubAndGenRandNumA;
-    uint128 internal s_pendingGasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead;
-    uint256 internal s_pendingMaxCallbackGasLimit;
-    uint48 internal s_pendingGetL1UpperBoundGasUsedWhenCalldataSize4;
-    uint48 internal s_pendingfailToRequestCvOrSubmitMerkleRootGasUsed;
-    uint48 internal s_pendingFailToSubmitMerkleRootAfterDisputeGasUsed;
-    uint48 internal s_pendingFailToRequestSOrGenerateRandomNumberGasUsed;
-    uint48 internal s_pendingFailToSubmitSGasUsed;
-    uint32 internal s_pendingFailToSubmitCoGasUsedBaseA;
-    uint32 internal s_pendingFailToSubmitCvGasUsedBaseA;
-    uint32 internal s_pendingFailToSubmitGasUsedBaseB;
-    uint32 internal s_pendingPerOperatorIncreaseGasUsedA;
-    uint32 internal s_pendingPerOperatorIncreaseGasUsedB;
-    uint32 internal s_pendingPerAdditionalDidntSubmitGasUsedA;
-    uint32 internal s_pendingPerAdditionalDidntSubmitGasUsedB;
-    uint32 internal s_pendingPerRequestedIncreaseGasUsed;
-
-    uint256 public s_economicParamsEffectiveTimestamp;
-    uint256 public s_gasParamsEffectiveTimestamp;
-    uint256 public s_pendingMaxGasPrice;
     uint256 public s_maxGasPrice;
 
     function getPeriods()
