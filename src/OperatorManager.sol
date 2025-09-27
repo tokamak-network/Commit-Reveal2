@@ -60,7 +60,6 @@ contract OperatorManager is Ownable {
 
     // * Errors
     error TransferFailed();
-    error InProcess(); // 0x0f56c325
     error OnlyActivatedOperatorCanClaim(); // 0x111fa29f
     error OwnerCannotActivate(); // 0x4534ad7f
     error LessThanActivationThreshold(); // 0x5af30906
@@ -74,23 +73,6 @@ contract OperatorManager is Ownable {
 
     constructor() {
         _initializeOwner(msg.sender);
-    }
-
-    /**
-     * @notice Ensures that no actions can be taken while the contract is in an ongoing process.
-     * @dev
-     *   - Reverts with {InProcess} if `s_isInProcess == IN_PROGRESS`.
-     *   - Commonly used to protect functions that should not execute while the system is ongoing
-     *     with a round of operations or an uncompleted flow.
-     */
-    modifier notInProcess() {
-        assembly ("memory-safe") {
-            if eq(sload(s_isInProcess.slot), IN_PROGRESS) {
-                mstore(0x00, 0x0f56c325) // `InProcess()`.
-                revert(0x1c, 0x04)
-            }
-        }
-        _;
     }
 
     // ** Override Ownable Functions
@@ -186,7 +168,7 @@ contract OperatorManager is Ownable {
         }
     }
 
-    function activate() public notInProcess {
+    function activate() public notInProgress {
         assembly ("memory-safe") {
             // Check if the caller's deposit amount is less than the activation threshold and revert if true.
             mstore(0x00, caller())
@@ -235,7 +217,7 @@ contract OperatorManager is Ownable {
         }
     }
 
-    function depositAndActivate() external payable virtual notInProcess {
+    function depositAndActivate() external payable virtual notInProgress {
         assembly ("memory-safe") {
             mstore(0x00, caller())
             mstore(0x20, s_depositAmount.slot)
@@ -250,7 +232,7 @@ contract OperatorManager is Ownable {
         _activate();
     }
 
-    function withdraw() external notInProcess {
+    function withdraw() external notInProgress {
         assembly ("memory-safe") {
             mstore(0x00, caller())
             mstore(0x20, s_depositAmount.slot)
@@ -305,7 +287,7 @@ contract OperatorManager is Ownable {
         }
     }
 
-    function deactivate() external notInProcess {
+    function deactivate() external notInProgress {
         // Note: Intentionally no operator activation check for gas optimization.
         // Non-activated operators have s_activatedOperatorIndex1Based[msg.sender] = 0,
         // causing underflow (0 - 1) which serves as implicit validation and reverts.

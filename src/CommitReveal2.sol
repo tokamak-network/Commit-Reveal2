@@ -72,7 +72,7 @@ contract CommitReveal2 is FailLogics {
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
         uint256 onChainSubmissionPeriodPerOperator
-    ) external onlyGovernance notInProcess {
+    ) external onlyGovernance notInProgress {
         assembly ("memory-safe") {
             let m := mload(0x40)
             sstore(s_offChainSubmissionPeriod.slot, offChainSubmissionPeriod)
