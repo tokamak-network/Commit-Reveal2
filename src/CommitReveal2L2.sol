@@ -53,7 +53,7 @@ contract CommitReveal2L2 is CommitReveal2 {
         )
     {}
 
-    function setL1FeeCoefficient(uint256 coefficient) external onlyGovernance {
+    function setL1FeeCoefficient(uint256 coefficient) external onlyGovernance onlyWhenCompleted {
         if (coefficient == 0 || coefficient > 100) {
             revert InvalidL1FeeCoefficient(coefficient);
         }

@@ -50,7 +50,11 @@ contract CommitReveal2 is FailLogics {
         governanceMultisig = _governanceMultisig;
     }
 
-    function setEconomicParameters(uint256 activationThreshold, uint256 flatFee) external onlyGovernance {
+    function setEconomicParameters(uint256 activationThreshold, uint256 flatFee)
+        external
+        onlyGovernance
+        onlyWhenCompleted
+    {
         assembly ("memory-safe") {
             let m := mload(0x40)
             sstore(s_activationThreshold.slot, activationThreshold)
@@ -104,7 +108,7 @@ contract CommitReveal2 is FailLogics {
         uint32 perAdditionalDidntSubmitGasUsedB,
         uint32 perRequestedIncreaseGasUsed,
         uint256 maxGasPrice
-    ) external onlyGovernance {
+    ) external onlyGovernance onlyWhenCompleted {
         assembly ("memory-safe") {
             sstore(
                 s_gasUsedMerkleRootSubAndGenRandNumA.slot,
