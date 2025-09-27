@@ -595,11 +595,13 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
             switch eq(requestedToSubmitSFromIndexK, sub(activatedOperatorsLength, 1))
             case 1 {
-                let storedSLength := sub(activatedOperatorsLength, 1)
-                for { let i } lt(i, storedSLength) { i := add(i, 1) } {
+                for { let i } lt(i, activatedOperatorIndex) { i := add(i, 1) } {
                     mstore(add(fmp, shl(5, i)), sload(add(s_secrets.slot, i))) // store secrets, overwrites fmp because it is not used anymore
                 }
-                mstore(add(fmp, shl(5, storedSLength)), s) // last secret
+                mstore(add(fmp, shl(5, activatedOperatorIndex)), s) // last secret
+                for { let i := add(activatedOperatorIndex, 1) } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
+                    mstore(add(fmp, shl(5, i)), sload(add(s_secrets.slot, i))) // store secrets, overwrites fmp because it is not used anymore
+                }
                 let randomNumber := keccak256(fmp, shl(5, activatedOperatorsLength))
                 let nextRound := add(curRound, 1)
                 let requestCount := sload(s_requestCount.slot)
