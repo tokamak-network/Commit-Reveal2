@@ -105,21 +105,30 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             let curRound := sload(s_currentRound.slot)
             mstore(0x40, curRound)
             mstore(0x60, s_trialNum.slot)
-            mstore(0x20, sload(keccak256(0x40, 0x40))) // trialNum
+            let trialNum := sload(keccak256(0x40, 0x40))
+            mstore(0x00, trialNum)
+            // * get requestedToSubmitCvTimestamp
+            mstore(0x60, s_requestedToSubmitCvTimestamp.slot)
+            mstore(0x20, keccak256(0x40, 0x40))
+            if iszero(sload(keccak256(0x00, 0x40))) {
+                mstore(0, 0xd3e6c959) // CvNotRequested()
+                revert(0x1c, 0x04)
+            }
             // * get merkleRootSubmittedTimestamp
             mstore(0x60, s_merkleRootSubmittedTimestamp.slot)
-            mstore(0x40, keccak256(0x40, 0x40))
-            // ** can only submit cv if merkleRoot is not submitted
-            if gt(sload(keccak256(0x20, 0x40)), 0) {
+            mstore(0x20, keccak256(0x40, 0x40))
+            if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0, 0xf6b442ac) // MerkleRootIsSubmitted()
                 revert(0x1c, 0x04)
             }
+
             sstore(add(s_cvs.slot, activatedOperatorIndex), cv)
             sstore(
                 s_bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2.slot,
                 and(bitSetIfRequestedToSubmitCv_zeroBitIfSubmittedCv_bitmap128x2, not(mask))
             ) // set to zero
             mstore(0x00, curRound) // 0x20 already has trialNum
+            mstore(0x20, trialNum)
             mstore(0x40, cv)
             mstore(0x60, activatedOperatorIndex)
             log1(0x00, 0x80, 0x6a6385c5eaed19d346ec4f9bd0010cfba4ac1d0407e2e55f959cb8fcac30f873) // event CvSubmitted(uint256 round, uint256 trialNum, bytes32 cv, uint256 index)
