@@ -18,10 +18,7 @@ contract CommitReveal2L2 is CommitReveal2 {
     uint256 public s_l1FeeCoefficient = 100;
 
     error InvalidL1FeeCoefficient(uint256 coefficient);
-    error L1FeeCalculationNotProposed();
-    error L1FeeCalculationNotEffective();
 
-    event L1FeeCalculationProposed(uint256 coefficient);
     event L1FeeCalculationSet(uint256 coefficient);
 
     constructor(
