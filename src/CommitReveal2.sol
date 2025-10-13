@@ -676,7 +676,8 @@ contract CommitReveal2 is FailLogics {
                 revert(0x1c, 0x04)
             }
             let nextRound := sload(s_currentRound.slot)
-            let requestCountMinusOne := sub(sload(s_requestCount.slot), 1)
+            let requestCount := sload(s_requestCount.slot)
+            let requestCountMinusOne := sub(requestCount, 1)
             let curRound := nextRound
             let requested
 
@@ -741,14 +742,14 @@ contract CommitReveal2 is FailLogics {
                     }
                     return(0, 0)
                 }
-                // If we reach or pass the last round without finding any requested round,
+                // If we reach or pass the total request count without finding any requested round,
                 // mark as COMPLETED and set the current round to the last possible index.
-                if iszero(lt(nextRound, requestCountMinusOne)) {
+                // Fixed off-by-one error: now matches generateRandomNumber() boundary logic
+                if iszero(lt(nextRound, requestCount)) {
                     sstore(s_isInProcess.slot, COMPLETED)
                     sstore(s_currentRound.slot, requestCountMinusOne)
                     mstore(0x00, requestCountMinusOne)
-                    mstore(0x20, s_trialNum.slot)
-                    mstore(0x20, sload(keccak256(0x00, 0x40))) // trialNum
+                    mstore(0x20, 0) // trialNum is 0 for consistency with generateRandomNumber()
                     mstore(0x40, COMPLETED)
                     log1(0x00, 0x60, 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813) // event Status(uint256 curRound, uint256 curTrialNum, uint256 curState)
                     return(0, 0)
