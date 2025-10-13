@@ -604,6 +604,9 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
             switch eq(requestedToSubmitSFromIndexK, sub(activatedOperatorsLength, 1))
             case 1 {
+                // Store the last revealer's secret for storage consistency
+                sstore(add(s_secrets.slot, activatedOperatorIndex), s)
+                
                 for { let i } lt(i, activatedOperatorIndex) { i := add(i, 1) } {
                     mstore(add(fmp, shl(5, i)), sload(add(s_secrets.slot, i))) // store secrets, overwrites fmp because it is not used anymore
                 }
