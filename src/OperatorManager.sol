@@ -241,11 +241,13 @@ contract OperatorManager is Ownable {
             let activatedOperatorIndex1Based := sload(keccak256(0x00, 0x40))
             let currentSlashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
             mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
+            let slashRewardPerOperatorPaidX8Slot := keccak256(0x00, 0x40)
+            // Calculate claimable reward once to prevent fractional loss when updating checkpoint
+            let claimableSlashReward := shr(8, sub(currentSlashRewardPerOperatorX8, sload(slashRewardPerOperatorPaidX8Slot)))
 
             if gt(activatedOperatorIndex1Based, 0) {
                 // ** update withdraw amount
-                withdrawAmount :=
-                    add(withdrawAmount, shr(8, sub(currentSlashRewardPerOperatorX8, sload(keccak256(0x00, 0x40)))))
+                withdrawAmount := add(withdrawAmount, claimableSlashReward)
                 // ** deactivate msg.sender
                 mstore(0x00, s_activatedOperators.slot)
                 let firstActivatedOperatorSlot := keccak256(0x00, 0x20)
@@ -267,15 +269,17 @@ contract OperatorManager is Ownable {
             if eq(caller(), sload(_OWNER_SLOT)) {
                 // If the caller is the owner (leader node) but not an operator,
                 // they can still withdraw deposit plus slash reward.
-                withdrawAmount :=
-                    add(withdrawAmount, shr(8, sub(currentSlashRewardPerOperatorX8, sload(keccak256(0x00, 0x40)))))
+                withdrawAmount := add(withdrawAmount, claimableSlashReward)
             }
             if iszero(withdrawAmount) {
                 mstore(0x00, 0xa393d14b) // `WithdrawAmountIsZero()`.
                 revert(0x1c, 0x04)
             }
-            mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
-            sstore(keccak256(0x00, 0x40), currentSlashRewardPerOperatorX8)
+            // Update checkpoint by only the actual amount claimed (converted back to X8)
+            // This prevents fractional loss by advancing checkpoint exactly by what was paid
+            if gt(claimableSlashReward, 0) {
+                sstore(slashRewardPerOperatorPaidX8Slot, add(sload(slashRewardPerOperatorPaidX8Slot), shl(8, claimableSlashReward)))
+            }
             // Reset deposit to zero and attempt transfer
             mstore(0x20, s_depositAmount.slot)
             sstore(keccak256(0x00, 0x40), 0)
@@ -313,7 +317,8 @@ contract OperatorManager is Ownable {
                 mstore(0x00, 0xa393d14b) // `WithdrawAmountIsZero()`.
                 revert(0x1c, 0x04)
             }
-            sstore(slashRewardPerOperatorPaidX8Slot, currentSlashRewardPerOperatorX8)
+            // Update checkpoint by exactly the amount paid out (converted back to X8) to prevent fractional loss
+            sstore(slashRewardPerOperatorPaidX8Slot, add(sload(slashRewardPerOperatorPaidX8Slot), shl(8, slashRewardAmount)))
             // Transfer the ETH and check if it succeeded or not.
             if iszero(call(gas(), caller(), slashRewardAmount, 0x00, 0x00, 0x00, 0x00)) {
                 mstore(0x00, 0xb12d13eb) // `ETHTransferFailed()`.
