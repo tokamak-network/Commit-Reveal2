@@ -753,12 +753,6 @@ contract FailLogics is DisputeLogics {
             let accumulatedReward :=
                 shr(8, sub(beforeSlashRewardPerOperatorX8, sload(slashRewardPerOperatorPaidX8Slot)))
             
-            // Update owner's checkpoint immediately to prevent double counting
-            // This must happen before any distribution to ensure rewards are marked as "consumed"
-            if gt(accumulatedReward, 0) {
-                sstore(slashRewardPerOperatorPaidX8Slot, add(sload(slashRewardPerOperatorPaidX8Slot), shl(8, accumulatedReward)))
-            }
-            
             mstore(0x40, s_depositAmount.slot)
             let depositSlot := keccak256(0x20, 0x40) // owner
             let totalAvailable := add(sload(depositSlot), accumulatedReward)
@@ -779,11 +773,13 @@ contract FailLogics is DisputeLogics {
             sstore(depositSlot, add(sload(depositSlot), returnGasFee))
             // ** Distribute remainder among operators
             distributeAmount := sub(distributeAmount, returnGasFee)
+            let afterSlashRewardPerOperatorX8 := beforeSlashRewardPerOperatorX8
             if gt(distributeAmount, 0) {
-                let afterSlashRewardPerOperatorX8 :=
+                afterSlashRewardPerOperatorX8 :=
                     add(beforeSlashRewardPerOperatorX8, div(shl(8, distributeAmount), sload(s_activatedOperators.slot)))
                 sstore(s_slashRewardPerOperatorX8.slot, afterSlashRewardPerOperatorX8)
             }
+            sstore(slashRewardPerOperatorPaidX8Slot, afterSlashRewardPerOperatorX8)
             mstore(0x40, m) // Restore the free memory pointer
         }
     }
