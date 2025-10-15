@@ -640,7 +640,7 @@ contract FailLogics is DisputeLogics {
             if gt(distributeAmount, 0) {
                 sstore(
                     s_slashRewardPerOperatorX8.slot,
-                    add(slashRewardPerOperatorX8, div(shl(8, distributeAmount), activatedOperatorLength)) // 1 for owner
+                    add(slashRewardPerOperatorX8, div(shl(8, distributeAmount), activatedOperatorLength))
                 )
             }
             // ** set activatedOperatorLength - 1
@@ -752,7 +752,6 @@ contract FailLogics is DisputeLogics {
             let slashRewardPerOperatorPaidX8Slot := keccak256(0x20, 0x40) // owner
             let accumulatedReward :=
                 shr(8, sub(beforeSlashRewardPerOperatorX8, sload(slashRewardPerOperatorPaidX8Slot)))
-            
             mstore(0x40, s_depositAmount.slot)
             let depositSlot := keccak256(0x20, 0x40) // owner
             let totalAvailable := add(sload(depositSlot), accumulatedReward)
