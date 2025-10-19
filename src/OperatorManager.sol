@@ -247,7 +247,11 @@ contract OperatorManager is Ownable {
 
             if gt(activatedOperatorIndex1Based, 0) {
                 // ** update withdraw amount
-                withdrawAmount := add(withdrawAmount, claimableSlashReward)
+                if gt(claimableSlashReward, 0) {
+                    withdrawAmount := add(withdrawAmount, claimableSlashReward)
+                    // Update checkpoint by only the actual amount claimed (converted back to X8)
+                    sstore(slashRewardPerOperatorPaidX8Slot, add(sload(slashRewardPerOperatorPaidX8Slot), shl(8, claimableSlashReward)))
+                }
                 // ** deactivate msg.sender
                 mstore(0x00, s_activatedOperators.slot)
                 let firstActivatedOperatorSlot := keccak256(0x00, 0x20)
@@ -269,16 +273,16 @@ contract OperatorManager is Ownable {
             if eq(caller(), sload(_OWNER_SLOT)) {
                 // If the caller is the owner (leader node) but not an operator,
                 // they can still withdraw deposit plus slash reward.
-                withdrawAmount := add(withdrawAmount, claimableSlashReward)
+                // This prevents fractional loss by advancing checkpoint exactly by what was paid
+                if gt(claimableSlashReward, 0) {
+                    withdrawAmount := add(withdrawAmount, claimableSlashReward)
+                    // Update checkpoint by only the actual amount claimed (converted back to X8)
+                    sstore(slashRewardPerOperatorPaidX8Slot, add(sload(slashRewardPerOperatorPaidX8Slot), shl(8, claimableSlashReward)))
+                }
             }
             if iszero(withdrawAmount) {
                 mstore(0x00, 0xa393d14b) // `WithdrawAmountIsZero()`.
                 revert(0x1c, 0x04)
-            }
-            // Update checkpoint by only the actual amount claimed (converted back to X8)
-            // This prevents fractional loss by advancing checkpoint exactly by what was paid
-            if gt(claimableSlashReward, 0) {
-                sstore(slashRewardPerOperatorPaidX8Slot, add(sload(slashRewardPerOperatorPaidX8Slot), shl(8, claimableSlashReward)))
             }
             // Reset deposit to zero and attempt transfer
             mstore(0x20, s_depositAmount.slot)
