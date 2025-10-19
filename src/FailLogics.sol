@@ -181,30 +181,70 @@ contract FailLogics is DisputeLogics {
             if gt(gasPrice, gasprice()) { gasPrice := gasprice() }
             switch eq(requestedToSubmitLength, activatedOperatorLength)
             case 1 {
-                returnGasFee :=
-                    add(
-                        returnGasFee,
-                        mul(
-                            gasPrice,
+                returnGasFee := add(
+                    returnGasFee,
+                    mul(
+                        gasPrice,
+                        add(
+                            sub(
+                                and(
+                                    shr(FAILTOSUBMITCVGASUSEDBASEA_OFFSET, dynamicFailToSubmitGasUsed),
+                                    DYNAMICFAILTOSUBMIT_MASK
+                                ),
+                                getL1UpperBoundGasUsed
+                            ),
                             add(
-                                sub(
+                                mul(
                                     and(
-                                        shr(FAILTOSUBMITCVGASUSEDBASEA_OFFSET, dynamicFailToSubmitGasUsed),
+                                        shr(PEROPERATORINCREASEGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
                                         DYNAMICFAILTOSUBMIT_MASK
                                     ),
-                                    getL1UpperBoundGasUsed
+                                    activatedOperatorLength
+                                ),
+                                mul(
+                                    and(
+                                        shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
+                                    sub(didntSubmitCvLength, 1)
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+            default {
+                returnGasFee := add(
+                    returnGasFee,
+                    mul(
+                        gasPrice,
+                        add(
+                            sub(
+                                and(
+                                    shr(FAILTOSUBMITGASUSEDBASEB_OFFSET, dynamicFailToSubmitGasUsed),
+                                    DYNAMICFAILTOSUBMIT_MASK
+                                ),
+                                getL1UpperBoundGasUsed
+                            ),
+                            add(
+                                mul(
+                                    and(
+                                        shr(PEROPERATORINCREASEGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
+                                    activatedOperatorLength
                                 ),
                                 add(
                                     mul(
                                         and(
-                                            shr(PEROPERATORINCREASEGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                            shr(PERREQUESTEDINCREASEGASUSED_OFFSET, dynamicFailToSubmitGasUsed),
                                             DYNAMICFAILTOSUBMIT_MASK
                                         ),
-                                        activatedOperatorLength
+                                        requestedToSubmitLength
                                     ),
                                     mul(
                                         and(
-                                            shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                            shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
                                             DYNAMICFAILTOSUBMIT_MASK
                                         ),
                                         sub(didntSubmitCvLength, 1)
@@ -213,49 +253,7 @@ contract FailLogics is DisputeLogics {
                             )
                         )
                     )
-            }
-            default {
-                returnGasFee :=
-                    add(
-                        returnGasFee,
-                        mul(
-                            gasPrice,
-                            add(
-                                sub(
-                                    and(
-                                        shr(FAILTOSUBMITGASUSEDBASEB_OFFSET, dynamicFailToSubmitGasUsed),
-                                        DYNAMICFAILTOSUBMIT_MASK
-                                    ),
-                                    getL1UpperBoundGasUsed
-                                ),
-                                add(
-                                    mul(
-                                        and(
-                                            shr(PEROPERATORINCREASEGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
-                                            DYNAMICFAILTOSUBMIT_MASK
-                                        ),
-                                        activatedOperatorLength
-                                    ),
-                                    add(
-                                        mul(
-                                            and(
-                                                shr(PERREQUESTEDINCREASEGASUSED_OFFSET, dynamicFailToSubmitGasUsed),
-                                                DYNAMICFAILTOSUBMIT_MASK
-                                            ),
-                                            requestedToSubmitLength
-                                        ),
-                                        mul(
-                                            and(
-                                                shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
-                                                DYNAMICFAILTOSUBMIT_MASK
-                                            ),
-                                            sub(didntSubmitCvLength, 1)
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
+                )
             }
             let activationThreshold := sload(s_activationThreshold.slot)
             // ** cache slash rewards
@@ -405,24 +403,64 @@ contract FailLogics is DisputeLogics {
             if gt(gasPrice, gasprice()) { gasPrice := gasprice() }
             switch eq(requestedToSubmitCoLength, activatedOperatorLength)
             case 1 {
-                returnGasFee :=
-                    add(
-                        returnGasFee,
-                        mul(
-                            gasPrice,
+                returnGasFee := add(
+                    returnGasFee,
+                    mul(
+                        gasPrice,
+                        add(
+                            sub(and(dynamicFailToSubmitGasUsed, DYNAMICFAILTOSUBMIT_MASK), getL1UpperBoundGasUsed),
                             add(
-                                sub(and(dynamicFailToSubmitGasUsed, DYNAMICFAILTOSUBMIT_MASK), getL1UpperBoundGasUsed),
+                                mul(
+                                    and(
+                                        shr(PEROPERATORINCREASEGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
+                                    activatedOperatorLength
+                                ),
+                                mul(
+                                    and(
+                                        shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
+                                    sub(didntSubmitCoLength, 1)
+                                )
+                            )
+                        )
+                    )
+                )
+            }
+            default {
+                returnGasFee := add(
+                    returnGasFee,
+                    mul(
+                        gasPrice,
+                        add(
+                            sub(
+                                and(
+                                    shr(FAILTOSUBMITGASUSEDBASEB_OFFSET, dynamicFailToSubmitGasUsed),
+                                    DYNAMICFAILTOSUBMIT_MASK
+                                ),
+                                getL1UpperBoundGasUsed
+                            ),
+                            add(
+                                mul(
+                                    and(
+                                        shr(PEROPERATORINCREASEGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
+                                        DYNAMICFAILTOSUBMIT_MASK
+                                    ),
+                                    activatedOperatorLength
+                                ),
                                 add(
                                     mul(
                                         and(
-                                            shr(PEROPERATORINCREASEGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                            shr(PERREQUESTEDINCREASEGASUSED_OFFSET, dynamicFailToSubmitGasUsed),
                                             DYNAMICFAILTOSUBMIT_MASK
                                         ),
-                                        activatedOperatorLength
+                                        requestedToSubmitCoLength
                                     ),
                                     mul(
                                         and(
-                                            shr(PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET, dynamicFailToSubmitGasUsed),
+                                            shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
                                             DYNAMICFAILTOSUBMIT_MASK
                                         ),
                                         sub(didntSubmitCoLength, 1)
@@ -431,49 +469,7 @@ contract FailLogics is DisputeLogics {
                             )
                         )
                     )
-            }
-            default {
-                returnGasFee :=
-                    add(
-                        returnGasFee,
-                        mul(
-                            gasPrice,
-                            add(
-                                sub(
-                                    and(
-                                        shr(FAILTOSUBMITGASUSEDBASEB_OFFSET, dynamicFailToSubmitGasUsed),
-                                        DYNAMICFAILTOSUBMIT_MASK
-                                    ),
-                                    getL1UpperBoundGasUsed
-                                ),
-                                add(
-                                    mul(
-                                        and(
-                                            shr(PEROPERATORINCREASEGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
-                                            DYNAMICFAILTOSUBMIT_MASK
-                                        ),
-                                        activatedOperatorLength
-                                    ),
-                                    add(
-                                        mul(
-                                            and(
-                                                shr(PERREQUESTEDINCREASEGASUSED_OFFSET, dynamicFailToSubmitGasUsed),
-                                                DYNAMICFAILTOSUBMIT_MASK
-                                            ),
-                                            requestedToSubmitCoLength
-                                        ),
-                                        mul(
-                                            and(
-                                                shr(PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET, dynamicFailToSubmitGasUsed),
-                                                DYNAMICFAILTOSUBMIT_MASK
-                                            ),
-                                            sub(didntSubmitCoLength, 1)
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
+                )
             }
             let activationThreshold := sload(s_activationThreshold.slot)
             // ** cache slash rewards
@@ -774,8 +770,10 @@ contract FailLogics is DisputeLogics {
             distributeAmount := sub(distributeAmount, returnGasFee)
             let afterSlashRewardPerOperatorX8 := beforeSlashRewardPerOperatorX8
             if gt(distributeAmount, 0) {
-                afterSlashRewardPerOperatorX8 :=
-                    add(beforeSlashRewardPerOperatorX8, div(shl(8, distributeAmount), sload(s_activatedOperators.slot)))
+                afterSlashRewardPerOperatorX8 := add(
+                    beforeSlashRewardPerOperatorX8,
+                    div(shl(8, distributeAmount), sload(s_activatedOperators.slot))
+                )
                 sstore(s_slashRewardPerOperatorX8.slot, afterSlashRewardPerOperatorX8)
             }
             sstore(slashRewardPerOperatorPaidX8Slot, afterSlashRewardPerOperatorX8)
@@ -788,11 +786,10 @@ contract FailLogics is DisputeLogics {
             let failgasUsed := sload(s_getL1UpperBoundGasUsedWhenCalldataSize4.slot)
             let gasPrice := sload(s_maxGasPrice.slot)
             if gt(gasPrice, gasprice()) { gasPrice := gasprice() }
-            gasFee :=
-                mul(
-                    gasPrice,
-                    sub(and(shr(bitsToShiftRight, failgasUsed), FAILTOSUBMIT_MASK), and(failgasUsed, FAILTOSUBMIT_MASK))
-                )
+            gasFee := mul(
+                gasPrice,
+                sub(and(shr(bitsToShiftRight, failgasUsed), FAILTOSUBMIT_MASK), and(failgasUsed, FAILTOSUBMIT_MASK))
+            )
         }
     }
 

@@ -359,8 +359,9 @@ contract ForManuscriptGas is BaseTest, CommitReveal2Helper {
             vm.serializeUint(scenarioKey, "depositAndActivateGas", _getAverageExceptIndex0(s_depositAndActivateGas));
         gasData = vm.serializeUint(scenarioKey, "resumeGas", _getAverageExceptIndex0(s_resumeGas));
         gasData = vm.serializeUint(scenarioKey, "submitMerkleRoot2Gas", _getAverageExceptIndex0(s_submitMerkleRoot2Gas));
-        gasData =
-            vm.serializeUint(scenarioKey, "generateRandomNumberGas", _getAverageExceptIndex0(s_generateRandomNumberGas));
+        gasData = vm.serializeUint(
+            scenarioKey, "generateRandomNumberGas", _getAverageExceptIndex0(s_generateRandomNumberGas)
+        );
 
         gasOutput = vm.serializeString("scenarios", scenarioKey, gasData);
 
