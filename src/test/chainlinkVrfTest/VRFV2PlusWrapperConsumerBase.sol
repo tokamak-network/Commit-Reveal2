@@ -81,9 +81,9 @@ abstract contract VRFV2PlusWrapperConsumerBase {
     ) internal returns (uint256 requestId, uint256 requestPrice) {
         requestPrice = i_vrfV2PlusWrapper.calculateRequestPriceNative(_callbackGasLimit, _numWords);
         return (
-            i_vrfV2PlusWrapper.requestRandomWordsInNative{value: requestPrice}(
-                _callbackGasLimit, _requestConfirmations, _numWords, extraArgs
-            ),
+            i_vrfV2PlusWrapper.requestRandomWordsInNative{
+                value: requestPrice
+            }(_callbackGasLimit, _requestConfirmations, _numWords, extraArgs),
             requestPrice
         );
     }

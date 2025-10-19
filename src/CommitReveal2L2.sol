@@ -99,26 +99,25 @@ contract CommitReveal2L2 is CommitReveal2 {
             }
             let gasUsedMerkleRootSubAndGenRandNum := sload(s_gasUsedMerkleRootSubAndGenRandNumA.slot)
 
-            requestFee :=
+            requestFee := add(
                 add(
-                    add(
-                        mul(
-                            gasPrice,
+                    mul(
+                        gasPrice,
+                        add(
+                            callbackGasLimit,
                             add(
-                                callbackGasLimit,
-                                add(
-                                    mul(
-                                        and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
-                                        numOfOperators
-                                    ),
-                                    shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
-                                )
+                                mul(
+                                    and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
+                                    numOfOperators
+                                ),
+                                shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
                             )
-                        ),
-                        sload(s_flatFee.slot)
-                    ), // l2GasFee
-                    div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(m))), 100) // L1GasFee
-                )
+                        )
+                    ),
+                    sload(s_flatFee.slot)
+                ), // l2GasFee
+                div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(m))), 100) // L1GasFee
+            )
             mstore(0x40, m) // Restore the free memory pointer
         }
     }
@@ -133,14 +132,13 @@ contract CommitReveal2L2 is CommitReveal2 {
             }
             let gasPrice := sload(s_maxGasPrice.slot)
             if gt(gasPrice, gasprice()) { gasPrice := gasprice() }
-            gasFee :=
-                add(
-                    mul(
-                        gasPrice,
-                        and(shr(bitsToShiftRight, sload(s_getL1UpperBoundGasUsedWhenCalldataSize4.slot)), FAILTOSUBMIT_MASK)
-                    ),
-                    div(mul(sload(s_l1FeeCoefficient.slot), mload(0x00)), 100)
-                )
+            gasFee := add(
+                mul(
+                    gasPrice,
+                    and(shr(bitsToShiftRight, sload(s_getL1UpperBoundGasUsedWhenCalldataSize4.slot)), FAILTOSUBMIT_MASK)
+                ),
+                div(mul(sload(s_l1FeeCoefficient.slot), mload(0x00)), 100)
+            )
         }
     }
 

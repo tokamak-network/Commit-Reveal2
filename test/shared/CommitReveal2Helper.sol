@@ -156,8 +156,7 @@ contract CommitReveal2Helper is Test {
             uint256 v = uint256(s_vs[i]);
             s_packedVs = s_packedVs | (v << (i * 8));
             s_secretSigRSs[i] = CommitReveal2Storage.SecretAndSigRS({
-                secret: s_secrets[i],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[i], s: s_ss[i]})
+                secret: s_secrets[i], rs: CommitReveal2Storage.SigRS({r: s_rs[i], s: s_ss[i]})
             });
         }
         // *** Set Reveal Orders
