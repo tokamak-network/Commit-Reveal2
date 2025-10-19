@@ -41,5 +41,5 @@ jobs:
 
       - name: Run Forge tests
         run: |
-          forge test -vvv --gas-limit 9999999999999999999
+          forge test --gas-limit 9999999999999999999 --isolate -vvv
         id: test
