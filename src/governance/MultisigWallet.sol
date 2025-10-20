@@ -346,11 +346,11 @@ contract MultisigWallet {
             revert InsufficientConfirmations();
         }
 
-        timelock.execute(txn.target, txn.value, txn.data, txn.predecessor, txn.salt);
-
         txn.executed = true;
 
         emit TransactionExecuted(_transactionId);
+
+        timelock.execute(txn.target, txn.value, txn.data, txn.predecessor, txn.salt);
     }
 
     /**
