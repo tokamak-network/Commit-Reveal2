@@ -95,9 +95,8 @@ contract NodesFailLogicsGas is BaseTest, CommitReveal2Helper {
                             j < s_requestedToSubmitLength;
                             j++
                         ) {
-                            s_deactivatedOperators[
-                                j - (s_requestedToSubmitLength - s_didntSubmitLength)
-                            ] = s_activatedOperators[j];
+                            s_deactivatedOperators[j - (s_requestedToSubmitLength - s_didntSubmitLength)] =
+                                s_activatedOperators[j];
                         }
 
                         mine(s_activeNetworkConfig.onChainSubmissionPeriod);
@@ -233,9 +232,8 @@ contract NodesFailLogicsGas is BaseTest, CommitReveal2Helper {
                             j < s_requestedToSubmitLength;
                             j++
                         ) {
-                            s_deactivatedOperators[
-                                j - (s_requestedToSubmitLength - s_didntSubmitLength)
-                            ] = s_activatedOperators[j];
+                            s_deactivatedOperators[j - (s_requestedToSubmitLength - s_didntSubmitLength)] =
+                                s_activatedOperators[j];
                         }
                         mine(s_onChainSubmissionPeriod);
                         vm.startPrank(LEADERNODE);

@@ -34,9 +34,7 @@ contract MultisigWalletTest is Test {
         multisigWallet = new MultisigWallet(owners, REQUIRED_CONFIRMATIONS, MIN_DELAY);
 
         vm.deal(address(this), 5 ether);
-        commitReveal2L2 = new CommitReveal2L2{
-            value: 2 ether
-        }(
+        commitReveal2L2 = new CommitReveal2L2{value: 2 ether}(
             INITIAL_ACTIVATION_THRESHOLD,
             INITIAL_FLAT_FEE,
             "CommitReveal2",

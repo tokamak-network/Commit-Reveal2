@@ -628,29 +628,31 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                     // get next round
                     function leastSignificantBit(x) -> r {
                         x := and(x, sub(0, x))
-                        r := shl(
-                            5,
-                            shr(
-                                252,
-                                shl(
+                        r :=
+                            shl(
+                                5,
+                                shr(
+                                    252,
                                     shl(
-                                        2,
-                                        shr(
-                                            250,
-                                            mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff)
-                                        )
-                                    ),
-                                    0x8040405543005266443200005020610674053026020000107506200176117077
+                                        shl(
+                                            2,
+                                            shr(
+                                                250,
+                                                mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff)
+                                            )
+                                        ),
+                                        0x8040405543005266443200005020610674053026020000107506200176117077
+                                    )
                                 )
                             )
-                        )
-                        r := or(
-                            r,
-                            byte(
-                                and(div(0xd76453e0, shr(r, x)), 0x1f),
-                                0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                        r :=
+                            or(
+                                r,
+                                byte(
+                                    and(div(0xd76453e0, shr(r, x)), 0x1f),
+                                    0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                                )
                             )
-                        )
                     }
                     function nextRequestedRound(_round) -> _next, _requested {
                         let wordPos := shr(8, _round)
@@ -913,26 +915,28 @@ contract DisputeLogics is EIP712, OperatorManager, CommitReveal2Storage {
                 // get next round
                 function leastSignificantBit(x) -> r {
                     x := and(x, sub(0, x))
-                    r := shl(
-                        5,
-                        shr(
-                            252,
-                            shl(
+                    r :=
+                        shl(
+                            5,
+                            shr(
+                                252,
                                 shl(
-                                    2,
-                                    shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
-                                ),
-                                0x8040405543005266443200005020610674053026020000107506200176117077
+                                    shl(
+                                        2,
+                                        shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
+                                    ),
+                                    0x8040405543005266443200005020610674053026020000107506200176117077
+                                )
                             )
                         )
-                    )
-                    r := or(
-                        r,
-                        byte(
-                            and(div(0xd76453e0, shr(r, x)), 0x1f),
-                            0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                    r :=
+                        or(
+                            r,
+                            byte(
+                                and(div(0xd76453e0, shr(r, x)), 0x1f),
+                                0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                            )
                         )
-                    )
                 }
                 function nextRequestedRound(_round) -> _next, _requested {
                     let wordPos := shr(8, _round)
