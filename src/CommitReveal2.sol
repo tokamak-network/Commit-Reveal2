@@ -282,22 +282,23 @@ contract CommitReveal2 is FailLogics {
     {
         assembly ("memory-safe") {
             let gasUsedMerkleRootSubAndGenRandNum := sload(s_gasUsedMerkleRootSubAndGenRandNumA.slot)
-            requestFee := add(
-                mul(
-                    gasPrice,
-                    add(
-                        callbackGasLimit,
+            requestFee :=
+                add(
+                    mul(
+                        gasPrice,
                         add(
-                            mul(
-                                and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
-                                numOfOperators
-                            ),
-                            shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
+                            callbackGasLimit,
+                            add(
+                                mul(
+                                    and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
+                                    numOfOperators
+                                ),
+                                shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
+                            )
                         )
-                    )
-                ),
-                sload(s_flatFee.slot)
-            )
+                    ),
+                    sload(s_flatFee.slot)
+                )
         }
     }
 
@@ -333,10 +334,7 @@ contract CommitReveal2 is FailLogics {
         SecretAndSigRS[] calldata secretSigRSs,
         uint256, // packedVs
         uint256 packedRevealOrders
-    )
-        external
-        inProgress
-    {
+    ) external inProgress {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             let m := mload(0x40)
@@ -479,26 +477,28 @@ contract CommitReveal2 is FailLogics {
                 // https://github.com/Uniswap/v4-core/blob/59d3ecf53afa9264a16bba0e38f4c5d2231f80bc/src/libraries/BitMath.sol#L31
                 function leastSignificantBit(x) -> r {
                     x := and(x, sub(0, x))
-                    r := shl(
-                        5,
-                        shr(
-                            252,
-                            shl(
+                    r :=
+                        shl(
+                            5,
+                            shr(
+                                252,
                                 shl(
-                                    2,
-                                    shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
-                                ),
-                                0x8040405543005266443200005020610674053026020000107506200176117077
+                                    shl(
+                                        2,
+                                        shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
+                                    ),
+                                    0x8040405543005266443200005020610674053026020000107506200176117077
+                                )
                             )
                         )
-                    )
-                    r := or(
-                        r,
-                        byte(
-                            and(div(0xd76453e0, shr(r, x)), 0x1f),
-                            0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                    r :=
+                        or(
+                            r,
+                            byte(
+                                and(div(0xd76453e0, shr(r, x)), 0x1f),
+                                0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                            )
                         )
-                    )
                 }
                 function nextRequestedRound(_round) -> _next, _requested {
                     let wordPos := shr(8, _round)
@@ -685,26 +685,25 @@ contract CommitReveal2 is FailLogics {
             // https://github.com/Uniswap/v4-core/blob/59d3ecf53afa9264a16bba0e38f4c5d2231f80bc/src/libraries/BitMath.sol#L31
             function leastSignificantBit(x) -> r {
                 x := and(x, sub(0, x))
-                r := shl(
-                    5,
-                    shr(
-                        252,
-                        shl(
+                r :=
+                    shl(
+                        5,
+                        shr(
+                            252,
                             shl(
-                                2,
-                                shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
-                            ),
-                            0x8040405543005266443200005020610674053026020000107506200176117077
+                                shl(2, shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))),
+                                0x8040405543005266443200005020610674053026020000107506200176117077
+                            )
                         )
                     )
-                )
-                r := or(
-                    r,
-                    byte(
-                        and(div(0xd76453e0, shr(r, x)), 0x1f),
-                        0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                r :=
+                    or(
+                        r,
+                        byte(
+                            and(div(0xd76453e0, shr(r, x)), 0x1f),
+                            0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
+                        )
                     )
-                )
             }
             function nextRequestedRound(_round) -> _next, _requested {
                 let wordPos := shr(8, _round)

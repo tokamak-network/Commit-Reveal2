@@ -24,9 +24,7 @@ contract ParamDelayTest is Test {
     uint256 maxGasPrice = 20 gwei;
 
     function setUp() public {
-        s_commitReveal2 = new CommitReveal2{
-            value: ACTIVATION_THRESHOLD
-        }(
+        s_commitReveal2 = new CommitReveal2{value: ACTIVATION_THRESHOLD}(
             ACTIVATION_THRESHOLD,
             FLAT_FEE,
             NAME,

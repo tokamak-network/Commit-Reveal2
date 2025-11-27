@@ -34,9 +34,7 @@ contract DeployMultisigGovernance is Script {
 
         multisigWallet = new MultisigWallet(govConfig.signers, govConfig.requiredConfirmations, govConfig.minDelay);
 
-        commitReveal2L2 = new CommitReveal2L2{
-            value: activeNetworkConfig.activationThreshold
-        }(
+        commitReveal2L2 = new CommitReveal2L2{value: activeNetworkConfig.activationThreshold}(
             activeNetworkConfig.activationThreshold,
             activeNetworkConfig.flatFee,
             activeNetworkConfig.name,

@@ -17,9 +17,7 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
         vm.startBroadcast(activeNetworkConfig.deployer);
         if (block.chainid == 31337 || block.chainid == 11155111) {
             commitReveal2 = address(
-                new CommitReveal2{
-                    value: activeNetworkConfig.activationThreshold
-                }(
+                new CommitReveal2{value: activeNetworkConfig.activationThreshold}(
                     activeNetworkConfig.activationThreshold,
                     activeNetworkConfig.flatFee,
                     activeNetworkConfig.name,
@@ -35,9 +33,7 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
             );
         } else {
             commitReveal2 = address(
-                new CommitReveal2L2{
-                    value: activeNetworkConfig.activationThreshold
-                }(
+                new CommitReveal2L2{value: activeNetworkConfig.activationThreshold}(
                     activeNetworkConfig.activationThreshold,
                     activeNetworkConfig.flatFee,
                     activeNetworkConfig.name,
@@ -60,9 +56,7 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
         NetworkHelperConfig.NetworkConfig memory activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
         vm.startBroadcast(activeNetworkConfig.deployer);
         commitReveal2 = address(
-            new CommitReveal2L2{
-                value: activeNetworkConfig.activationThreshold
-            }(
+            new CommitReveal2L2{value: activeNetworkConfig.activationThreshold}(
                 activeNetworkConfig.activationThreshold,
                 activeNetworkConfig.flatFee,
                 activeNetworkConfig.name,
@@ -88,9 +82,7 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
 
         vm.startBroadcast(activeNetworkConfig.deployer);
         commitReveal2 = address(
-            new CommitReveal2ForGasTest{
-                value: activeNetworkConfig.activationThreshold
-            }(
+            new CommitReveal2ForGasTest{value: activeNetworkConfig.activationThreshold}(
                 activeNetworkConfig.activationThreshold,
                 activeNetworkConfig.flatFee,
                 activeNetworkConfig.name,
