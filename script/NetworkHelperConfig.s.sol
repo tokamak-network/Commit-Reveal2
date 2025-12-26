@@ -47,6 +47,10 @@ contract NetworkHelperConfig is Script, BaseTest {
             activeNetworkConfig = getOpSepoliaConfig();
         } else if (chainId == 11155111) {
             activeNetworkConfig = getSepoliaConfig();
+        } else {
+            console2.log("Warning: Unknown chain ID", chainId);
+            console2.log("Using default configuration. Consider adding a specific config for this chain.");
+            activeNetworkConfig = getDefaultConfig();
         }
     }
 
@@ -112,6 +116,25 @@ contract NetworkHelperConfig is Script, BaseTest {
     }
 
     function getOpSepoliaConfig() public view returns (NetworkConfig memory) {
+        string memory name = "Commit Reveal2";
+        string memory version = "1";
+        return NetworkConfig({
+            activationThreshold: 0.01 ether,
+            flatFee: 0.001 ether,
+            name: name,
+            version: version,
+            nameHash: keccak256(bytes(name)),
+            versionHash: keccak256(bytes(version)),
+            offChainSubmissionPeriod: 40,
+            requestOrSubmitOrFailDecisionPeriod: 30,
+            onChainSubmissionPeriod: 60,
+            offChainSubmissionPeriodPerOperator: 20,
+            onChainSubmissionPeriodPerOperator: 30,
+            deployer: s_deployer
+        });
+    }
+
+    function getDefaultConfig() public view returns (NetworkConfig memory) {
         string memory name = "Commit Reveal2";
         string memory version = "1";
         return NetworkConfig({
