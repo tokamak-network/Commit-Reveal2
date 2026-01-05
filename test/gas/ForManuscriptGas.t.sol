@@ -2,6 +2,7 @@
 pragma solidity ^0.8.30;
 
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
+import {CommitReveal2WithLeaderSelection} from "./../../src/CommitReveal2WithLeaderSelection.sol";
 import {BaseTest, console2} from "./../shared/BaseTest.t.sol";
 import {CommitReveal2Helper} from "./../shared/CommitReveal2Helper.sol";
 import {DeployCommitReveal2} from "./../../script/DeployCommitReveal2.s.sol";
@@ -24,6 +25,7 @@ contract ForManuscriptGas is BaseTest, CommitReveal2Helper {
     uint256[] public s_participantWithholding2Gas;
     uint256[] public s_participantWithholding3Gas;
     uint256[] public s_leaderWithholdingGas;
+    uint256[] public s_leaderWithholdingWithLeaderSelectionGas;
 
     uint256[] public s_submitMerkleRootGas;
     uint256[] public s_requestToSubmitSGas;
@@ -34,6 +36,8 @@ contract ForManuscriptGas is BaseTest, CommitReveal2Helper {
     uint256[] public s_submitMerkleRoot2Gas;
     uint256[] public s_generateRandomNumberGas;
     uint256[] public s_failToRequestSorGenerateRandomNumberGas;
+    uint256[] public s_commitGas;
+    uint256[] public s_revealGas;
 
     string public s_gasReportPathForManuscript;
 
@@ -359,8 +363,9 @@ contract ForManuscriptGas is BaseTest, CommitReveal2Helper {
             vm.serializeUint(scenarioKey, "depositAndActivateGas", _getAverageExceptIndex0(s_depositAndActivateGas));
         gasData = vm.serializeUint(scenarioKey, "resumeGas", _getAverageExceptIndex0(s_resumeGas));
         gasData = vm.serializeUint(scenarioKey, "submitMerkleRoot2Gas", _getAverageExceptIndex0(s_submitMerkleRoot2Gas));
-        gasData =
-            vm.serializeUint(scenarioKey, "generateRandomNumberGas", _getAverageExceptIndex0(s_generateRandomNumberGas));
+        gasData = vm.serializeUint(
+            scenarioKey, "generateRandomNumberGas", _getAverageExceptIndex0(s_generateRandomNumberGas)
+        );
 
         gasOutput = vm.serializeString("scenarios", scenarioKey, gasData);
 
@@ -459,5 +464,191 @@ contract ForManuscriptGas is BaseTest, CommitReveal2Helper {
             "Gas usage for leader withholding path: 1->5->14->resume{value: activationThreshold}->5->11 by scenario: operators_XX"
         );
         vm.writeJson(finalOutput, s_gasReportPathForManuscript, ".leaderWithholdingGas");
+    }
+
+    // 1 -> 5 -> 14 -> commit -> reveal -> resume -> 5 -> 11 for leader withholding with leader selection
+    function test_LeaderWithholdingWithLeaderSelectionGas() public {
+        string memory gasOutput;
+
+        // ** Test - start from 3 operators because new leader gets deactivated
+        for (s_numOfOperators = 3; s_numOfOperators <= 32; s_numOfOperators++) {
+            // Initialize arrays for this scenario
+            s_leaderWithholdingWithLeaderSelectionGas = new uint256[](s_numOfTests);
+            s_submitMerkleRootGas = new uint256[](s_numOfTests);
+            s_failToRequestSorGenerateRandomNumberGas = new uint256[](s_numOfTests);
+            s_commitGas = new uint256[](s_numOfTests);
+            s_revealGas = new uint256[](s_numOfTests);
+            s_resumeGas = new uint256[](s_numOfTests);
+            s_submitMerkleRoot2Gas = new uint256[](s_numOfTests);
+            s_generateRandomNumberGas = new uint256[](s_numOfTests);
+
+            for (uint256 i; i < s_numOfTests; i++) {
+                // ** Deploy fresh contract for each iteration to ensure full operator count
+                _deployContractsWithLeaderSelection();
+                _depositAndActivateOperators(s_operatorAddresses);
+
+                CommitReveal2WithLeaderSelection commitRevealWithLeaderSelection =
+                    CommitReveal2WithLeaderSelection(payable(address(s_commitReveal2)));
+                uint256 requestFee = s_commitReveal2.estimateRequestPrice(s_callbackGas, tx.gasprice);
+
+                // ** Get current owner (leader) for this iteration
+                address currentLeader = commitRevealWithLeaderSelection.owner();
+
+                vm.startPrank(s_anyAddress);
+                s_commitReveal2.requestRandomNumber{value: requestFee}(s_callbackGas);
+                vm.stopPrank();
+
+                // ** Update activated operators and generate signatures for current state
+                _setSCoCvRevealOrdersWithLeaderSelection(s_privateKeys, commitRevealWithLeaderSelection);
+
+                // ** 5. submitMerkleRoot
+                vm.startPrank(currentLeader);
+                s_commitReveal2.submitMerkleRoot(_createMerkleRoot(s_cvs));
+                s_submitMerkleRootGas[i] = vm.lastCallGas().gasTotalUsed;
+                s_leaderWithholdingWithLeaderSelectionGas[i] = s_submitMerkleRootGas[i];
+
+                // ** 14. failToRequestSorGenerateRandomNumber (leader withholding)
+                mine(s_offChainSubmissionPeriod);
+                mine(s_offChainSubmissionPeriodPerOperator * s_activatedOperators.length);
+                mine(s_requestOrSubmitOrFailDecisionPeriod);
+                s_commitReveal2.failToRequestSorGenerateRandomNumber();
+                s_failToRequestSorGenerateRandomNumberGas[i] = vm.lastCallGas().gasTotalUsed;
+                s_leaderWithholdingWithLeaderSelectionGas[i] += s_failToRequestSorGenerateRandomNumberGas[i];
+                vm.stopPrank();
+
+                // ** commit phase - all operators commit
+                uint256 totalCommitGas;
+                // Use current activated operators count (may change after resume)
+                uint256 currentOperatorCount = s_activatedOperators.length;
+                uint256[] memory commitValues = new uint256[](currentOperatorCount);
+                for (uint256 j; j < currentOperatorCount; j++) {
+                    commitValues[j] = uint256(keccak256(abi.encodePacked(j, block.timestamp, i)));
+                    vm.startPrank(s_activatedOperators[j]);
+                    commitRevealWithLeaderSelection.commit(commitValues[j]);
+                    totalCommitGas += vm.lastCallGas().gasTotalUsed;
+                    vm.stopPrank();
+                }
+                s_commitGas[i] = totalCommitGas;
+                s_leaderWithholdingWithLeaderSelectionGas[i] += s_commitGas[i];
+
+                // ** move to reveal phase
+                uint256 commitDuration = commitRevealWithLeaderSelection.s_commitDurationForLeaderSelection();
+                mine(commitDuration);
+
+                // ** reveal phase - all operators reveal
+                uint256 totalRevealGas;
+                for (uint256 j; j < currentOperatorCount; j++) {
+                    vm.startPrank(s_activatedOperators[j]);
+                    commitRevealWithLeaderSelection.reveal(commitValues[j]);
+                    totalRevealGas += vm.lastCallGas().gasTotalUsed;
+                    vm.stopPrank();
+                }
+                s_revealGas[i] = totalRevealGas;
+                s_leaderWithholdingWithLeaderSelectionGas[i] += s_revealGas[i];
+
+                // ** move past leader selection time
+                uint256 revealDuration = commitRevealWithLeaderSelection.s_revealDurationForLeaderSelection();
+                mine(revealDuration);
+
+                // ** resume() - anyone can call resume, new leader is determined inside
+                address predictedNewLeader = _predictNewLeader(commitRevealWithLeaderSelection, commitValues);
+                vm.startPrank(predictedNewLeader);
+                commitRevealWithLeaderSelection.resume{value: s_activeNetworkConfig.activationThreshold}();
+                s_resumeGas[i] = vm.lastCallGas().gasTotalUsed;
+                s_leaderWithholdingWithLeaderSelectionGas[i] += s_resumeGas[i];
+                vm.stopPrank();
+
+                // ** get actual new leader (owner) after resume
+                address actualNewLeader = commitRevealWithLeaderSelection.owner();
+
+                // ** 5. submitMerkleRoot (second time - new round)
+                vm.startPrank(actualNewLeader);
+                _setSCoCvRevealOrdersWithLeaderSelection(s_privateKeys, commitRevealWithLeaderSelection);
+                commitRevealWithLeaderSelection.submitMerkleRoot(_createMerkleRoot(s_cvs));
+                s_submitMerkleRoot2Gas[i] = vm.lastCallGas().gasTotalUsed;
+                s_leaderWithholdingWithLeaderSelectionGas[i] += s_submitMerkleRoot2Gas[i];
+
+                // ** 11. generateRandomNumber (final completion)
+                commitRevealWithLeaderSelection.generateRandomNumber(s_secretSigRSs, s_packedVs, s_packedRevealOrders);
+                s_generateRandomNumberGas[i] = vm.lastCallGas().gasTotalUsed;
+                s_leaderWithholdingWithLeaderSelectionGas[i] += s_generateRandomNumberGas[i];
+                vm.stopPrank();
+            }
+
+            string memory scenarioKey =
+                string.concat("operators_", s_numOfOperators < 10 ? "0" : "", Strings.toString(s_numOfOperators));
+
+            string memory gasData = "";
+            gasData = vm.serializeUint(
+                scenarioKey, "totalGas", _getAverageExceptIndex0(s_leaderWithholdingWithLeaderSelectionGas)
+            );
+            gasData =
+                vm.serializeUint(scenarioKey, "submitMerkleRootGas", _getAverageExceptIndex0(s_submitMerkleRootGas));
+            gasData = vm.serializeUint(
+                scenarioKey,
+                "failToRequestSorGenerateRandomNumberGas",
+                _getAverageExceptIndex0(s_failToRequestSorGenerateRandomNumberGas)
+            );
+            gasData = vm.serializeUint(scenarioKey, "commitGas", _getAverageExceptIndex0(s_commitGas));
+            gasData = vm.serializeUint(scenarioKey, "revealGas", _getAverageExceptIndex0(s_revealGas));
+            gasData = vm.serializeUint(scenarioKey, "resumeGas", _getAverageExceptIndex0(s_resumeGas));
+            gasData =
+                vm.serializeUint(scenarioKey, "submitMerkleRoot2Gas", _getAverageExceptIndex0(s_submitMerkleRoot2Gas));
+            gasData = vm.serializeUint(
+                scenarioKey, "generateRandomNumberGas", _getAverageExceptIndex0(s_generateRandomNumberGas)
+            );
+
+            gasOutput = vm.serializeString("scenarios", scenarioKey, gasData);
+        }
+
+        string memory finalOutput =
+            vm.serializeString("leaderWithholdingWithLeaderSelectionGas", "scenarios", gasOutput);
+        finalOutput = vm.serializeString(
+            "leaderWithholdingWithLeaderSelectionGas",
+            "description",
+            "Gas usage for leader withholding with leader selection path: 1->5->14->commit->reveal->resume->5->11 by scenario: operators_XX"
+        );
+        vm.writeJson(finalOutput, s_gasReportPathForManuscript, ".leaderWithholdingWithLeaderSelectionGas");
+    }
+
+    function _deployContractsWithLeaderSelection() internal {
+        // ** Deploy CommitReveal2WithLeaderSelection
+        address commitRevealAddress;
+        (commitRevealAddress, s_networkHelperConfig) = (new DeployCommitReveal2()).runForLeaderSelectionGasTest();
+        s_commitReveal2 = CommitReveal2(commitRevealAddress);
+        s_activeNetworkConfig = s_networkHelperConfig.getActiveNetworkConfig();
+
+        s_callbackGas = 90000;
+        (
+            s_offChainSubmissionPeriod,
+            s_requestOrSubmitOrFailDecisionPeriod,
+            s_onChainSubmissionPeriod,
+            s_offChainSubmissionPeriodPerOperator,
+            s_onChainSubmissionPeriodPerOperator
+        ) = s_commitReveal2.getPeriods();
+    }
+
+    function _predictNewLeader(
+        CommitReveal2WithLeaderSelection commitRevealWithLeaderSelection,
+        uint256[] memory revealValues
+    ) internal view returns (address) {
+        address[] memory activatedOps = commitRevealWithLeaderSelection.getActivatedOperators();
+        uint256 indexForLeader = uint256(keccak256(abi.encodePacked(revealValues))) % activatedOps.length;
+        return activatedOps[indexForLeader];
+    }
+
+    function _setSCoCvRevealOrdersWithLeaderSelection(
+        mapping(address => uint256) storage privatekeys,
+        CommitReveal2WithLeaderSelection commitRevealWithLeaderSelection
+    ) internal returns (uint256[] memory revealOrders) {
+        s_startTimestamp = commitRevealWithLeaderSelection.getCurStartTime();
+        s_activatedOperators = commitRevealWithLeaderSelection.getActivatedOperators();
+        (s_currentRound, s_currentTrialNum) = commitRevealWithLeaderSelection.getCurRoundAndTrialNum();
+        // *** Generate S, Co, Cv, Signatures
+        uint256[] memory privateKeys = new uint256[](s_activatedOperators.length);
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            privateKeys[i] = privatekeys[s_activatedOperators[i]];
+        }
+        revealOrders = _setSCoCv(s_activatedOperators.length, privateKeys);
     }
 }
