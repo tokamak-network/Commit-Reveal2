@@ -5,6 +5,7 @@ import {Script, console2} from "forge-std/Script.sol";
 import {CommitReveal2} from "../src/CommitReveal2.sol";
 import {CommitReveal2ForGasTest} from "../src/test/CommitReveal2ForGasTest.sol";
 import {CommitReveal2L2} from "../src/CommitReveal2L2.sol";
+import {CommitReveal2WithLeaderSelection} from "../src/CommitReveal2WithLeaderSelection.sol";
 import {NetworkHelperConfig} from "./NetworkHelperConfig.s.sol";
 import {CommitReveal2Helper} from "./../test/shared/CommitReveal2Helper.sol";
 import {DeployMockGasPriceOracle} from "./../test/shared/DeployMockGasPriceOracle.sol";
@@ -83,6 +84,35 @@ contract DeployCommitReveal2 is Script, CommitReveal2Helper {
         vm.startBroadcast(activeNetworkConfig.deployer);
         commitReveal2 = address(
             new CommitReveal2ForGasTest{value: activeNetworkConfig.activationThreshold}(
+                activeNetworkConfig.activationThreshold,
+                activeNetworkConfig.flatFee,
+                activeNetworkConfig.name,
+                activeNetworkConfig.version,
+                activeNetworkConfig.offChainSubmissionPeriod,
+                activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
+                activeNetworkConfig.onChainSubmissionPeriod,
+                activeNetworkConfig.offChainSubmissionPeriodPerOperator,
+                activeNetworkConfig.onChainSubmissionPeriodPerOperator,
+                activeNetworkConfig.maxGasPrice,
+                address(0) // TODO: Deploy MultisigTimelock first
+            )
+        );
+        DeployMockGasPriceOracle mockGasPriceOracle = new DeployMockGasPriceOracle();
+        vm.allowCheatcodes(address(mockGasPriceOracle));
+        mockGasPriceOracle.deployMockGasPriceOracle();
+        vm.stopBroadcast();
+    }
+
+    function runForLeaderSelectionGasTest()
+        public
+        returns (address commitReveal2, NetworkHelperConfig networkHelperConfig)
+    {
+        networkHelperConfig = new NetworkHelperConfig();
+        NetworkHelperConfig.NetworkConfig memory activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
+
+        vm.startBroadcast(activeNetworkConfig.deployer);
+        commitReveal2 = address(
+            new CommitReveal2WithLeaderSelection{value: activeNetworkConfig.activationThreshold}(
                 activeNetworkConfig.activationThreshold,
                 activeNetworkConfig.flatFee,
                 activeNetworkConfig.name,

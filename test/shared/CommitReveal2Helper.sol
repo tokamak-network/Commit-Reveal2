@@ -8,6 +8,7 @@ import {console2, Test} from "forge-std/Test.sol";
 import {Bitmap} from "../../src/libraries/Bitmap.sol";
 import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 import {Sort} from "./Sort.sol";
+import {CommitReveal2BLS} from "../../src/CommitReveal2BLS.sol";
 
 contract CommitReveal2Helper is Test {
     // ** Contracts
@@ -138,6 +139,21 @@ contract CommitReveal2Helper is Test {
         revealOrders = _setSCoCv(s_activatedOperators.length, privateKeys);
     }
 
+    function _setSCoCvRevealOrdersBLS(
+        mapping(address => uint256) storage privatekeys,
+        CommitReveal2BLS commitReveal2Bls
+    ) internal returns (uint256[] memory revealOrders) {
+        s_startTimestamp = commitReveal2Bls.getCurStartTime();
+        s_activatedOperators = commitReveal2Bls.getActivatedOperators();
+        (s_currentRound, s_currentTrialNum) = commitReveal2Bls.getCurRoundAndTrialNum();
+        // *** Generate S, Co, Cv, Signatures
+        uint256[] memory privateKeys = new uint256[](s_activatedOperators.length);
+        for (uint256 i; i < s_activatedOperators.length; i++) {
+            privateKeys[i] = privatekeys[s_activatedOperators[i]];
+        }
+        revealOrders = _setSCoCv(s_activatedOperators.length, privateKeys);
+    }
+
     function _setSCoCv(uint256 length, uint256[] memory privatekeys) internal returns (uint256[] memory revealOrders) {
         s_secrets = new bytes32[](length);
         s_cos = new bytes32[](length);
@@ -156,8 +172,7 @@ contract CommitReveal2Helper is Test {
             uint256 v = uint256(s_vs[i]);
             s_packedVs = s_packedVs | (v << (i * 8));
             s_secretSigRSs[i] = CommitReveal2Storage.SecretAndSigRS({
-                secret: s_secrets[i],
-                rs: CommitReveal2Storage.SigRS({r: s_rs[i], s: s_ss[i]})
+                secret: s_secrets[i], rs: CommitReveal2Storage.SigRS({r: s_rs[i], s: s_ss[i]})
             });
         }
         // *** Set Reveal Orders
