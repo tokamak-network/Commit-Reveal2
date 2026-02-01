@@ -154,7 +154,8 @@ contract NetworkHelperConfig is Script, BaseTest {
             onChainSubmissionPeriod: 60,
             offChainSubmissionPeriodPerOperator: 20,
             onChainSubmissionPeriodPerOperator: 30,
-            deployer: s_deployer
+            deployer: s_deployer,
+            maxGasPrice: 100 gwei
         });
     }
 }
