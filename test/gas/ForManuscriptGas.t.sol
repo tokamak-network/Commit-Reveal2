@@ -520,11 +520,12 @@ contract ForManuscriptGas is BaseTest, CommitReveal2Helper {
                 uint256 totalCommitGas;
                 // Use current activated operators count (may change after resume)
                 uint256 currentOperatorCount = s_activatedOperators.length;
-                uint256[] memory commitValues = new uint256[](currentOperatorCount);
+                uint256[] memory secretValues = new uint256[](currentOperatorCount);
                 for (uint256 j; j < currentOperatorCount; j++) {
-                    commitValues[j] = uint256(keccak256(abi.encodePacked(j, block.timestamp, i)));
+                    secretValues[j] = uint256(keccak256(abi.encodePacked(j, block.timestamp, i)));
+                    uint256 commitValue = uint256(keccak256(abi.encodePacked(secretValues[j])));
                     vm.startPrank(s_activatedOperators[j]);
-                    commitRevealWithLeaderSelection.commit(commitValues[j]);
+                    commitRevealWithLeaderSelection.commit(commitValue);
                     totalCommitGas += vm.lastCallGas().gasTotalUsed;
                     vm.stopPrank();
                 }
@@ -539,7 +540,7 @@ contract ForManuscriptGas is BaseTest, CommitReveal2Helper {
                 uint256 totalRevealGas;
                 for (uint256 j; j < currentOperatorCount; j++) {
                     vm.startPrank(s_activatedOperators[j]);
-                    commitRevealWithLeaderSelection.reveal(commitValues[j]);
+                    commitRevealWithLeaderSelection.reveal(secretValues[j]);
                     totalRevealGas += vm.lastCallGas().gasTotalUsed;
                     vm.stopPrank();
                 }
@@ -551,7 +552,7 @@ contract ForManuscriptGas is BaseTest, CommitReveal2Helper {
                 mine(revealDuration);
 
                 // ** resume() - anyone can call resume, new leader is determined inside
-                address predictedNewLeader = _predictNewLeader(commitRevealWithLeaderSelection, commitValues);
+                address predictedNewLeader = _predictNewLeader(commitRevealWithLeaderSelection, secretValues);
                 vm.startPrank(predictedNewLeader);
                 commitRevealWithLeaderSelection.resume{value: s_activeNetworkConfig.activationThreshold}();
                 s_resumeGas[i] = vm.lastCallGas().gasTotalUsed;

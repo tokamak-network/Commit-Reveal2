@@ -97,6 +97,10 @@ contract LeaderSelection is FailLogics {
         if (block.timestamp < s_revealStartTimeForLeaderSelection) revert RevealPhaseNotStarted();
         if (block.timestamp >= s_leaderSelectionTime) revert RevealPhaseOver();
         if (s_revealForLeaderSelection[activatedOperatorIndex] != 0) revert AlreadyRevealed();
+        // Verify that hash(revealValue) matches the committed value
+        if (uint256(keccak256(abi.encodePacked(revealValue))) != s_cvsForLeaderSelection[activatedOperatorIndex]) {
+            revert InvalidRevealValue();
+        }
         s_revealForLeaderSelection[activatedOperatorIndex] = revealValue;
     }
 }

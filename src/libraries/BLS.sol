@@ -128,6 +128,46 @@ library BLS {
         }
     }
 
+    /// @dev Subtracts point1 from point0. Returns a new G1 point.
+    function sub(G1Point memory point0, G1Point memory point1) internal view returns (G1Point memory result) {
+        result = add(point0, negate(point1));
+    }
+
+    /// @dev Negates a G1 point by negating the y-coordinate (p - y).
+    function negate(G1Point memory point) internal pure returns (G1Point memory result) {
+        // BLS12-381 field modulus p split into two bytes32:
+        // p = 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab
+        bytes32 P_A = bytes32(uint256(0x000000000000000000000000000000001a0111ea397fe69a4b1ba7b6434bacd7));
+        bytes32 P_B = bytes32(uint256(0x64774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab));
+
+        assembly ("memory-safe") {
+            // Copy x coordinates unchanged
+            mstore(result, mload(point))
+            mstore(add(result, 0x20), mload(add(point, 0x20)))
+
+            // Negate y: compute p - y
+            let y_a := mload(add(point, 0x40))
+            let y_b := mload(add(point, 0x60))
+
+            // If point is identity (0,0), return identity
+            let isZero := and(and(iszero(mload(point)), iszero(mload(add(point, 0x20)))), and(iszero(y_a), iszero(y_b)))
+            if isZero {
+                mstore(add(result, 0x40), 0)
+                mstore(add(result, 0x60), 0)
+            }
+            if iszero(isZero) {
+                // Compute p - y with borrow handling
+                let p_b := P_B
+                let p_a := P_A
+                let borrow := lt(p_b, y_b)
+                let result_b := sub(p_b, y_b)
+                let result_a := sub(sub(p_a, y_a), borrow)
+                mstore(add(result, 0x40), result_a)
+                mstore(add(result, 0x60), result_b)
+            }
+        }
+    }
+
     /// @dev Multi-scalar multiplication of G1 points with scalars. Returns a new G1 point.
     function msm(G1Point[] memory points, bytes32[] memory scalars) internal view returns (G1Point memory result) {
         assembly ("memory-safe") {

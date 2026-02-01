@@ -3,6 +3,7 @@ pragma solidity ^0.8.30;
 
 import {CommitReveal2} from "./../../src/CommitReveal2.sol";
 import {CommitReveal2BLS} from "./../../src/CommitReveal2BLS.sol";
+import {CommitReveal2BLSOptimized} from "./../../src/CommitReveal2BLSOptimized.sol";
 import {BaseTest} from "./../shared/BaseTest.t.sol";
 import {console2} from "forge-std/Test.sol";
 import {CommitReveal2Helper} from "./../shared/CommitReveal2Helper.sol";
@@ -21,6 +22,7 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
     uint256[] public s_generateRandomNumberGas;
 
     CommitReveal2BLS public commitReveal2Bls;
+    CommitReveal2BLSOptimized public commitReveal2BlsOptimized;
     NetworkHelperConfig networkHelperConfig;
     NetworkHelperConfig.NetworkConfig activeNetworkConfig;
 
@@ -28,6 +30,7 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         BaseTest.setUp();
         if (block.chainid == 31337) vm.txGasPrice(10 gwei);
         s_numOfTests = 10;
+        s_callbackGas = 90000;
 
         s_anyAddress = makeAddr("any");
         vm.deal(s_anyAddress, 10000 ether);
@@ -49,7 +52,34 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
 
         vm.startBroadcast(activeNetworkConfig.deployer);
-        commitReveal2Bls = new CommitReveal2BLS{value: activeNetworkConfig.activationThreshold}(
+        commitReveal2Bls = new CommitReveal2BLS{
+            value: activeNetworkConfig.activationThreshold
+        }(
+            activeNetworkConfig.activationThreshold,
+            activeNetworkConfig.flatFee,
+            activeNetworkConfig.name,
+            activeNetworkConfig.version,
+            activeNetworkConfig.offChainSubmissionPeriod,
+            activeNetworkConfig.requestOrSubmitOrFailDecisionPeriod,
+            activeNetworkConfig.onChainSubmissionPeriod,
+            activeNetworkConfig.offChainSubmissionPeriodPerOperator,
+            activeNetworkConfig.onChainSubmissionPeriodPerOperator,
+            activeNetworkConfig.maxGasPrice,
+            address(0)
+        );
+        vm.stopBroadcast();
+    }
+
+    function _deployBLSOptimizedContracts() internal {
+        // ** Deploy CommitReveal2BLS
+
+        networkHelperConfig = new NetworkHelperConfig();
+        activeNetworkConfig = networkHelperConfig.getActiveNetworkConfig();
+
+        vm.startBroadcast(activeNetworkConfig.deployer);
+        commitReveal2BlsOptimized = new CommitReveal2BLSOptimized{
+            value: activeNetworkConfig.activationThreshold
+        }(
             activeNetworkConfig.activationThreshold,
             activeNetworkConfig.flatFee,
             activeNetworkConfig.name,
@@ -130,8 +160,7 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
                     : numOfOperatorsString,
                 abi.encodeWithSelector(
                     s_commitReveal2.generateRandomNumber.selector, s_secretSigRSs, s_packedVs, s_packedRevealOrders
-                )
-                .length
+                ).length
             );
         }
 
@@ -165,9 +194,9 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
             _deployBLSContracts();
             for (uint256 i; i < s_numOfOperators; i++) {
                 vm.startPrank(s_operatorAddresses[i]);
-                commitReveal2Bls.depositAndActivate{value: activeNetworkConfig.activationThreshold}(
-                    _blsg1mul(G1_GENERATOR(), bytes32(s_operatorPrivateKeys[i]))
-                );
+                commitReveal2Bls.depositAndActivate{
+                    value: activeNetworkConfig.activationThreshold
+                }(_blsg1mul(G1_GENERATOR(), bytes32(s_operatorPrivateKeys[i])));
                 vm.stopPrank();
             }
             s_submitMerkleRootGas = new uint256[](s_numOfTests);
@@ -259,6 +288,120 @@ contract CommitReveal2Gas is BaseTest, CommitReveal2Helper {
         );
 
         vm.writeJson(finalOutput, s_gasReportPath, ".commitReveal2BLSGas");
+    }
+
+    function test_commitReveal2BLSOptimizedGas() public {
+        string memory gasOutput;
+        string memory gasOutputMax;
+        string memory gasOutput2;
+        string memory calldataSizeOutput;
+        // ** Test
+        for (s_numOfOperators = 2; s_numOfOperators <= 32; s_numOfOperators++) {
+            _deployBLSOptimizedContracts();
+            for (uint256 i; i < s_numOfOperators; i++) {
+                vm.startPrank(s_operatorAddresses[i]);
+                commitReveal2BlsOptimized.depositAndActivate{
+                    value: activeNetworkConfig.activationThreshold
+                }(_blsg1mul(G1_GENERATOR(), bytes32(s_operatorPrivateKeys[i])));
+                vm.stopPrank();
+            }
+            s_submitMerkleRootGas = new uint256[](s_numOfTests);
+            s_generateRandomNumberGas = new uint256[](s_numOfTests);
+
+            uint256 requestFee = commitReveal2BlsOptimized.estimateRequestPrice(s_callbackGas, tx.gasprice);
+            for (uint256 i; i < s_numOfTests; i++) {
+                vm.startPrank(s_anyAddress);
+                commitReveal2BlsOptimized.requestRandomNumber{value: requestFee * 11 / 10}(90000);
+                vm.stopPrank();
+            }
+            bytes32[] memory ss;
+            BLS.G2Point memory sig0;
+            for (uint256 i; i < s_numOfTests; i++) {
+                _setSCoCvRevealOrdersBLSOptimized(s_privateKeys, commitReveal2BlsOptimized);
+                bytes32 merkleRoot = _createMerkleRoot(s_cvs);
+                BLS.G2Point memory messagePoint = BLS.toG2(BLS.Fp2(0, 0, 0, merkleRoot));
+                ss = new bytes32[](s_numOfOperators);
+                ss[0] = s_secrets[0];
+                sig0 = _blsg2mul(messagePoint, bytes32(s_privateKeys[s_activatedOperators[0]]));
+                for (uint256 j = 1; j < s_numOfOperators; j++) {
+                    ss[j] = s_secrets[j];
+                    BLS.G2Point memory sig = _blsg2mul(messagePoint, bytes32(s_privateKeys[s_activatedOperators[j]]));
+                    sig0 = BLS.add(sig0, sig);
+                }
+                vm.startPrank(LEADERNODE);
+                commitReveal2BlsOptimized.submitMerkleRoot(merkleRoot, sig0);
+                s_submitMerkleRootGas[i] = vm.lastCallGas().gasTotalUsed;
+
+                commitReveal2BlsOptimized.generateRandomNumber(ss, s_packedRevealOrders);
+                s_generateRandomNumberGas[i] = vm.lastCallGas().gasTotalUsed;
+                vm.stopPrank();
+            }
+
+            string memory numOfOperatorsString = Strings.toString(s_numOfOperators);
+            // For generateRandomNumber - use average except index 0
+            gasOutput = vm.serializeUint(
+                "gasObject",
+                bytes(numOfOperatorsString).length == 1
+                    ? string.concat("0", numOfOperatorsString)
+                    : numOfOperatorsString,
+                _getAverageExceptIndex0(s_generateRandomNumberGas)
+            );
+
+            // For generateRandomNumber - use max except index 0
+            gasOutputMax = vm.serializeUint(
+                "gasObjectMax",
+                bytes(numOfOperatorsString).length == 1
+                    ? string.concat("0", numOfOperatorsString)
+                    : numOfOperatorsString,
+                _getMaxExceptIndex0(s_generateRandomNumberGas)
+            );
+
+            // For submitMerkleRoot - use any value except index 0 (since it's constant)
+            gasOutput2 = vm.serializeUint(
+                "gasObject2",
+                bytes(numOfOperatorsString).length == 1
+                    ? string.concat("0", numOfOperatorsString)
+                    : numOfOperatorsString,
+                s_submitMerkleRootGas[1] // Just use index 1 since it's constant
+            );
+
+            // For generateRandomNumber calldata size - measure for each numOfOperators
+            calldataSizeOutput = vm.serializeUint(
+                "calldataSizeObject",
+                bytes(numOfOperatorsString).length == 1
+                    ? string.concat("0", numOfOperatorsString)
+                    : numOfOperatorsString,
+                abi.encodeWithSelector(
+                    commitReveal2BlsOptimized.generateRandomNumber.selector, ss, s_packedRevealOrders
+                ).length
+            );
+        }
+
+        // Create final JSON output
+        string memory finalOutput = vm.serializeString(
+            "commitReveal2BLSOptimizedGas", "generateRandomNumber_numOfOperators_gasUsed_average", gasOutput
+        );
+        finalOutput = vm.serializeString(
+            "commitReveal2BLSOptimizedGas", "generateRandomNumber_numOfOperators_gasUsed_max", gasOutputMax
+        );
+        finalOutput =
+            vm.serializeString("commitReveal2BLSOptimizedGas", "submitMerkleRoot_numOfOperators_gasUsed", gasOutput2);
+        finalOutput = vm.serializeString(
+            "commitReveal2BLSOptimizedGas",
+            "generateRandomNumber_numOfOperators_calldataSizeInBytes",
+            calldataSizeOutput
+        );
+
+        // Add submitMerkleRoot calldata size (constant)
+        BLS.G2Point memory emptySig;
+        finalOutput = vm.serializeUint(
+            "commitReveal2BLSOptimizedGas",
+            "submitMerkleRoot_calldataSizeInBytes",
+            abi.encodeWithSelector(commitReveal2BlsOptimized.submitMerkleRoot.selector, type(uint256).max, emptySig)
+            .length
+        );
+
+        vm.writeJson(finalOutput, s_gasReportPath, ".commitReveal2BLSOptimizedGas");
     }
 
     function _blsg1mul(BLS.G1Point memory g1, bytes32 scalar) private view returns (BLS.G1Point memory) {
