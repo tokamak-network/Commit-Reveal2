@@ -105,8 +105,7 @@ contract OperatorManager is Ownable {
     function requestOwnershipHandover() public payable override noNativeTokenSent {
         unchecked {
             uint256 expires = block.timestamp + _ownershipHandoverValidFor();
-            /// @solidity memory-safe-assembly
-            assembly {
+            assembly ("memory-safe") {
                 mstore(0x00, caller())
                 mstore(0x20, s_activatedOperatorIndex1Based.slot)
                 if gt(sload(keccak256(0x00, 0x40)), 0) {
@@ -132,8 +131,7 @@ contract OperatorManager is Ownable {
         onlyOwner
     {
         _settleSlashReward(owner());
-        /// @solidity memory-safe-assembly
-        assembly {
+        assembly ("memory-safe") {
             mstore(0x00, pendingOwner)
             // initialize slashRewardPerOperatorPaid for the pendingOwner
             mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
@@ -371,7 +369,7 @@ contract OperatorManager is Ownable {
      * @param activatedOperatorIndex The zero-based index of the operator in `s_activatedOperators`.
      * @param operator The address of the operator to remove.
      */
-    function _deactivate(uint256 activatedOperatorIndex, address operator) internal {
+    function _deactivate(uint256 activatedOperatorIndex, address operator) internal virtual {
         assembly ("memory-safe") {
             mstore(0x00, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x00, 0x20)
