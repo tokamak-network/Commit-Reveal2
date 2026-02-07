@@ -9,7 +9,6 @@ import {Bitmap} from "../../src/libraries/Bitmap.sol";
 import {ConsumerExample} from "./../../src/ConsumerExample.sol";
 import {Sort} from "./Sort.sol";
 import {CommitReveal2BLS} from "../../src/CommitReveal2BLS.sol";
-import {CommitReveal2BLSOptimized} from "../../src/CommitReveal2BLSOptimized.sol";
 
 contract CommitReveal2Helper is Test {
     // ** Contracts
@@ -141,23 +140,8 @@ contract CommitReveal2Helper is Test {
     }
 
     function _setSCoCvRevealOrdersBLS(
-        mapping(address => uint256) storage privatekeys,
-        CommitReveal2BLS commitReveal2Bls
-    ) internal returns (uint256[] memory revealOrders) {
-        s_startTimestamp = commitReveal2Bls.getCurStartTime();
-        s_activatedOperators = commitReveal2Bls.getActivatedOperators();
-        (s_currentRound, s_currentTrialNum) = commitReveal2Bls.getCurRoundAndTrialNum();
-        // *** Generate S, Co, Cv, Signatures
-        uint256[] memory privateKeys = new uint256[](s_activatedOperators.length);
-        for (uint256 i; i < s_activatedOperators.length; i++) {
-            privateKeys[i] = privatekeys[s_activatedOperators[i]];
-        }
-        revealOrders = _setSCoCv(s_activatedOperators.length, privateKeys);
-    }
-
-    function _setSCoCvRevealOrdersBLSOptimized(
         mapping(address => uint256) storage privateKeys,
-        CommitReveal2BLSOptimized commitReveal2Bls
+        CommitReveal2BLS commitReveal2Bls
     ) internal returns (uint256[] memory revealOrders) {
         s_startTimestamp = commitReveal2Bls.getCurStartTime();
         s_activatedOperators = commitReveal2Bls.getActivatedOperators();

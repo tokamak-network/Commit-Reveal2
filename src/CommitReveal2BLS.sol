@@ -6,11 +6,12 @@ import {BLS} from "./libraries/BLS.sol";
 
 contract CommitReveal2BLS is FailLogics {
     address public governanceMultisig;
-
+    BLS.G1Point public s_aggregatedBLSPubKey;
     mapping(address => BLS.G1Point) public s_operatorBLSPubKeys;
 
     error UnauthorizedGovernance();
     error BLSVerificationFailed();
+    error InvalidProofOfPossession();
 
     modifier onlyGovernance() {
         if (msg.sender != governanceMultisig) revert UnauthorizedGovernance();
@@ -305,7 +306,14 @@ contract CommitReveal2BLS is FailLogics {
         }
     }
 
-    function submitMerkleRoot(bytes32 merkleRoot) external inProgress onlyOwner {
+    function submitMerkleRoot(bytes32 merkleRoot, BLS.G2Point calldata blsSignature) external inProgress onlyOwner {
+        BLS.G1Point[] memory g1Points = new BLS.G1Point[](2);
+        g1Points[0] = NEGATED_G1_GENERATOR();
+        g1Points[1] = s_aggregatedBLSPubKey;
+        BLS.G2Point[] memory g2Points = new BLS.G2Point[](2);
+        g2Points[0] = blsSignature;
+        g2Points[1] = BLS.toG2(BLS.Fp2(0, 0, 0, merkleRoot));
+        require(BLS.pairing(g1Points, g2Points), BLSVerificationFailed());
         assembly ("memory-safe") {
             let m := mload(0x40)
             // * get trialNum
@@ -333,16 +341,11 @@ contract CommitReveal2BLS is FailLogics {
         }
     }
 
-    function generateRandomNumber(bytes32[] calldata ss, uint256 packedRevealOrders, BLS.G2Point calldata blsSignature)
-        external
-        inProgress
-    {
+    function generateRandomNumber(bytes32[] calldata ss, uint256 packedRevealOrders) external inProgress {
         bytes32 domainSeparator = _domainSeparatorV4();
-        uint256 cvs;
-        uint256 activatedOperatorsLength;
         assembly ("memory-safe") {
             let m := mload(0x40)
-            activatedOperatorsLength := sload(s_activatedOperators.slot)
+            let activatedOperatorsLength := sload(s_activatedOperators.slot)
             // ** check if all secrets are submitted
             if iszero(eq(activatedOperatorsLength, ss.length)) {
                 mstore(0, 0xe0767fa4) // selector for InvalidSecretLength()
@@ -351,7 +354,7 @@ contract CommitReveal2BLS is FailLogics {
             // ** initialize cos and cvs arrays memory, without length data
             let activatedOperatorsLengthInBytes := shl(5, activatedOperatorsLength)
             let cos := m
-            cvs := add(add(cos, activatedOperatorsLengthInBytes), 1) // add 1 for the index
+            let cvs := add(add(cos, activatedOperatorsLengthInBytes), 1) // add 1 for the index
             let secrets := add(cvs, activatedOperatorsLengthInBytes)
             mstore(0x40, add(secrets, activatedOperatorsLengthInBytes)) // update the free memory pointer
 
@@ -565,23 +568,6 @@ contract CommitReveal2BLS is FailLogics {
             mstore(0x40, secrets) // Restore free memory pointer to secrets (cvs still needed for BLS verification)
             mstore(0x60, 0) // Restore the zero slot.
         }
-        // verify BLS signatures
-        ++activatedOperatorsLength;
-        BLS.G1Point[] memory g1Points = new BLS.G1Point[](activatedOperatorsLength);
-        BLS.G2Point[] memory g2Points = new BLS.G2Point[](activatedOperatorsLength);
-        g1Points[0] = NEGATED_G1_GENERATOR();
-        for (uint256 i = 1; i < activatedOperatorsLength; ++i) {
-            g1Points[i] = s_operatorBLSPubKeys[s_activatedOperators[i - 1]];
-        }
-        g2Points[0] = blsSignature;
-        for (uint256 i = 1; i < activatedOperatorsLength; ++i) {
-            bytes32 message;
-            assembly ("memory-safe") {
-                message := mload(add(cvs, shl(5, sub(i, 1))))
-            }
-            g2Points[i] = BLS.toG2(BLS.Fp2(0, 0, 0, message));
-        }
-        require(BLS.pairing(g1Points, g2Points), BLSVerificationFailed());
     }
 
     function refund(uint256 round) external {
@@ -747,7 +733,11 @@ contract CommitReveal2BLS is FailLogics {
         }
     }
 
-    function depositAndActivate(BLS.G1Point memory pubKey) external payable notInProgress {
+    function depositAndActivate(BLS.G1Point memory pubKey, BLS.G2Point memory pop) external payable notInProgress {
+        // Verify Proof of Possession: pop = BLSSign(sk, H(msg.sender))
+        // This prevents rogue-key attacks by proving the caller knows the secret key for pubKey
+        _verifyProofOfPossession(pubKey, pop);
+
         assembly ("memory-safe") {
             mstore(0x00, caller())
             mstore(0x20, s_depositAmount.slot)
@@ -759,8 +749,51 @@ contract CommitReveal2BLS is FailLogics {
             }
             sstore(depositAmountSlot, updatedDepositAmount)
         }
+        // Sum pubkey
+        s_aggregatedBLSPubKey = BLS.add(s_aggregatedBLSPubKey, pubKey);
         s_operatorBLSPubKeys[msg.sender] = pubKey;
         _activate();
+    }
+
+    /// @dev Verifies that the caller knows the secret key for the given BLS public key.
+    /// PoP = BLSSign(sk, H_to_G2(abi.encodePacked(msg.sender)))
+    /// Verification: e(-G1, pop) · e(PK, H(msg.sender)) == 1
+    function _verifyProofOfPossession(BLS.G1Point memory pubKey, BLS.G2Point memory pop) internal view {
+        BLS.G2Point memory messagePoint = BLS.hashToG2(abi.encodePacked(msg.sender));
+        BLS.G1Point[] memory g1Points = new BLS.G1Point[](2);
+        BLS.G2Point[] memory g2Points = new BLS.G2Point[](2);
+        g1Points[0] = NEGATED_G1_GENERATOR();
+        g1Points[1] = pubKey;
+        g2Points[0] = pop;
+        g2Points[1] = messagePoint;
+        if (!BLS.pairing(g1Points, g2Points)) {
+            revert InvalidProofOfPossession();
+        }
+    }
+
+    function _deactivate(uint256 activatedOperatorIndex, address operator) internal override {
+        // Subtract operator's pubkey from aggregated pubkey
+        s_aggregatedBLSPubKey = BLS.sub(s_aggregatedBLSPubKey, s_operatorBLSPubKeys[operator]);
+        delete s_operatorBLSPubKeys[operator];
+
+        assembly ("memory-safe") {
+            mstore(0x00, s_activatedOperators.slot)
+            let firstActivatedOperatorSlot := keccak256(0x00, 0x20)
+            let lastOperatorIndex := sub(sload(s_activatedOperators.slot), 1)
+            let lastOperatorAddress := sload(add(firstActivatedOperatorSlot, lastOperatorIndex))
+            mstore(0x20, s_activatedOperatorIndex1Based.slot)
+            // swap the operator to remove with the last operator in the array
+            if iszero(eq(lastOperatorAddress, operator)) {
+                sstore(add(firstActivatedOperatorSlot, activatedOperatorIndex), lastOperatorAddress)
+                mstore(0x00, lastOperatorAddress)
+                sstore(keccak256(0x00, 0x40), add(activatedOperatorIndex, 1))
+            }
+            // pop the last operator by setting the length to the last index
+            sstore(s_activatedOperators.slot, lastOperatorIndex)
+            mstore(0x00, operator)
+            sstore(keccak256(0x00, 0x40), 0)
+            log1(0x00, 0x20, 0x5d10eb48d8c00fb4cc9120533a99e2eac5eb9d0f8ec06216b2e4d5b1ff175a4d) // `DeActivated(address operator)`.
+        }
     }
 
     function NEGATED_G1_GENERATOR() internal pure returns (BLS.G1Point memory) {

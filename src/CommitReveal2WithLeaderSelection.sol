@@ -664,8 +664,17 @@ contract CommitReveal2WithLeaderSelection is LeaderSelection {
             }
         }
         activatedOperatorsLength = s_activatedOperators.length; // new length after deactivations
-        uint256 indexForLeader =
-            uint256(keccak256(abi.encodePacked(s_revealForLeaderSelection))) % activatedOperatorsLength;
+        // argmin_i Hash(R_elec || addr_i)
+        bytes32 elecRandomness = keccak256(abi.encodePacked(s_revealForLeaderSelection));
+        uint256 minHash = type(uint256).max;
+        uint256 indexForLeader;
+        for (uint256 i; i < activatedOperatorsLength; ++i) {
+            uint256 h = uint256(keccak256(abi.encodePacked(elecRandomness, s_activatedOperators[i])));
+            if (h < minHash) {
+                minHash = h;
+                indexForLeader = i;
+            }
+        }
         _settleSlashReward(owner());
         address newLeader = s_activatedOperators[indexForLeader];
         _deactivate(indexForLeader, newLeader);
