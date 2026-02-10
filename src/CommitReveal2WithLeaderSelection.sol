@@ -656,23 +656,44 @@ contract CommitReveal2WithLeaderSelection is LeaderSelection {
     function resume() external payable {
         if (block.timestamp < s_leaderSelectionTime) revert CannotResumeBeforeLeaderSelectionTime();
         uint256 activatedOperatorsLength = s_activatedOperators.length;
-        for (uint256 i; i < activatedOperatorsLength; ++i) {
+        // Iterate backwards to avoid array out-of-bounds when _deactivate
+        // swap-and-pops elements, shrinking the array during iteration.
+        for (uint256 i = activatedOperatorsLength; i > 0;) {
+            unchecked {
+                --i;
+            }
             if (s_revealForLeaderSelection[i] == 0) {
                 address addressToDeactivate = s_activatedOperators[i];
-                _deactivate(s_activatedOperatorIndex1Based[s_activatedOperators[i]] - 1, addressToDeactivate);
+                _deactivate(i, addressToDeactivate);
                 _settleSlashReward(addressToDeactivate);
             }
         }
         activatedOperatorsLength = s_activatedOperators.length; // new length after deactivations
-        // argmin_i Hash(R_elec || addr_i)
-        bytes32 elecRandomness = keccak256(abi.encodePacked(s_revealForLeaderSelection));
+        // Build election randomness from only non-zero revealed values.
+        // Including zeros from non-revealers makes the hash predictable and manipulable.
+        uint256 revealArrayLength = s_revealForLeaderSelection.length;
+        bytes memory revealedValues;
+        for (uint256 i; i < revealArrayLength;) {
+            uint256 val = s_revealForLeaderSelection[i];
+            if (val != 0) {
+                revealedValues = abi.encodePacked(revealedValues, val);
+            }
+            unchecked {
+                ++i;
+            }
+        }
+        // argmin_i Hash(R_elec || addr_i) — order-independent leader selection
+        bytes32 elecRandomness = keccak256(revealedValues);
         uint256 minHash = type(uint256).max;
         uint256 indexForLeader;
-        for (uint256 i; i < activatedOperatorsLength; ++i) {
+        for (uint256 i; i < activatedOperatorsLength;) {
             uint256 h = uint256(keccak256(abi.encodePacked(elecRandomness, s_activatedOperators[i])));
             if (h < minHash) {
                 minHash = h;
                 indexForLeader = i;
+            }
+            unchecked {
+                ++i;
             }
         }
         _settleSlashReward(owner());
