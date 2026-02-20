@@ -656,13 +656,14 @@ contract CommitReveal2WithLeaderSelection is LeaderSelection {
     function resume() external payable {
         if (block.timestamp < s_leaderSelectionTime) revert CannotResumeBeforeLeaderSelectionTime();
         uint256 activatedOperatorsLength = s_activatedOperators.length;
+        uint256 revealLength = s_revealForLeaderSelection.length;
         // Iterate backwards to avoid array out-of-bounds when _deactivate
         // swap-and-pops elements, shrinking the array during iteration.
         for (uint256 i = activatedOperatorsLength; i > 0;) {
             unchecked {
                 --i;
             }
-            if (s_revealForLeaderSelection[i] == 0) {
+            if (i < revealLength && s_revealForLeaderSelection[i] == 0) {
                 address addressToDeactivate = s_activatedOperators[i];
                 _deactivate(i, addressToDeactivate);
                 _settleSlashReward(addressToDeactivate);
