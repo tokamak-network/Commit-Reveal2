@@ -19,3 +19,6 @@ docs/
 
 # Claude
 /.claude/
+
+# Paper
+paper/
