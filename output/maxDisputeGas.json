@@ -1,0 +1,68 @@
+{
+  "disputeCvCoGas": {
+    "metrics": {
+      "generateRandomNumberWhenSomeCvsAreOnChainGas": 180624,
+      "requestToSubmitCoGas": 479012,
+      "requestToSubmitCvGas": 66872,
+      "submitCoGas": 48980,
+      "submitCvGas": 48107,
+      "sumRequestGas": 545884
+    },
+    "scenarioKey": "operators_32_submitCv_01_submitCo_32"
+  },
+  "disputeSecretsGas": {
+    "metrics": {
+      "lastSubmitSGas": 194010,
+      "requestToSubmitCoGas": 77860,
+      "requestToSubmitCvGas": 66872,
+      "requestToSubmitSGas": 473593,
+      "submitCoGas": 48980,
+      "submitCvGas": 48107,
+      "submitSGas": 51626,
+      "sumRequestGas": 618325
+    },
+    "scenarioKey": "operators_32_submitCv_01"
+  },
+  "failToSubmitSGas": {
+    "calldataSizeInBytes": 4,
+    "description": "Gas usage for failToSubmitS function by scenario: operators_XX -> requested_YY -> didntSubmit_ZZ",
+    "scenarios": {
+      "operators_32": {
+        "requested_32": {
+          "didntSubmit_01": 104823,
+          "didntSubmit_02": 104823,
+          "didntSubmit_03": 104823,
+          "didntSubmit_04": 104823,
+          "didntSubmit_05": 104823,
+          "didntSubmit_06": 104823,
+          "didntSubmit_07": 104823,
+          "didntSubmit_08": 104823,
+          "didntSubmit_09": 104823,
+          "didntSubmit_10": 104823,
+          "didntSubmit_11": 104823,
+          "didntSubmit_12": 104823,
+          "didntSubmit_13": 104823,
+          "didntSubmit_14": 104823,
+          "didntSubmit_15": 104823,
+          "didntSubmit_16": 104823,
+          "didntSubmit_17": 104823,
+          "didntSubmit_18": 104823,
+          "didntSubmit_19": 104823,
+          "didntSubmit_20": 104823,
+          "didntSubmit_21": 104823,
+          "didntSubmit_22": 104823,
+          "didntSubmit_23": 104823,
+          "didntSubmit_24": 104823,
+          "didntSubmit_25": 104823,
+          "didntSubmit_26": 104823,
+          "didntSubmit_27": 104823,
+          "didntSubmit_28": 104823,
+          "didntSubmit_29": 104823,
+          "didntSubmit_30": 104823,
+          "didntSubmit_31": 104823,
+          "didntSubmit_32": 104823
+        }
+      }
+    }
+  }
+}

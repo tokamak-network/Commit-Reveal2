@@ -5,6 +5,26 @@ pragma solidity ^0.8.30;
 import {Ownable} from "@solady/src/auth/Ownable.sol";
 
 contract OperatorManager is Ownable {
+    modifier notInProgress() {
+        assembly ("memory-safe") {
+            // ** check if the contract is COMPLETED or HALTED
+            if eq(sload(s_isInProcess.slot), IN_PROGRESS) {
+                mstore(0, 0x8a902655) // ShouldNotBeInProgress()
+                revert(0x1c, 0x04)
+            }
+        }
+        _;
+    }
+
+    modifier noNativeTokenSent() {
+        assembly ("memory-safe") {
+            if iszero(eq(callvalue(), 0)) {
+                mstore(0, 0x1a131e57) // NativeTokenSent()
+                revert(0x1c, 0x04)
+            }
+        }
+        _;
+    }
     // * State Variables
 
     mapping(address operator => uint256) public s_depositAmount;
@@ -13,7 +33,7 @@ contract OperatorManager is Ownable {
     uint256 public s_slashRewardPerOperatorX8;
     mapping(address => uint256) public s_slashRewardPerOperatorPaidX8;
 
-    uint256 public s_isInProcess = COMPLETED;
+    uint256 public s_isInProcess;
     uint256 public s_activationThreshold;
 
     // ** internal variables
@@ -40,7 +60,6 @@ contract OperatorManager is Ownable {
 
     // * Errors
     error TransferFailed();
-    error InProcess(); // 0x0f56c325
     error OnlyActivatedOperatorCanClaim(); // 0x111fa29f
     error OwnerCannotActivate(); // 0x4534ad7f
     error LessThanActivationThreshold(); // 0x5af30906
@@ -48,32 +67,23 @@ contract OperatorManager is Ownable {
     error ActivatedOperatorsLimitReached(); // 0x3e8fbd5f
     error WithdrawAmountIsZero(); // 0xa393d14b
     error PendingOwnerCannotBeActivatedOperator(); // 0x5df6bf29
+    error NotAllowed();
+    error NativeTokenSent(); // 0x1a131e57
+    error ShouldNotBeInProgress(); // 0x8a902655
 
     constructor() {
         _initializeOwner(msg.sender);
     }
 
-    /**
-     * @notice Ensures that no actions can be taken while the contract is in an ongoing process.
-     * @dev
-     *   - Reverts with {InProcess} if `s_isInProcess == IN_PROGRESS`.
-     *   - Commonly used to protect functions that should not execute while the system is ongoing
-     *     with a round of operations or an uncompleted flow.
-     */
-    modifier notInProcess() {
-        assembly ("memory-safe") {
-            if eq(sload(s_isInProcess.slot), IN_PROGRESS) {
-                mstore(0x00, 0x0f56c325) // `InProcess()`.
-                revert(0x1c, 0x04)
-            }
-        }
-        _;
-    }
-
     // ** Override Ownable Functions
-    function transferOwnership(address newOwner) public payable override onlyOwner {
+    function transferOwnership(address newOwner) public payable override noNativeTokenSent notInProgress onlyOwner {
+        _settleSlashReward(msg.sender);
         assembly ("memory-safe") {
             mstore(0x00, newOwner)
+            // initialize slashRewardPerOperatorPaid for the new owner
+            mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
+            sstore(keccak256(0x00, 0x40), sload(s_slashRewardPerOperatorX8.slot))
+
             mstore(0x20, s_activatedOperatorIndex1Based.slot)
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0x00, 0x9279dd8e) // NewOwnerCannotBeActivatedOperator()
@@ -87,11 +97,15 @@ contract OperatorManager is Ownable {
         _setOwner(newOwner);
     }
 
-    function requestOwnershipHandover() public payable override {
+    function renounceOwnership() public payable override onlyOwner {
+        // prevent it from working
+        revert NotAllowed();
+    }
+
+    function requestOwnershipHandover() public payable override noNativeTokenSent {
         unchecked {
             uint256 expires = block.timestamp + _ownershipHandoverValidFor();
-            /// @solidity memory-safe-assembly
-            assembly {
+            assembly ("memory-safe") {
                 mstore(0x00, caller())
                 mstore(0x20, s_activatedOperatorIndex1Based.slot)
                 if gt(sload(keccak256(0x00, 0x40)), 0) {
@@ -108,10 +122,21 @@ contract OperatorManager is Ownable {
         }
     }
 
-    function completeOwnershipHandover(address pendingOwner) public payable override onlyOwner {
-        /// @solidity memory-safe-assembly
-        assembly {
+    function completeOwnershipHandover(address pendingOwner)
+        public
+        payable
+        override
+        noNativeTokenSent
+        notInProgress
+        onlyOwner
+    {
+        _settleSlashReward(owner());
+        assembly ("memory-safe") {
             mstore(0x00, pendingOwner)
+            // initialize slashRewardPerOperatorPaid for the pendingOwner
+            mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
+            sstore(keccak256(0x00, 0x40), sload(s_slashRewardPerOperatorX8.slot))
+
             mstore(0x20, s_activatedOperatorIndex1Based.slot)
             if gt(sload(keccak256(0x00, 0x40)), 0) {
                 mstore(0x00, 0x5df6bf29) // PendingOwnerCannotBeActivatedOperator()
@@ -141,7 +166,7 @@ contract OperatorManager is Ownable {
         }
     }
 
-    function activate() public notInProcess {
+    function activate() public notInProgress {
         assembly ("memory-safe") {
             // Check if the caller's deposit amount is less than the activation threshold and revert if true.
             mstore(0x00, caller())
@@ -186,10 +211,11 @@ contract OperatorManager is Ownable {
             mstore(0x20, s_slashRewardPerOperatorPaidX8.slot) // caller is already in memory 0x00
             sstore(keccak256(0x00, 0x40), sload(s_slashRewardPerOperatorX8.slot))
             log1(0x00, 0x20, 0x0cc43938d137e7efade6a531f663e78c1fc75257b0d65ffda2fdaf70cb49cdf9)
+            // event Activated(address operator)
         }
     }
 
-    function depositAndActivate() external payable virtual notInProcess {
+    function depositAndActivate() external payable virtual notInProgress {
         assembly ("memory-safe") {
             mstore(0x00, caller())
             mstore(0x20, s_depositAmount.slot)
@@ -204,7 +230,7 @@ contract OperatorManager is Ownable {
         _activate();
     }
 
-    function withdraw() external notInProcess {
+    function withdraw() external notInProgress {
         assembly ("memory-safe") {
             mstore(0x00, caller())
             mstore(0x20, s_depositAmount.slot)
@@ -213,11 +239,21 @@ contract OperatorManager is Ownable {
             let activatedOperatorIndex1Based := sload(keccak256(0x00, 0x40))
             let currentSlashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
             mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
+            let slashRewardPerOperatorPaidX8Slot := keccak256(0x00, 0x40)
+            // Calculate claimable reward once to prevent fractional loss when updating checkpoint
+            let claimableSlashReward :=
+                shr(8, sub(currentSlashRewardPerOperatorX8, sload(slashRewardPerOperatorPaidX8Slot)))
 
             if gt(activatedOperatorIndex1Based, 0) {
                 // ** update withdraw amount
-                withdrawAmount :=
-                    add(withdrawAmount, shr(8, sub(currentSlashRewardPerOperatorX8, sload(keccak256(0x00, 0x40)))))
+                if gt(claimableSlashReward, 0) {
+                    withdrawAmount := add(withdrawAmount, claimableSlashReward)
+                    // Update checkpoint by only the actual amount claimed (converted back to X8)
+                    sstore(
+                        slashRewardPerOperatorPaidX8Slot,
+                        add(sload(slashRewardPerOperatorPaidX8Slot), shl(8, claimableSlashReward))
+                    )
+                }
                 // ** deactivate msg.sender
                 mstore(0x00, s_activatedOperators.slot)
                 let firstActivatedOperatorSlot := keccak256(0x00, 0x20)
@@ -239,15 +275,20 @@ contract OperatorManager is Ownable {
             if eq(caller(), sload(_OWNER_SLOT)) {
                 // If the caller is the owner (leader node) but not an operator,
                 // they can still withdraw deposit plus slash reward.
-                withdrawAmount :=
-                    add(withdrawAmount, shr(8, sub(currentSlashRewardPerOperatorX8, sload(keccak256(0x00, 0x40)))))
+                // This prevents fractional loss by advancing checkpoint exactly by what was paid
+                if gt(claimableSlashReward, 0) {
+                    withdrawAmount := add(withdrawAmount, claimableSlashReward)
+                    // Update checkpoint by only the actual amount claimed (converted back to X8)
+                    sstore(
+                        slashRewardPerOperatorPaidX8Slot,
+                        add(sload(slashRewardPerOperatorPaidX8Slot), shl(8, claimableSlashReward))
+                    )
+                }
             }
             if iszero(withdrawAmount) {
                 mstore(0x00, 0xa393d14b) // `WithdrawAmountIsZero()`.
                 revert(0x1c, 0x04)
             }
-            mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
-            sstore(keccak256(0x00, 0x40), currentSlashRewardPerOperatorX8)
             // Reset deposit to zero and attempt transfer
             mstore(0x20, s_depositAmount.slot)
             sstore(keccak256(0x00, 0x40), 0)
@@ -259,28 +300,13 @@ contract OperatorManager is Ownable {
         }
     }
 
-    function deactivate() external notInProcess {
+    function deactivate() external notInProgress {
         // Note: Intentionally no operator activation check for gas optimization.
         // Non-activated operators have s_activatedOperatorIndex1Based[msg.sender] = 0,
         // causing underflow (0 - 1) which serves as implicit validation and reverts.
         // This design prioritizes gas efficiency over verbose error messages.
         _deactivate(s_activatedOperatorIndex1Based[msg.sender] - 1, msg.sender);
-        assembly ("memory-safe") {
-            let currentSlashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
-            mstore(0x00, caller())
-            mstore(0x20, s_depositAmount.slot)
-            let depositAmountSlot := keccak256(0x00, 0x40)
-            mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
-            let slashRewardPerOperatorPaidX8Slot := keccak256(0x00, 0x40)
-            sstore(
-                depositAmountSlot,
-                add(
-                    sload(depositAmountSlot),
-                    shr(8, sub(currentSlashRewardPerOperatorX8, sload(slashRewardPerOperatorPaidX8Slot)))
-                )
-            )
-            sstore(slashRewardPerOperatorPaidX8Slot, currentSlashRewardPerOperatorX8)
-        }
+        _settleSlashReward(msg.sender);
     }
 
     function claimSlashReward() external {
@@ -300,7 +326,11 @@ contract OperatorManager is Ownable {
                 mstore(0x00, 0xa393d14b) // `WithdrawAmountIsZero()`.
                 revert(0x1c, 0x04)
             }
-            sstore(slashRewardPerOperatorPaidX8Slot, currentSlashRewardPerOperatorX8)
+            // Update checkpoint by exactly the amount paid out (converted back to X8) to prevent fractional loss
+            sstore(
+                slashRewardPerOperatorPaidX8Slot,
+                add(sload(slashRewardPerOperatorPaidX8Slot), shl(8, slashRewardAmount))
+            )
             // Transfer the ETH and check if it succeeded or not.
             if iszero(call(gas(), caller(), slashRewardAmount, 0x00, 0x00, 0x00, 0x00)) {
                 mstore(0x00, 0xb12d13eb) // `ETHTransferFailed()`.
@@ -339,7 +369,7 @@ contract OperatorManager is Ownable {
      * @param activatedOperatorIndex The zero-based index of the operator in `s_activatedOperators`.
      * @param operator The address of the operator to remove.
      */
-    function _deactivate(uint256 activatedOperatorIndex, address operator) internal {
+    function _deactivate(uint256 activatedOperatorIndex, address operator) internal virtual {
         assembly ("memory-safe") {
             mstore(0x00, s_activatedOperators.slot)
             let firstActivatedOperatorSlot := keccak256(0x00, 0x20)
@@ -357,6 +387,25 @@ contract OperatorManager is Ownable {
             mstore(0x00, operator)
             sstore(keccak256(0x00, 0x40), 0)
             log1(0x00, 0x20, 0x5d10eb48d8c00fb4cc9120533a99e2eac5eb9d0f8ec06216b2e4d5b1ff175a4d) // `DeActivated(address operator)`.
+        }
+    }
+
+    function _settleSlashReward(address addrToSettle) internal {
+        assembly ("memory-safe") {
+            let currentSlashRewardPerOperatorX8 := sload(s_slashRewardPerOperatorX8.slot)
+            mstore(0x00, addrToSettle)
+            mstore(0x20, s_depositAmount.slot)
+            let depositAmountSlot := keccak256(0x00, 0x40)
+            mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
+            let slashRewardPerOperatorPaidX8Slot := keccak256(0x00, 0x40)
+            sstore(
+                depositAmountSlot,
+                add(
+                    sload(depositAmountSlot),
+                    shr(8, sub(currentSlashRewardPerOperatorX8, sload(slashRewardPerOperatorPaidX8Slot)))
+                )
+            )
+            sstore(slashRewardPerOperatorPaidX8Slot, currentSlashRewardPerOperatorX8)
         }
     }
 }

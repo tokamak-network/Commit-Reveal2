@@ -15,11 +15,11 @@ contract CommitReveal2L2 is CommitReveal2 {
     /// @dev L1 fee coefficient is used to account for the impact of data compression on the l1 fee
     /// getL1FeeUpperBound returns the upper bound of l1 fee so this configurable coefficient will help
     /// charge a predefined percentage of the upper bound.
-    uint8 public s_l1FeeCoefficient = 100;
+    uint256 public s_l1FeeCoefficient = 100;
 
-    error InvalidL1FeeCoefficient(uint8 coefficient);
+    error InvalidL1FeeCoefficient(uint256 coefficient);
 
-    event L1FeeCalculationSet(uint8 coefficient);
+    event L1FeeCalculationSet(uint256 coefficient);
 
     constructor(
         uint256 activationThreshold,
@@ -30,7 +30,9 @@ contract CommitReveal2L2 is CommitReveal2 {
         uint256 requestOrSubmitOrFailDecisionPeriod,
         uint256 onChainSubmissionPeriod,
         uint256 offChainSubmissionPeriodPerOperator,
-        uint256 onChainSubmissionPeriodPerOperator
+        uint256 onChainSubmissionPeriodPerOperator,
+        uint256 maxGasPrice,
+        address _governanceMultisig
     )
         payable
         CommitReveal2(
@@ -42,11 +44,13 @@ contract CommitReveal2L2 is CommitReveal2 {
             requestOrSubmitOrFailDecisionPeriod,
             onChainSubmissionPeriod,
             offChainSubmissionPeriodPerOperator,
-            onChainSubmissionPeriodPerOperator
+            onChainSubmissionPeriodPerOperator,
+            maxGasPrice,
+            _governanceMultisig
         )
     {}
 
-    function setL1FeeCoefficient(uint8 coefficient) external onlyOwner notInProcess {
+    function setL1FeeCoefficient(uint256 coefficient) external onlyGovernance onlyWhenCompleted {
         if (coefficient == 0 || coefficient > 100) {
             revert InvalidL1FeeCoefficient(coefficient);
         }
@@ -75,9 +79,10 @@ contract CommitReveal2L2 is CommitReveal2 {
         returns (uint256 requestFee)
     {
         assembly ("memory-safe") {
+            let m := mload(0x40)
             mstore(0x00, 0xf1c7a58b) // selector for "getL1FeeUpperBound(uint256 _unsignedTxSize) external view returns (uint256)"
             mstore(0x20, add(MERKLEROOTSUB_CALLDATA_BYTES_SIZE, L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
-            if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, 0x80, 0x20)) {
+            if iszero(staticcall(gas(), OVM_GASPRICEORACLE_ADDR, 0x1c, 0x24, m, 0x20)) {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
             }
@@ -93,6 +98,7 @@ contract CommitReveal2L2 is CommitReveal2 {
                 revert(0x1c, 0x04)
             }
             let gasUsedMerkleRootSubAndGenRandNum := sload(s_gasUsedMerkleRootSubAndGenRandNumA.slot)
+
             requestFee :=
                 add(
                     add(
@@ -105,18 +111,19 @@ contract CommitReveal2L2 is CommitReveal2 {
                                         and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
                                         numOfOperators
                                     ),
-                                    shr(128, gasUsedMerkleRootSubAndGenRandNum)
+                                    shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
                                 )
                             )
                         ),
                         sload(s_flatFee.slot)
                     ), // l2GasFee
-                    div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(0x80))), 100) // L1GasFee
+                    div(mul(sload(s_l1FeeCoefficient.slot), add(mload(0x20), mload(m))), 100) // L1GasFee
                 )
+            mstore(0x40, m) // Restore the free memory pointer
         }
     }
 
-    function _calculateFailGasFee(uint256 gasUsed) internal view override returns (uint256 gasFee) {
+    function _calculateFailGasFee(uint256 bitsToShiftRight) internal view override returns (uint256 gasFee) {
         assembly ("memory-safe") {
             mstore(0x00, 0xf1c7a58b) // selector for "getL1FeeUpperBound(uint256 _unsignedTxSize) external view returns (uint256)"
             mstore(0x20, add(FAIL_FUNCTIONS_CALLDATA_BYTES_SIZE, L1_UNSIGNED_RLP_ENC_TX_DATA_BYTES_SIZE))
@@ -124,7 +131,16 @@ contract CommitReveal2L2 is CommitReveal2 {
                 mstore(0, 0xb75f34bf) // selector for L1FeeEstimationFailed()
                 revert(0x1c, 0x04)
             }
-            gasFee := add(mul(gasprice(), gasUsed), div(mul(sload(s_l1FeeCoefficient.slot), mload(0x00)), 100))
+            let gasPrice := sload(s_maxGasPrice.slot)
+            if gt(gasPrice, gasprice()) { gasPrice := gasprice() }
+            gasFee :=
+                add(
+                    mul(
+                        gasPrice,
+                        and(shr(bitsToShiftRight, sload(s_getL1UpperBoundGasUsedWhenCalldataSize4.slot)), FAILTOSUBMIT_MASK)
+                    ),
+                    div(mul(sload(s_l1FeeCoefficient.slot), mload(0x00)), 100)
+                )
         }
     }
 

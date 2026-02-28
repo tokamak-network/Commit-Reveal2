@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {FailLogics} from "./FailLogics.sol";
+import {LeaderSelection} from "./LeaderSelection.sol";
 
-contract CommitReveal2 is FailLogics {
+contract CommitReveal2WithLeaderSelection is LeaderSelection {
     address public governanceMultisig;
 
     error UnauthorizedGovernance();
+    error CannotResumeBeforeLeaderSelectionTime();
 
     modifier onlyGovernance() {
         if (msg.sender != governanceMultisig) revert UnauthorizedGovernance();
@@ -35,7 +36,7 @@ contract CommitReveal2 is FailLogics {
         uint256 onChainSubmissionPeriodPerOperator,
         uint256 maxGasPrice,
         address _governanceMultisig
-    ) payable FailLogics(name, version) {
+    ) payable LeaderSelection(60, 60, name, version) {
         require(msg.value >= activationThreshold);
         s_depositAmount[msg.sender] = msg.value;
         s_activationThreshold = activationThreshold;
@@ -282,23 +283,22 @@ contract CommitReveal2 is FailLogics {
     {
         assembly ("memory-safe") {
             let gasUsedMerkleRootSubAndGenRandNum := sload(s_gasUsedMerkleRootSubAndGenRandNumA.slot)
-            requestFee :=
-                add(
-                    mul(
-                        gasPrice,
+            requestFee := add(
+                mul(
+                    gasPrice,
+                    add(
+                        callbackGasLimit,
                         add(
-                            callbackGasLimit,
-                            add(
-                                mul(
-                                    and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
-                                    numOfOperators
-                                ),
-                                shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
-                            )
+                            mul(
+                                and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
+                                numOfOperators
+                            ),
+                            shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
                         )
-                    ),
-                    sload(s_flatFee.slot)
-                )
+                    )
+                ),
+                sload(s_flatFee.slot)
+            )
         }
     }
 
@@ -334,7 +334,10 @@ contract CommitReveal2 is FailLogics {
         SecretAndSigRS[] calldata secretSigRSs,
         uint256, // packedVs
         uint256 packedRevealOrders
-    ) external inProgress {
+    )
+        external
+        inProgress
+    {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             let m := mload(0x40)
@@ -477,28 +480,26 @@ contract CommitReveal2 is FailLogics {
                 // https://github.com/Uniswap/v4-core/blob/59d3ecf53afa9264a16bba0e38f4c5d2231f80bc/src/libraries/BitMath.sol#L31
                 function leastSignificantBit(x) -> r {
                     x := and(x, sub(0, x))
-                    r :=
-                        shl(
-                            5,
-                            shr(
-                                252,
+                    r := shl(
+                        5,
+                        shr(
+                            252,
+                            shl(
                                 shl(
-                                    shl(
-                                        2,
-                                        shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
-                                    ),
-                                    0x8040405543005266443200005020610674053026020000107506200176117077
-                                )
+                                    2,
+                                    shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
+                                ),
+                                0x8040405543005266443200005020610674053026020000107506200176117077
                             )
                         )
-                    r :=
-                        or(
-                            r,
-                            byte(
-                                and(div(0xd76453e0, shr(r, x)), 0x1f),
-                                0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
-                            )
+                    )
+                    r := or(
+                        r,
+                        byte(
+                            and(div(0xd76453e0, shr(r, x)), 0x1f),
+                            0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
                         )
+                    )
                 }
                 function nextRequestedRound(_round) -> _next, _requested {
                     let wordPos := shr(8, _round)
@@ -652,7 +653,53 @@ contract CommitReveal2 is FailLogics {
         }
     }
 
-    function resume() external payable onlyOwner {
+    function resume() external payable {
+        if (block.timestamp < s_leaderSelectionTime) revert CannotResumeBeforeLeaderSelectionTime();
+        uint256 activatedOperatorsLength = s_activatedOperators.length;
+        for (uint256 i; i < activatedOperatorsLength; ++i) {
+            if (s_revealForLeaderSelection[i] == 0) {
+                address addressToDeactivate = s_activatedOperators[i];
+                _deactivate(s_activatedOperatorIndex1Based[s_activatedOperators[i]] - 1, addressToDeactivate);
+                _settleSlashReward(addressToDeactivate);
+            }
+        }
+        activatedOperatorsLength = s_activatedOperators.length; // new length after deactivations
+        // argmin_i Hash(R_elec || addr_i)
+        bytes32 elecRandomness = keccak256(abi.encodePacked(s_revealForLeaderSelection));
+        uint256 minHash = type(uint256).max;
+        uint256 indexForLeader;
+        for (uint256 i; i < activatedOperatorsLength; ++i) {
+            uint256 h = uint256(keccak256(abi.encodePacked(elecRandomness, s_activatedOperators[i])));
+            if (h < minHash) {
+                minHash = h;
+                indexForLeader = i;
+            }
+        }
+        _settleSlashReward(owner());
+        address newLeader = s_activatedOperators[indexForLeader];
+        _deactivate(indexForLeader, newLeader);
+        _settleSlashReward(newLeader);
+        assembly ("memory-safe") {
+            mstore(0x00, newLeader)
+            // initialize slashRewardPerOperatorPaid for the new leader
+            mstore(0x20, s_slashRewardPerOperatorPaidX8.slot)
+            sstore(keccak256(0x00, 0x40), sload(s_slashRewardPerOperatorX8.slot))
+
+            mstore(0x20, s_activatedOperatorIndex1Based.slot)
+            if gt(sload(keccak256(0x00, 0x40)), 0) {
+                mstore(0x00, 0x9279dd8e) // NewOwnerCannotBeActivatedOperator()
+                revert(0x1c, 0x04)
+            }
+            if iszero(shl(96, newLeader)) {
+                mstore(0x00, 0x7448fbae) // `NewOwnerIsZeroAddress()`.
+                revert(0x1c, 0x04)
+            }
+        }
+        _setOwner(newLeader);
+        // Reset leader selection arrays for next round
+        delete s_cvsForLeaderSelection;
+        delete s_revealForLeaderSelection;
+        ///
         assembly ("memory-safe") {
             let m := mload(0x40)
             if iszero(eq(sload(s_isInProcess.slot), HALTED)) {
@@ -685,25 +732,26 @@ contract CommitReveal2 is FailLogics {
             // https://github.com/Uniswap/v4-core/blob/59d3ecf53afa9264a16bba0e38f4c5d2231f80bc/src/libraries/BitMath.sol#L31
             function leastSignificantBit(x) -> r {
                 x := and(x, sub(0, x))
-                r :=
-                    shl(
-                        5,
-                        shr(
-                            252,
+                r := shl(
+                    5,
+                    shr(
+                        252,
+                        shl(
                             shl(
-                                shl(2, shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))),
-                                0x8040405543005266443200005020610674053026020000107506200176117077
-                            )
+                                2,
+                                shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
+                            ),
+                            0x8040405543005266443200005020610674053026020000107506200176117077
                         )
                     )
-                r :=
-                    or(
-                        r,
-                        byte(
-                            and(div(0xd76453e0, shr(r, x)), 0x1f),
-                            0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
-                        )
+                )
+                r := or(
+                    r,
+                    byte(
+                        and(div(0xd76453e0, shr(r, x)), 0x1f),
+                        0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
                     )
+                )
             }
             function nextRequestedRound(_round) -> _next, _requested {
                 let wordPos := shr(8, _round)

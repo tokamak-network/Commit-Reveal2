@@ -64,6 +64,7 @@ contract CommitReveal2Storage {
     error OnChainCvNotEqualDoubleHashS(); // 0xa39ecadf
     error L1FeeEstimationFailed(); // 0xb75f34bf
     error TooLate(); // 0xecdd1c29
+    error NotProposed(); // 0xf2a87d5e
     error RoundNotInProgress(); // 0x6b4bc078
     error RoundAlreadyProcessed(); // 0x5cafea8c
     error NonExistentRound(); // 0x905deff6
@@ -85,6 +86,7 @@ contract CommitReveal2Storage {
     error SRequested(); // 0x53489cf9
     error AlreadyRefunded(); // 0xa85e6f1a
     error AlreadyCompleted(); // 0x195332a5
+    error NotEnoughGasToCallback(); // 0xc5b54909
     error AlreadySubmittedMerkleRoot(); // 0x1c044d8b
     error AlreadyRequestedToSubmitS(); // 0x0d934196
     error AlreadyRequestedToSubmitCv(); // 0x899a05f2
@@ -97,6 +99,7 @@ contract CommitReveal2Storage {
     error AllSubmittedCo(); // 0x1c7f7cc9
     error ZeroLength(); // 0xbf557497
     error LeaderLowDeposit(); // 0xc0013a5a
+    error NotEnoughGasToRevert(); // 0xcea2d914
     error CoNotRequested(); // 0x11974969
     error SNotRequested(); // 0x2d37f8d3
     error AlreadySubmittedS();
@@ -105,8 +108,10 @@ contract CommitReveal2Storage {
     error RevealNotInDescendingOrder(); // 0x24f1948e
     error CvNotSubmitted(); // 0x03798920
     error CvNotEqualHashCo(); // 0x67b3c693
-    error NoMoreOperatorsToSubmitS(); // 0x3fdba6b8
-    error AlreadyHaveAllSecrets(); // 0x5a49519d
+    error CvAlreadySubmitted(); // 0x9ed7466a
+    error NotCompletedStatus(); // 0x644a8033
+    error InvalidLength(); // 0x947d5a84
+    error AllSecretsReceivedOffchain(); // 0xbce4a361
 
     // * Events
     event Status(uint256 curRound, uint256 curTrialNum, uint256 curState); // 0xd42cacab4700e77b08a2d33cc97d95a9cb985cdfca3a206cfa4990da46dd1813
@@ -120,6 +125,7 @@ contract CommitReveal2Storage {
     event SSubmitted(uint256 round, uint256 trialNum, bytes32 s, uint256 index); // 0xfa070a58e2c77080acd5c2b1819669eb194bbeeca6f680a31a2076510be5a7b1
 
     event EconomicParametersSet(uint256 activationThreshold, uint256 flatFee); // 0x08f0774e7eb69e2d6a7cf2192cbf9c6f519a40bcfa16ff60d3f18496585e46dc
+    event EconomicParametersProposed(uint256 activationThreshold, uint256 flatFee, uint256 effectiveTimestamp); // 0xdcf23dfc5bc14859d1943fd156abd0fb732347e70c61c56215bbd728307234e2
     event PeriodsSet(
         uint256 offChainSubmissionPeriod,
         uint256 requestOrSubmitOrFailDecisionPeriod,
@@ -132,7 +138,7 @@ contract CommitReveal2Storage {
         uint128 gasUsedMerkleRootSubAndGenRandNumB,
         uint256 maxCallbackGasLimit,
         uint48 getL1UpperBoundGasUsedWhenCalldataSize4,
-        uint48 failToSubmitCvOrSubmitMerkleRootGasUsed,
+        uint48 failToRequestCvOrSubmitMerkleRootGasUsed,
         uint48 failToSubmitMerkleRootAfterDisputeGasUsed,
         uint48 failToRequestSOrGenerateRandomNumberGasUsed,
         uint48 failToSubmitSGasUsed,
@@ -143,9 +149,30 @@ contract CommitReveal2Storage {
         uint32 perOperatorIncreaseGasUsedB,
         uint32 perAdditionalDidntSubmitGasUsedA,
         uint32 perAdditionalDidntSubmitGasUsedB,
-        uint32 perRequestedIncreaseGasUsed
-    ); // 0x8d09171105499771f96d6d39dcdda061a70fd18e5eafd65881c2158c55f94e1d
-
+        uint32 perRequestedIncreaseGasUsed,
+        uint256 maxGasPrice
+    ); // 0xeb624bc1c126e8a8e5b3b848dc36ed397e8f707ceba869c4cca058dbe4abf5d7
+    event GasParametersProposed(
+        uint128 gasUsedMerkleRootSubAndGenRandNumA,
+        uint128 gasUsedMerkleRootSubAndGenRandNumB,
+        uint256 maxCallbackGasLimit,
+        uint48 getL1UpperBoundGasUsedWhenCalldataSize4,
+        uint48 failToRequestCvOrSubmitMerkleRootGasUsed,
+        uint48 failToSubmitMerkleRootAfterDisputeGasUsed,
+        uint48 failToRequestSOrGenerateRandomNumberGasUsed,
+        uint48 failToSubmitSGasUsed,
+        uint32 failToSubmitCoGasUsedBaseA,
+        uint32 failToSubmitCvGasUsedBaseA,
+        uint32 failToSubmitGasUsedBaseB,
+        uint32 perOperatorIncreaseGasUsedA,
+        uint32 perOperatorIncreaseGasUsedB,
+        uint32 perAdditionalDidntSubmitGasUsedA,
+        uint32 perAdditionalDidntSubmitGasUsedB,
+        uint32 perRequestedIncreaseGasUsed,
+        uint256 effectiveTimestamp,
+        uint256 maxGasPrice
+    );
+    // 0x3fdaf13122b997bf0388b0bf45df533647a2ff56c32aed869f0630ea422ce4a1
     // * State Variables
     // ** public
 
@@ -275,13 +302,12 @@ contract CommitReveal2Storage {
     uint256 internal constant MERKLEROOTSUB_CALLDATA_BYTES_SIZE = 36;
     uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_A = 96;
     uint256 internal constant GENRANDNUM_CALLDATA_BYTES_SIZE_B = 132;
-    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumA = 7900;
-    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumB = 91000 + 58131;
+    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumA = 7791;
+    uint128 internal s_gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead = 58263 + 88711 + 10000; // gasUsedMerkleRootSub + gasUsedGenRandNum + leaderOverhead
     uint256 internal constant GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK = 0xffffffffffffffffffffffffffffffff;
     uint256 internal s_maxCallbackGasLimit = 2500000;
     uint256 internal constant GAS_FOR_CALL_EXACT_CHECK = 5_000;
 
-    bytes32 internal constant MESSAGE_TYPEHASH = keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)");
     bytes32 internal constant MESSAGE_TYPEHASH_DIRECT =
         0x7c90823f4ccd06a00814473b1ad932d6313680c6d946963ecf1d30094346c24e; // keccak256("Message(uint256 round,uint256 trialNum,bytes32 cv)");
 
@@ -289,42 +315,57 @@ contract CommitReveal2Storage {
     uint256 internal constant FAIL_FUNCTIONS_CALLDATA_BYTES_SIZE = 4;
 
     uint48 internal s_getL1UpperBoundGasUsedWhenCalldataSize4 = 21833; // 21833 ~ 21934
-    uint48 internal s_failToSubmitCvOrSubmitMerkleRootGasUsed = 85386;
-    uint48 internal s_failToSubmitMerkleRootAfterDisputeGasUsed = 82746;
-    uint48 internal s_failToRequestSOrGenerateRandomNumberGasUsed = 86242;
-    uint48 internal s_failToSubmitSGasUsed = 122282;
+    uint48 internal s_failToRequestCvOrSubmitMerkleRootGasUsed = 85573;
+    uint48 internal s_failToSubmitMerkleRootAfterDisputeGasUsed = 82889;
+    uint48 internal s_failToRequestSOrGenerateRandomNumberGasUsed = 86275;
+    uint48 internal s_failToSubmitSGasUsed = 122304;
     uint256 internal constant FAILTOSUBMIT_MASK = 0xffffffffffff;
 
     /**
      * @dev  FailToSubmitCo GasUsed
      * if (requestedToSubmitLength == operatorsLength):
-     * gasUsage = 95,000 + 500 × operatorsLength + 15,000 × (didntSubmitLength - 1)
+     * gasUsage = 90,045 + 90 × operatorsLength + 14,886 × (didntSubmitLength - 1)
      * else:
-     * gasUsage = 110,000 + 200 × operatorsLength + 500 × requestedToSubmitLength +
-     *            24,000 × (didntSubmitLength - 1)
+     * gasUsage = 111,429 + 90 × operatorsLength + 2,500 × requestedToSubmitLength +
+     *            17,000 × (didntSubmitLength - 1)
      */
-    uint32 internal s_failToSubmitCoGasUsedBaseA = 95000;
+    uint32 internal s_failToSubmitCoGasUsedBaseA = 90045;
 
     /**
      * @dev  FailToSubmitCv GasUsed
      * if (requestedToSubmitLength == operatorsLength):
-     * gasUsage = 95,500 + 500 × operatorsLength + 15,000 × (didntSubmitLength - 1)
+     * gasUsage = 89,745 + 90 × operatorsLength + 14,886 × (didntSubmitLength - 1)
      * else:
-     * gasUsage = 110,000 + 200 × operatorsLength + 500 × requestedToSubmitLength +
-     *            24,000 × (didntSubmitLength - 1)
+     * gasUsage = 111,429 + 90 × operatorsLength + 2,500 × requestedToSubmitLength +
+     *            17,000 × (didntSubmitLength - 1)
      */
-    uint32 internal s_failToSubmitCvGasUsedBaseA = 95500; // shr(32, )
+    uint32 internal s_failToSubmitCvGasUsedBaseA = 89745; // shr(32, )
 
-    uint32 internal s_failToSubmitGasUsedBaseB = 110000; // shr(64, )
-    uint32 internal s_perOperatorIncreaseGasUsedA = 500; // shr(96, )
-    uint32 internal s_perOperatorIncreaseGasUsedB = 200; // shr(128, )
-    uint32 internal s_perAdditionalDidntSubmitGasUsedA = 15000; // shr(160, )
-    uint32 internal s_perAdditionalDidntSubmitGasUsedB = 24000; // shr(192, )
-    uint32 internal s_perRequestedIncreaseGasUsed = 500; // shr(224, )
+    uint32 internal s_failToSubmitGasUsedBaseB = 111429; // shr(64, )
+    uint32 internal s_perOperatorIncreaseGasUsedA = 90; // shr(96, )
+    uint32 internal s_perOperatorIncreaseGasUsedB = 90; // shr(128, )
+    uint32 internal s_perAdditionalDidntSubmitGasUsedA = 14886; // shr(160, )
+    uint32 internal s_perAdditionalDidntSubmitGasUsedB = 17000; // shr(192, )
+    uint32 internal s_perRequestedIncreaseGasUsed = 2500; // shr(224, )
     uint256 internal constant DYNAMICFAILTOSUBMIT_MASK = 0xffffffff;
 
     // *** functions calldata size;
-    uint256 internal constant NO_CALLDATA_SIZE = 4;
+    uint256 internal constant FAILTOREQUESTSUBMITCV_OR_SUBMITMEKRLEROOT_OFFSET = 48;
+    uint256 internal constant FAILTOSUBMITMERKLEROOTAFTERDISPUTE_OFFSET = 96;
+    uint256 internal constant FAILTOREQUESTS_OR_GENERATERANDOMNUMBER_OFFSET = 144;
+    uint256 internal constant FAILTOSUBMITS_OFFSET = 192;
+
+    uint256 internal constant FAILTOSUBMITCVGASUSEDBASEA_OFFSET = 32;
+    uint256 internal constant FAILTOSUBMITGASUSEDBASEB_OFFSET = 64;
+    uint256 internal constant PEROPERATORINCREASEGASUSEDA_OFFSET = 96;
+    uint256 internal constant PEROPERATORINCREASEGASUSEDB_OFFSET = 128;
+    uint256 internal constant PERADDITIONALDIDNTSUBMITGASUSEDA_OFFSET = 160;
+    uint256 internal constant PERADDITIONALDIDNTSUBMITGASUSEDB_OFFSET = 192;
+    uint256 internal constant PERREQUESTEDINCREASEGASUSED_OFFSET = 224;
+
+    uint256 internal constant SECP256K1_CURVE_ORDER = 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0;
+
+    uint256 public s_maxGasPrice;
 
     function getPeriods()
         external
@@ -433,5 +474,47 @@ contract CommitReveal2Storage {
         requestedToSubmitCvTimestamp = s_requestedToSubmitCvTimestamp[round][trialNum];
         requestedToSubmitCoTimestamp = s_requestedToSubmitCoTimestamp[round][trialNum];
         requestedToSubmitSTimestamp = s_requestedToSubmitSTimestamp[round][trialNum];
+    }
+
+    function getGasParameters()
+        external
+        view
+        returns (
+            uint128,
+            uint128,
+            uint256,
+            uint48,
+            uint48,
+            uint48,
+            uint48,
+            uint48,
+            uint32,
+            uint32,
+            uint32,
+            uint32,
+            uint32,
+            uint32,
+            uint32,
+            uint32
+        )
+    {
+        return (
+            s_gasUsedMerkleRootSubAndGenRandNumA,
+            s_gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead,
+            s_maxCallbackGasLimit,
+            s_getL1UpperBoundGasUsedWhenCalldataSize4,
+            s_failToRequestCvOrSubmitMerkleRootGasUsed,
+            s_failToSubmitMerkleRootAfterDisputeGasUsed,
+            s_failToRequestSOrGenerateRandomNumberGasUsed,
+            s_failToSubmitSGasUsed,
+            s_failToSubmitCoGasUsedBaseA,
+            s_failToSubmitCvGasUsedBaseA,
+            s_failToSubmitGasUsedBaseB,
+            s_perOperatorIncreaseGasUsedA,
+            s_perOperatorIncreaseGasUsedB,
+            s_perAdditionalDidntSubmitGasUsedA,
+            s_perAdditionalDidntSubmitGasUsedB,
+            s_perRequestedIncreaseGasUsed
+        );
     }
 }

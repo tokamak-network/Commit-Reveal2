@@ -33,7 +33,7 @@ contract ConsumerExample is ConsumerBase {
     constructor(address coordinator) ConsumerBase(coordinator) {}
 
     function requestRandomNumber() external payable {
-        (uint256 requestId, uint256 requestFee) = _requestRandomNumber(CALLBACK_GAS_LIMIT);
+        (uint256 requestId, uint256 requestFee) = _requestRandomNumber(CALLBACK_GAS_LIMIT, msg.value);
         s_requesterRequestIds[msg.sender].push(requestId);
         s_requestInfos[requestId] = RequestInfo(msg.sender, requestFee);
     }
@@ -48,7 +48,7 @@ contract ConsumerExample is ConsumerBase {
     }
 
     function getCommitReveal2Address() external view returns (address) {
-        return address(s_commitreveal2);
+        return address(i_commitreveal2);
     }
 
     function withdraw() external {

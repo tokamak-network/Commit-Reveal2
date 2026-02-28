@@ -2,11 +2,16 @@
 pragma solidity ^0.8.30;
 
 import {FailLogics} from "./FailLogics.sol";
+import {BLS} from "./libraries/BLS.sol";
 
-contract CommitReveal2 is FailLogics {
+contract CommitReveal2BLS is FailLogics {
     address public governanceMultisig;
+    BLS.G1Point public s_aggregatedBLSPubKey;
+    mapping(address => BLS.G1Point) public s_operatorBLSPubKeys;
 
     error UnauthorizedGovernance();
+    error BLSVerificationFailed();
+    error InvalidProofOfPossession();
 
     modifier onlyGovernance() {
         if (msg.sender != governanceMultisig) revert UnauthorizedGovernance();
@@ -282,27 +287,33 @@ contract CommitReveal2 is FailLogics {
     {
         assembly ("memory-safe") {
             let gasUsedMerkleRootSubAndGenRandNum := sload(s_gasUsedMerkleRootSubAndGenRandNumA.slot)
-            requestFee :=
-                add(
-                    mul(
-                        gasPrice,
+            requestFee := add(
+                mul(
+                    gasPrice,
+                    add(
+                        callbackGasLimit,
                         add(
-                            callbackGasLimit,
-                            add(
-                                mul(
-                                    and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
-                                    numOfOperators
-                                ),
-                                shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
-                            )
+                            mul(
+                                and(gasUsedMerkleRootSubAndGenRandNum, GASUSED_MERKLEROOTSUB_GENRANDNUM_MASK),
+                                numOfOperators
+                            ),
+                            shr(128, gasUsedMerkleRootSubAndGenRandNum) // gasUsedMerkleRootSubAndGenRandNumBWithLeaderOverhead
                         )
-                    ),
-                    sload(s_flatFee.slot)
-                )
+                    )
+                ),
+                sload(s_flatFee.slot)
+            )
         }
     }
 
-    function submitMerkleRoot(bytes32 merkleRoot) external inProgress onlyOwner {
+    function submitMerkleRoot(bytes32 merkleRoot, BLS.G2Point calldata blsSignature) external inProgress onlyOwner {
+        BLS.G1Point[] memory g1Points = new BLS.G1Point[](2);
+        g1Points[0] = NEGATED_G1_GENERATOR();
+        g1Points[1] = s_aggregatedBLSPubKey;
+        BLS.G2Point[] memory g2Points = new BLS.G2Point[](2);
+        g2Points[0] = blsSignature;
+        g2Points[1] = BLS.toG2(BLS.Fp2(0, 0, 0, merkleRoot));
+        require(BLS.pairing(g1Points, g2Points), BLSVerificationFailed());
         assembly ("memory-safe") {
             let m := mload(0x40)
             // * get trialNum
@@ -330,17 +341,13 @@ contract CommitReveal2 is FailLogics {
         }
     }
 
-    function generateRandomNumber(
-        SecretAndSigRS[] calldata secretSigRSs,
-        uint256, // packedVs
-        uint256 packedRevealOrders
-    ) external inProgress {
+    function generateRandomNumber(bytes32[] calldata ss, uint256 packedRevealOrders) external inProgress {
         bytes32 domainSeparator = _domainSeparatorV4();
         assembly ("memory-safe") {
             let m := mload(0x40)
             let activatedOperatorsLength := sload(s_activatedOperators.slot)
             // ** check if all secrets are submitted
-            if iszero(eq(activatedOperatorsLength, secretSigRSs.length)) {
+            if iszero(eq(activatedOperatorsLength, ss.length)) {
                 mstore(0, 0xe0767fa4) // selector for InvalidSecretLength()
                 revert(0x1c, 0x04)
             }
@@ -354,7 +361,7 @@ contract CommitReveal2 is FailLogics {
             // ** get cos and cvs
             for { let i } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
                 let secretMemP := add(secrets, i)
-                mstore(secretMemP, calldataload(add(secretSigRSs.offset, mul(i, 3)))) // secret
+                mstore(secretMemP, calldataload(add(ss.offset, i))) // secret
                 let cosMemP := add(cos, i)
                 mstore(add(cosMemP, 1), shr(5, i))
                 mstore(cosMemP, keccak256(secretMemP, 0x20))
@@ -366,9 +373,9 @@ contract CommitReveal2 is FailLogics {
             mstore(0x00, keccak256(cos, activatedOperatorsLengthInBytes)) // rv
             mstore(0x20, mload(add(cvs, shl(5, index))))
             let before := keccak256(0x00, 0x40)
-            // revealOrdersOffset = 0x44
+            // revealOrdersOffset = 0x24
             for { let i := 1 } lt(i, activatedOperatorsLength) { i := add(i, 1) } {
-                index := and(calldataload(sub(0x44, i)), 0xff)
+                index := and(calldataload(sub(0x24, i)), 0xff)
                 revealBitmap := or(revealBitmap, shl(index, 1))
                 mstore(0x20, mload(add(cvs, shl(5, index))))
                 let after := keccak256(0x00, 0x40)
@@ -425,39 +432,6 @@ contract CommitReveal2 is FailLogics {
                 mstore(0, 0x624dc351) // selector for MerkleVerificationFailed()
                 revert(0x1c, 0x04)
             }
-            // ** verify signatures
-            mstore(fmp, MESSAGE_TYPEHASH_DIRECT) // typehash, overwrite the previous value, which is not used anymore
-            mstore(add(fmp, 0x20), round)
-            mstore(add(fmp, 0x40), trialNum)
-            mstore(add(fmp, 0x80), hex"1901") // prefix and version
-            mstore(add(fmp, 0x82), domainSeparator)
-            for { let i } lt(i, activatedOperatorsLengthInBytes) { i := add(i, 0x20) } {
-                // signature malleability prevention
-                let rSOffset := add(secretSigRSs.offset, add(mul(i, 3), 0x20))
-                let s := calldataload(add(rSOffset, 0x20))
-                if gt(s, SECP256K1_CURVE_ORDER) {
-                    mstore(0, 0xbf4bf5b8) // selector for InvalidSignatureS()
-                    revert(0x1c, 0x04)
-                }
-                mstore(add(fmp, 0x60), mload(add(cvs, i))) // cv
-                mstore(add(fmp, 0xa2), keccak256(fmp, 0x80)) // structHash
-                mstore(0x00, keccak256(add(fmp, 0x80), 0x42)) // digest hash
-                mstore(0x20, and(calldataload(sub(0x24, shr(5, i))), 0xff)) // v, 0x24: packedVsOffset
-                mstore(0x40, calldataload(rSOffset)) // r
-                mstore(0x60, s) // s
-                let operatorAddress := mload(staticcall(gas(), 1, 0x00, 0x80, 0x01, 0x20))
-                // `returndatasize()` will be `0x20` upon success, and `0x00` otherwise.
-                if iszero(returndatasize()) {
-                    mstore(0x00, 0x8baa579f) // selector for InvalidSignature()
-                    revert(0x1c, 0x04)
-                }
-                mstore(0x00, operatorAddress)
-                mstore(0x20, s_activatedOperatorIndex1Based.slot)
-                if iszero(eq(sload(keccak256(0x00, 0x40)), add(shr(5, i), 1))) {
-                    mstore(0x00, 0x1b256530) // selector for NotActivatedOperator()
-                    revert(0x1c, 0x04)
-                }
-            }
 
             // ** create random number
             let randomNumber := keccak256(secrets, activatedOperatorsLengthInBytes)
@@ -477,28 +451,26 @@ contract CommitReveal2 is FailLogics {
                 // https://github.com/Uniswap/v4-core/blob/59d3ecf53afa9264a16bba0e38f4c5d2231f80bc/src/libraries/BitMath.sol#L31
                 function leastSignificantBit(x) -> r {
                     x := and(x, sub(0, x))
-                    r :=
-                        shl(
-                            5,
-                            shr(
-                                252,
+                    r := shl(
+                        5,
+                        shr(
+                            252,
+                            shl(
                                 shl(
-                                    shl(
-                                        2,
-                                        shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
-                                    ),
-                                    0x8040405543005266443200005020610674053026020000107506200176117077
-                                )
+                                    2,
+                                    shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
+                                ),
+                                0x8040405543005266443200005020610674053026020000107506200176117077
                             )
                         )
-                    r :=
-                        or(
-                            r,
-                            byte(
-                                and(div(0xd76453e0, shr(r, x)), 0x1f),
-                                0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
-                            )
+                    )
+                    r := or(
+                        r,
+                        byte(
+                            and(div(0xd76453e0, shr(r, x)), 0x1f),
+                            0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
                         )
+                    )
                 }
                 function nextRequestedRound(_round) -> _next, _requested {
                     let wordPos := shr(8, _round)
@@ -546,7 +518,7 @@ contract CommitReveal2 is FailLogics {
                 sload(
                     add(
                         keccak256(0x00, 0x20), // s_activatedOperators first data slot
-                        and(calldataload(sub(0x44, sub(activatedOperatorsLength, 1))), 0xff) // last revealer index, 0x44: revealOrdersOffset
+                        and(calldataload(sub(0x24, sub(activatedOperatorsLength, 1))), 0xff) // last revealer index, 0x24: revealOrdersOffset
                     )
                 )
             ) // last revealer address
@@ -593,7 +565,7 @@ contract CommitReveal2 is FailLogics {
                 // call(gas, addr, value, argsOffset,argsLength,retOffset,retLength)
                 pop(call(callbackGasLimit, consumer, 0, 0x1c, 0x44, 0, 0))
             }
-            mstore(0x40, m) // Restore the free memory pointer
+            mstore(0x40, secrets) // Restore free memory pointer to secrets (cvs still needed for BLS verification)
             mstore(0x60, 0) // Restore the zero slot.
         }
     }
@@ -685,25 +657,26 @@ contract CommitReveal2 is FailLogics {
             // https://github.com/Uniswap/v4-core/blob/59d3ecf53afa9264a16bba0e38f4c5d2231f80bc/src/libraries/BitMath.sol#L31
             function leastSignificantBit(x) -> r {
                 x := and(x, sub(0, x))
-                r :=
-                    shl(
-                        5,
-                        shr(
-                            252,
+                r := shl(
+                    5,
+                    shr(
+                        252,
+                        shl(
                             shl(
-                                shl(2, shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))),
-                                0x8040405543005266443200005020610674053026020000107506200176117077
-                            )
+                                2,
+                                shr(250, mul(x, 0xb6db6db6ddddddddd34d34d349249249210842108c6318c639ce739cffffffff))
+                            ),
+                            0x8040405543005266443200005020610674053026020000107506200176117077
                         )
                     )
-                r :=
-                    or(
-                        r,
-                        byte(
-                            and(div(0xd76453e0, shr(r, x)), 0x1f),
-                            0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
-                        )
+                )
+                r := or(
+                    r,
+                    byte(
+                        and(div(0xd76453e0, shr(r, x)), 0x1f),
+                        0x001f0d1e100c1d070f090b19131c1706010e11080a1a141802121b1503160405
                     )
+                )
             }
             function nextRequestedRound(_round) -> _next, _requested {
                 let wordPos := shr(8, _round)
@@ -758,5 +731,81 @@ contract CommitReveal2 is FailLogics {
             }
             mstore(0x40, m) // Restore the free memory pointer
         }
+    }
+
+    function depositAndActivate(BLS.G1Point memory pubKey, BLS.G2Point memory pop) external payable notInProgress {
+        // Verify Proof of Possession: pop = BLSSign(sk, H(msg.sender))
+        // This prevents rogue-key attacks by proving the caller knows the secret key for pubKey
+        _verifyProofOfPossession(pubKey, pop);
+
+        assembly ("memory-safe") {
+            mstore(0x00, caller())
+            mstore(0x20, s_depositAmount.slot)
+            let depositAmountSlot := keccak256(0x00, 0x40)
+            let updatedDepositAmount := add(sload(depositAmountSlot), callvalue())
+            if lt(updatedDepositAmount, sload(s_activationThreshold.slot)) {
+                mstore(0x00, 0x5af30906) // `LessThanActivationThreshold()`.
+                revert(0x1c, 0x04)
+            }
+            sstore(depositAmountSlot, updatedDepositAmount)
+        }
+        // Sum pubkey
+        s_aggregatedBLSPubKey = BLS.add(s_aggregatedBLSPubKey, pubKey);
+        s_operatorBLSPubKeys[msg.sender] = pubKey;
+        _activate();
+    }
+
+    /// @dev Verifies that the caller knows the secret key for the given BLS public key.
+    /// PoP = BLSSign(sk, H_to_G2(abi.encodePacked(msg.sender)))
+    /// Verification: e(-G1, pop) · e(PK, H(msg.sender)) == 1
+    function _verifyProofOfPossession(BLS.G1Point memory pubKey, BLS.G2Point memory pop) internal view {
+        BLS.G2Point memory messagePoint = BLS.hashToG2(abi.encodePacked(msg.sender));
+        BLS.G1Point[] memory g1Points = new BLS.G1Point[](2);
+        BLS.G2Point[] memory g2Points = new BLS.G2Point[](2);
+        g1Points[0] = NEGATED_G1_GENERATOR();
+        g1Points[1] = pubKey;
+        g2Points[0] = pop;
+        g2Points[1] = messagePoint;
+        if (!BLS.pairing(g1Points, g2Points)) {
+            revert InvalidProofOfPossession();
+        }
+    }
+
+    function _deactivate(uint256 activatedOperatorIndex, address operator) internal override {
+        // Subtract operator's pubkey from aggregated pubkey
+        s_aggregatedBLSPubKey = BLS.sub(s_aggregatedBLSPubKey, s_operatorBLSPubKeys[operator]);
+        delete s_operatorBLSPubKeys[operator];
+
+        assembly ("memory-safe") {
+            mstore(0x00, s_activatedOperators.slot)
+            let firstActivatedOperatorSlot := keccak256(0x00, 0x20)
+            let lastOperatorIndex := sub(sload(s_activatedOperators.slot), 1)
+            let lastOperatorAddress := sload(add(firstActivatedOperatorSlot, lastOperatorIndex))
+            mstore(0x20, s_activatedOperatorIndex1Based.slot)
+            // swap the operator to remove with the last operator in the array
+            if iszero(eq(lastOperatorAddress, operator)) {
+                sstore(add(firstActivatedOperatorSlot, activatedOperatorIndex), lastOperatorAddress)
+                mstore(0x00, lastOperatorAddress)
+                sstore(keccak256(0x00, 0x40), add(activatedOperatorIndex, 1))
+            }
+            // pop the last operator by setting the length to the last index
+            sstore(s_activatedOperators.slot, lastOperatorIndex)
+            mstore(0x00, operator)
+            sstore(keccak256(0x00, 0x40), 0)
+            log1(0x00, 0x20, 0x5d10eb48d8c00fb4cc9120533a99e2eac5eb9d0f8ec06216b2e4d5b1ff175a4d) // `DeActivated(address operator)`.
+        }
+    }
+
+    function NEGATED_G1_GENERATOR() internal pure returns (BLS.G1Point memory) {
+        return BLS.G1Point(
+            _u(31827880280837800241567138048534752271),
+            _u(88385725958748408079899006800036250932223001591707578097800747617502997169851),
+            _u(22997279242622214937712647648895181298),
+            _u(46816884707101390882112958134453447585552332943769894357249934112654335001290)
+        );
+    }
+
+    function _u(uint256 x) internal pure returns (bytes32) {
+        return bytes32(x);
     }
 }
