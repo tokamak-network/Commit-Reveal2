@@ -19,6 +19,8 @@ contract LeaderSelection is FailLogics {
     error RevealPhaseOver();
     error AlreadyRevealed();
     error NotCommitted();
+    error LeaderSelectionNotInitiated(); // 0x5251b3cf
+    error NoRevealsForLeaderSelection(); // 0x7ffd6dc1
 
     constructor(
         uint256 commitDurationForLeaderSelection_,

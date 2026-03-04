@@ -654,6 +654,8 @@ contract CommitReveal2WithLeaderSelection is LeaderSelection {
     }
 
     function resume() external payable {
+        if (s_cvsForLeaderSelection.length == 0) revert LeaderSelectionNotInitiated();
+        if (s_revealForLeaderSelection.length == 0) revert NoRevealsForLeaderSelection();
         if (block.timestamp < s_leaderSelectionTime) revert CannotResumeBeforeLeaderSelectionTime();
         uint256 activatedOperatorsLength = s_activatedOperators.length;
         uint256 revealLength = s_revealForLeaderSelection.length;
